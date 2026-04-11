@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lançamento de Vendas — Museu de Cera RJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:   #127369;
+  --green2:  #10403B;
+  --green-l: #e8f0ef;
+  --green-m: rgba(18,115,105,0.12);
+  --bg:      #f4f5f5;
+  --white:   #FFFFFF;
+  --text:    #10403B;
+  --muted:   #4C5958;
+  --muted2:  #8AA6A3;
+  --border:  #BFBFBF;
+  --danger:  #c0392b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  font-size: 15px;
+}
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 16px 80px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.header-text {}
+.header-date {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.header-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+.header-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.header-avatar {
+  width: 40px; height: 40px;
+  background: var(--green);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.header-avatar svg { width: 20px; height: 20px; }
+
+/* Card */
+.card {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: visible;
+  padding: 0;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+
+.card-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 20px 24px 8px;
+}
+
+/* Field row */
+.field {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  min-height: 60px;
+  position: relative;
+  overflow: visible;
+}
+.field:last-child { border-bottom: none; }
+
+.field-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--green-l);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.field-icon svg { width: 16px; height: 16px; color: var(--green); }
+
+.field-body { flex: 1; min-width: 0; }
+.field-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.field-ctrl {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  width: 100%;
+}
+
+/* Inputs */
+input[type="date"],
+input[type="number"],
+input[type="text"] {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  width: 100%;
+  padding: 0;
+}
+input::placeholder { color: var(--muted2); font-weight: 400; }
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.4; cursor: pointer;
+}
+
+/* Vendedor row */
+.vwrap { display: flex; align-items: center; gap: 8px; }
+.vwrap select {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.vwrap select option { background: #fff; color: var(--text); }
+
+.btn-plus {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--green);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.btn-plus:hover { background: var(--green2); }
+.btn-plus svg { width: 14px; height: 14px; color: white; }
+
+/* Custom dropdown produto */
+.cdd { position: relative; width: 100%; }
+.cdd-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  background: none; border: none; outline: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px; font-weight: 500;
+  color: var(--text); text-align: left;
+  cursor: pointer; width: 100%; padding: 0; gap: 8px;
+}
+.cdd-trigger.ph { color: var(--muted2); font-weight: 400; }
+.cdd-trigger svg { flex-shrink: 0; opacity: 0.4; transition: transform 0.2s; }
+.cdd.open .cdd-trigger svg { transform: rotate(180deg); opacity: 0.7; }
+
+.cdd-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: -20px;
+  width: calc(100% + 40px);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.14);
+  z-index: 500;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.cdd.open .cdd-panel { display: block; }
+
+.cdd-group {
+  padding: 10px 16px 4px;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--green);
+}
+.cdd-opt {
+  padding: 10px 16px;
+  font-size: 13px; font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.cdd-opt:hover { background: var(--green-l); color: var(--text); }
+.cdd-opt.sel { color: var(--green); font-weight: 600; }
+.cdd-panel::-webkit-scrollbar { width: 4px; }
+.cdd-panel::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 4px; }
+
+/* Badge produto selecionado */
+.prod-badge {
+  font-size: 13px; font-weight: 500;
+  color: var(--green);
+  line-height: 1.4;
+}
+
+/* Valores grid */
+.val-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--green-l);
+}
+.val-item {}
+.val-lbl { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+.val-num { font-size: 17px; font-weight: 600; color: var(--text); }
+.val-num.hi { color: var(--green); }
+
+/* Total */
+.total-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--green);
+  border-radius: 0 0 20px 20px;
+}
+.total-lbl { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.75); letter-spacing: 0.06em; text-transform: uppercase; }
+.total-num { font-size: 24px; font-weight: 600; color: white; }
+
+/* Pills de categoria */
+.cat-pills {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 4px 0;
+}
+.cat-pill input { display: none; }
+.cat-pill span {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.cat-pill input:checked + span {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.cat-pill:hover span { border-color: var(--green); color: var(--green); }
+
+/* Radio pills */
+.radio-group { display: flex; gap: 8px; }
+.rpill input { display: none; }
+.rpill span {
+  display: inline-block;
+  padding: 6px 18px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.rpill input:checked + span {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+/* Divider */
+.sec-sep {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 24px;
+  margin: 4px 0;
+}
+.sec-sep-line { flex: 1; height: 1px; background: var(--border); }
+.sec-sep-txt { font-size: 10px; font-weight: 600; color: var(--muted2); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* Botões */
+.btn-row { display: flex; gap: 10px; margin-top: 20px; }
+.btn-primary {
+  flex: 1; padding: 15px;
+  background: var(--green); color: white;
+  border: none; border-radius: 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 6px 20px rgba(29,201,148,0.35);
+}
+.btn-primary:hover { background: var(--green2); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-ghost {
+  padding: 15px 22px;
+  background: var(--white); color: var(--muted);
+  border: 1.5px solid var(--border); border-radius: 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px; font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-ghost:hover { border-color: var(--muted2); color: var(--text); }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(10,20,35,0.55);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  width: 100%; max-width: 400px;
+  padding-bottom: 24px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  animation: fadeup 0.22s ease;
+  position: relative;
+  z-index: 1001;
+}
+@keyframes fadeup { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-handle { display: none; }
+.modal-title {
+  font-size: 15px; font-weight: 600;
+  color: var(--text);
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+}
+@media (max-width: 480px) {
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal { border-radius: 20px 20px 0 0; max-width: 100%; }
+  .modal-handle { display: block; }
+}
+.modal-body { padding: 20px 24px 0; }
+.modal-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.modal-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px; font-weight: 500; color: var(--text);
+  outline: none; transition: border-color 0.15s;
+}
+.modal-input:focus { border-color: var(--green); }
+.modal-input::placeholder { color: var(--muted2); font-weight: 400; }
+.btn-add {
+  padding: 12px 16px;
+  background: var(--green); color: white;
+  border: none; border-radius: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-add:hover { background: var(--green2); }
+.v-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+.v-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px;
+  background: var(--bg);
+  border-radius: 10px;
+  font-size: 14px; font-weight: 500; color: var(--text);
+}
+.v-del {
+  background: none; border: none; color: var(--muted2);
+  font-size: 18px; cursor: pointer; padding: 0 4px;
+  border-radius: 4px; line-height: 1;
+  transition: color 0.15s;
+}
+.v-del:hover { color: var(--danger); }
+.v-empty { text-align: center; font-size: 13px; color: var(--muted2); padding: 14px 0; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--green); color: white;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 12px 24px; border-radius: 12px;
+  opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 400;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(29,201,148,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Mobile */
+@media (max-width: 480px) {
+  .page { padding: 20px 12px 80px; }
+  .field { padding: 12px 16px; }
+  .val-grid { padding: 12px 16px; }
+  .total-row { padding: 14px 16px; }
+  .btn-row { flex-direction: column-reverse; }
+  .card-section-title { padding: 16px 16px 6px; }
+  .sec-sep { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-text">
+      <div class="header-date" id="h-date"></div>
+      <div class="header-title">Registrar Venda</div>
+      <div class="header-sub">Museu de Cera RJ</div>
+    </div>
+    <div class="header-avatar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Card PAX do dia — topo -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-section-title">PAX do dia</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
+      <div style="padding:12px 20px;border-right:1px solid var(--border)">
+        <div class="val-lbl" style="margin-bottom:4px">Aquário</div>
+        <input type="number" id="f-pax" placeholder="350" min="0"
+          style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
+      </div>
+      <div style="padding:12px 20px;border-right:1px solid var(--border)">
+        <div class="val-lbl" style="margin-bottom:4px">GEX</div>
+        <input type="number" id="f-pax-gex" placeholder="120" min="0"
+          style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
+      </div>
+      <div style="padding:12px 20px">
+        <div class="val-lbl" style="margin-bottom:4px">MAR</div>
+        <input type="number" id="f-pax-mar" placeholder="80" min="0"
+          style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+    <div class="card-section-title">Dados da venda</div>
+
+    <!-- DATA -->
+    <div class="field">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Data</div>
+        <div class="field-ctrl"><input type="date" id="f-data"></div>
+      </div>
+    </div>
+
+    <!-- VENDEDOR -->
+    <div class="field" style="flex-direction:column; align-items:stretch; padding:0;">
+      <div style="display:flex; align-items:center; padding:14px 24px; gap:12px; min-height:60px;">
+        <div class="field-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="field-body">
+          <div class="field-lbl">Vendedor</div>
+          <div class="field-ctrl">
+            <div class="vwrap">
+              <select id="f-vendedor">
+                <option value="">— Selecione —</option>
+              </select>
+              <button class="btn-plus" id="btn-vend-open" type="button" onclick="togglePainelVend()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL INLINE DE VENDEDORES -->
+      <div id="painel-vend" style="display:none; border-top:1px solid var(--border); padding:16px 24px; background:var(--bg);">
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input id="m-nome" type="text" placeholder="Nome do vendedor"
+            style="flex:1; background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:500; color:var(--text); outline:none;"
+            onfocus="this.style.borderColor='var(--green)'"
+            onblur="this.style.borderColor='var(--border)'">
+          <button type="button" onclick="addVendedor()"
+            style="padding:10px 16px; background:var(--green); color:white; border:none; border-radius:12px; font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;">
+            Adicionar
+          </button>
+        </div>
+        <div id="v-list" style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto;">
+          <div style="text-align:center; font-size:13px; color:var(--muted2); padding:10px 0;">Nenhum vendedor cadastrado ainda</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIA -->
+    <div class="field">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Categoria</div>
+        <div class="field-ctrl">
+          <div class="cat-pills">
+            <label class="cat-pill"><input type="radio" name="cat" value="avulso" onchange="onCategoria()"><span>Avulso</span></label>
+            <label class="cat-pill"><input type="radio" name="cat" value="combo_duplo" onchange="onCategoria()"><span>Combo Duplo</span></label>
+            <label class="cat-pill"><input type="radio" name="cat" value="combo_triplo" onchange="onCategoria()"><span>Combo Triplo</span></label>
+            <label class="cat-pill"><input type="radio" name="cat" value="exp_completa" onchange="onCategoria()"><span>Exp. Completa</span></label>
+            <label class="cat-pill"><input type="radio" name="cat" value="complementos" onchange="onCategoria()"><span>Complementos</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUTO -->
+    <div class="field">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Produto · combo ou ingresso</div>
+        <div class="field-ctrl">
+          <div class="cdd" id="cdd">
+            <button type="button" class="cdd-trigger ph" id="cdd-btn">
+              <span id="cdd-lbl">— Selecione —</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
+            <div class="cdd-panel" id="cdd-panel"></div>
+            <input type="hidden" id="f-produto">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUTO SELECIONADO -->
+    <div class="field" id="row-badge" style="display:none">
+      <div class="field-icon" style="background:var(--green-m)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Selecionado</div>
+        <div class="prod-badge" id="badge"></div>
+      </div>
+    </div>
+
+    <!-- VALORES -->
+    <div class="val-grid" id="row-vals" style="display:none">
+      <div class="val-item">
+        <div class="val-lbl">Total combo</div>
+        <div class="val-num hi" id="v-unit">—</div>
+      </div>
+      <div class="val-item" id="vi-aqua" style="display:none">
+        <div class="val-lbl">Aquário</div>
+        <div class="val-num" id="v-aqua">—</div>
+      </div>
+      <div class="val-item" id="vi-museu" style="display:none">
+        <div class="val-lbl">Museu</div>
+        <div class="val-num" id="v-museu">—</div>
+      </div>
+      <div class="val-item" id="vi-gex" style="display:none">
+        <div class="val-lbl">GEX</div>
+        <div class="val-num" id="v-gex">—</div>
+      </div>
+      <div class="val-item" id="vi-mar" style="display:none">
+        <div class="val-lbl">MAR</div>
+        <div class="val-num" id="v-mar">—</div>
+      </div>
+    </div>
+
+    <!-- QUANTIDADE -->
+    <div class="field">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Quantidade</div>
+        <div class="field-ctrl"><input type="number" id="f-qtd" value="1" min="1" max="999" oninput="calcTotal()"></div>
+      </div>
+    </div>
+
+    <!-- CANAL -->
+    <div class="field">
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Canal de venda</div>
+        <div class="field-ctrl">
+          <div class="radio-group">
+            <label class="rpill"><input type="radio" name="canal" value="Bilheteria" checked><span>Bilheteria</span></label>
+            <label class="rpill"><input type="radio" name="canal" value="POS"><span>POS</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-row">
+      <div class="total-lbl">Total do bilhete</div>
+      <div class="total-num" id="v-total">R$ 0,00</div>
+    </div>
+
+  </div><!-- /card -->
+
+  <div class="btn-row">
+    <button class="btn-ghost" type="button" onclick="limpar()">Limpar</button>
+    <button class="btn-primary" type="button" onclick="salvar()">Registrar venda</button>
+  </div>
+
+  <div style="margin-top:12px;text-align:center">
+    <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--green);text-decoration:none;padding:8px 16px;border:1.5px solid var(--green);border-radius:20px;transition:all 0.15s" onmouseover="this.style.background='var(--green-l)'" onmouseout="this.style.background='transparent'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Ver Dashboard
+    </a>
+  </div>
+
+</div><!-- /page -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data ──
+const hoje = new Date();
+document.getElementById('f-data').value = hoje.toISOString().split('T')[0];
+const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+document.getElementById('h-date').textContent =
+  hoje.getDate() + ' de ' + meses[hoje.getMonth()] + ' de ' + hoje.getFullYear();
+
+// ── Formatação ──
+const fmt = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ── Tabela completa de preços por atração ──
+// Fonte: tabela oficial Museu de Cera RJ
+const PRECOS = {
+  // AVULSO
+  'MUSEU DE CERA - VISITANTES':   {aqua:0,   museu:50,  gex:0,   mar:0,   total:50},
+  'MUSEU DE CERA - INTEIRA':      {aqua:0,   museu:66,  gex:0,   mar:0,   total:66},
+  'MUSEU DE CERA - MEIA':         {aqua:0,   museu:33,  gex:0,   mar:0,   total:33},
+  'GEX - INTEIRA':                {aqua:0,   museu:0,   gex:50,  mar:0,   total:50},
+  'GEX - MEIA':                   {aqua:0,   museu:0,   gex:66,  mar:0,   total:66},
+  'GEX - COMPLEMENTO':            {aqua:0,   museu:0,   gex:45,  mar:0,   total:45},
+  'GEX - INFANTIL':               {aqua:0,   museu:0,   gex:33,  mar:0,   total:33},
+  'MAR DE ESPELHOS - VISITANTE':  {aqua:0,   museu:0,   gex:0,   mar:50,  total:50},
+  'MAR DE ESPELHOS - INTEIRA':    {aqua:0,   museu:0,   gex:0,   mar:66,  total:66},
+  'MAR DE ESPELHOS - MEIA':       {aqua:0,   museu:0,   gex:0,   mar:33,  total:33},
+  // COMBO DUPLO
+  'COMBO AQUA + MUSEU - INTEIRA':  {aqua:150, museu:66,  gex:0,   mar:0,   total:216},
+  'COMBO AQUA + MUSEU - MEIA':     {aqua:80,  museu:33,  gex:0,   mar:0,   total:113},
+  'COMBO AQUA + MUSEU - PROMO RJ': {aqua:99,  museu:66,  gex:0,   mar:0,   total:165},
+  'COMBO AQUA + MUSEU - INFANTIL': {aqua:70,  museu:33,  gex:0,   mar:0,   total:103},
+  'COMBO AQUA + GEX - INTEIRA':    {aqua:150, museu:0,   gex:66,  mar:0,   total:216},
+  'COMBO AQUA + GEX - MEIA':       {aqua:80,  museu:0,   gex:33,  mar:0,   total:113},
+  'COMBO AQUA + GEX - PROMO RJ':   {aqua:99,  museu:0,   gex:66,  mar:0,   total:165},
+  'COMBO AQUA + GEX - INFANTIL':   {aqua:70,  museu:0,   gex:33,  mar:0,   total:103},
+  'COMBO AQUA + MAR - INTEIRA':    {aqua:150, museu:0,   gex:0,   mar:66,  total:216},
+  'COMBO AQUA + MAR - MEIA':       {aqua:80,  museu:0,   gex:0,   mar:33,  total:113},
+  'COMBO AQUA + MAR - PROMO RJ':   {aqua:99,  museu:0,   gex:0,   mar:66,  total:165},
+  'COMBO AQUA + MAR - INFANTIL':   {aqua:70,  museu:0,   gex:0,   mar:33,  total:103},
+  // COMBO TRIPLO
+  'COMBO AQUA + MAR + MUSEU - INTEIRA':  {aqua:150, museu:40,  gex:0,   mar:40,  total:230},
+  'COMBO AQUA + MAR + MUSEU - MEIA':     {aqua:80,  museu:33,  gex:0,   mar:33,  total:146},
+  'COMBO AQUA + MAR + MUSEU - PROMO RJ': {aqua:99,  museu:40,  gex:0,   mar:40,  total:179},
+  'COMBO AQUA + MAR + MUSEU - INFANTIL': {aqua:70,  museu:33,  gex:0,   mar:33,  total:136},
+  'COMBO AQUA + MUSEU + GEX - INTEIRA':  {aqua:150, museu:40,  gex:40,  mar:0,   total:230},
+  'COMBO AQUA + MUSEU + GEX - MEIA':     {aqua:80,  museu:33,  gex:33,  mar:0,   total:146},
+  'COMBO AQUA + MUSEU + GEX - PROMO RJ': {aqua:99,  museu:40,  gex:40,  mar:0,   total:179},
+  'COMBO AQUA + MUSEU + GEX - INFANTIL': {aqua:70,  museu:33,  gex:33,  mar:0,   total:136},
+  'COMBO AQUA + MAR + GEX - INTEIRA':    {aqua:150, museu:0,   gex:40,  mar:40,  total:230},
+  'COMBO AQUA + MAR + GEX - MEIA':       {aqua:80,  museu:0,   gex:33,  mar:28,  total:141},
+  'COMBO AQUA + MAR + GEX - PROMO RJ':   {aqua:99,  museu:0,   gex:40,  mar:40,  total:179},
+  'COMBO AQUA + MAR + GEX - INFANTIL':   {aqua:70,  museu:0,   gex:33,  mar:33,  total:136},
+  // EXPERIÊNCIA COMPLETA
+  'EXPERIENCIA COMPLETA + GEX - INTEIRA':  {aqua:140, museu:33,  gex:33,  mar:33,  total:239},
+  'EXPERIENCIA COMPLETA + GEX - MEIA':     {aqua:80,  museu:33,  gex:33,  mar:33,  total:179},
+  'EXPERIENCIA COMPLETA + GEX - PROMO RJ': {aqua:99,  museu:33,  gex:33,  mar:33,  total:198},
+  'EXPERIENCIA COMPLETA + GEX - INFANTIL': {aqua:70,  museu:33,  gex:33,  mar:33,  total:169},
+  // COMPLEMENTOS (sem AQUA na tabela — valores estimados)
+  'MUSEU + MAR - DUAS ATRAÇÕES':      {aqua:0, museu:40, gex:0,  mar:40,  total:80},
+  'MUSEU + MAR - DUAS ATRAÇÕES MEIA': {aqua:0, museu:33, gex:0,  mar:33,  total:66},
+  'MUSEU + GEX - DUAS ATRAÇÕES':      {aqua:0, museu:40, gex:40, mar:0,   total:80},
+  'MUSEU + GEX - DUAS ATRAÇÕES MEIA': {aqua:0, museu:33, gex:33, mar:0,   total:66},
+  'MAR + MUSEU + GEX - TRÊS ATRAÇÕES':{aqua:0, museu:33, gex:33, mar:33,  total:99},
+  'MAR + GEX - DUAS ATRAÇÕES':        {aqua:0, museu:0,  gex:40, mar:40,  total:80},
+  'MAR + GEX - DUAS ATRAÇÕES MEIA':   {aqua:0, museu:0,  gex:33, mar:33,  total:66},
+};
+// Atalho para compatibilidade
+const museuVal = Object.fromEntries(Object.entries(PRECOS).map(([k,v])=>[k,v.museu]));
+
+// ── Produtos por categoria ──
+const produtosPorCat = {
+  avulso: [
+    ["Museu de Cera — Visitantes · R$ 50",   "MUSEU DE CERA - VISITANTES|50"],
+    ["Museu de Cera — Inteira · R$ 66",       "MUSEU DE CERA - INTEIRA|66"],
+    ["Museu de Cera — Meia · R$ 33",          "MUSEU DE CERA - MEIA|33"],
+    ["GEX — Inteira · R$ 50",                 "GEX - INTEIRA|50"],
+    ["GEX — Meia · R$ 66",                    "GEX - MEIA|66"],
+    ["GEX — Complemento · R$ 45",             "GEX - COMPLEMENTO|45"],
+    ["GEX — Infantil · R$ 33",                "GEX - INFANTIL|33"],
+    ["Mar de Espelhos — Visitante · R$ 50",   "MAR DE ESPELHOS - VISITANTE|50"],
+    ["Mar de Espelhos — Inteira · R$ 66",     "MAR DE ESPELHOS - INTEIRA|66"],
+    ["Mar de Espelhos — Meia · R$ 33",        "MAR DE ESPELHOS - MEIA|33"],
+  ],
+  combo_duplo: [
+    ["Combo Aqua + Museu — Inteira · R$ 216",   "COMBO AQUA + MUSEU - INTEIRA|216"],
+    ["Combo Aqua + Museu — Meia · R$ 113",      "COMBO AQUA + MUSEU - MEIA|113"],
+    ["Combo Aqua + Museu — Promo RJ · R$ 165",  "COMBO AQUA + MUSEU - PROMO RJ|165"],
+    ["Combo Aqua + Museu — Infantil · R$ 103",  "COMBO AQUA + MUSEU - INFANTIL|103"],
+    ["Combo Aqua + GEX — Inteira · R$ 216",     "COMBO AQUA + GEX - INTEIRA|216"],
+    ["Combo Aqua + GEX — Meia · R$ 113",        "COMBO AQUA + GEX - MEIA|113"],
+    ["Combo Aqua + GEX — Promo RJ · R$ 165",    "COMBO AQUA + GEX - PROMO RJ|165"],
+    ["Combo Aqua + GEX — Infantil · R$ 103",    "COMBO AQUA + GEX - INFANTIL|103"],
+    ["Combo Aqua + Mar — Inteira · R$ 216",     "COMBO AQUA + MAR - INTEIRA|216"],
+    ["Combo Aqua + Mar — Meia · R$ 113",        "COMBO AQUA + MAR - MEIA|113"],
+    ["Combo Aqua + Mar — Promo RJ · R$ 165",    "COMBO AQUA + MAR - PROMO RJ|165"],
+    ["Combo Aqua + Mar — Infantil · R$ 103",    "COMBO AQUA + MAR - INFANTIL|103"],
+  ],
+  combo_triplo: [
+    ["Combo Aqua + Mar + Museu — Inteira · R$ 230",   "COMBO AQUA + MAR + MUSEU - INTEIRA|230"],
+    ["Combo Aqua + Mar + Museu — Meia · R$ 146",      "COMBO AQUA + MAR + MUSEU - MEIA|146"],
+    ["Combo Aqua + Mar + Museu — Promo RJ · R$ 179",  "COMBO AQUA + MAR + MUSEU - PROMO RJ|179"],
+    ["Combo Aqua + Mar + Museu — Infantil · R$ 136",  "COMBO AQUA + MAR + MUSEU - INFANTIL|136"],
+    ["Combo Aqua + Museu + GEX — Inteira · R$ 230",   "COMBO AQUA + MUSEU + GEX - INTEIRA|230"],
+    ["Combo Aqua + Museu + GEX — Meia · R$ 146",      "COMBO AQUA + MUSEU + GEX - MEIA|146"],
+    ["Combo Aqua + Museu + GEX — Promo RJ · R$ 179",  "COMBO AQUA + MUSEU + GEX - PROMO RJ|179"],
+    ["Combo Aqua + Museu + GEX — Infantil · R$ 136",  "COMBO AQUA + MUSEU + GEX - INFANTIL|136"],
+    ["Combo Aqua + Mar + GEX — Inteira · R$ 230",     "COMBO AQUA + MAR + GEX - INTEIRA|230"],
+    ["Combo Aqua + Mar + GEX — Meia · R$ 141",        "COMBO AQUA + MAR + GEX - MEIA|141"],
+    ["Combo Aqua + Mar + GEX — Promo RJ · R$ 179",    "COMBO AQUA + MAR + GEX - PROMO RJ|179"],
+    ["Combo Aqua + Mar + GEX — Infantil · R$ 136",    "COMBO AQUA + MAR + GEX - INFANTIL|136"],
+  ],
+  exp_completa: [
+    ["Experiência Completa + GEX — Inteira · R$ 239",   "EXPERIENCIA COMPLETA + GEX - INTEIRA|239"],
+    ["Experiência Completa + GEX — Meia · R$ 179",      "EXPERIENCIA COMPLETA + GEX - MEIA|179"],
+    ["Experiência Completa + GEX — Promo RJ · R$ 198",  "EXPERIENCIA COMPLETA + GEX - PROMO RJ|198"],
+    ["Experiência Completa + GEX — Infantil · R$ 169",  "EXPERIENCIA COMPLETA + GEX - INFANTIL|169"],
+  ],
+  complementos: [
+    ["Museu + Mar — Duas Atrações · R$ 80",          "MUSEU + MAR - DUAS ATRAÇÕES|80"],
+    ["Museu + Mar — Duas Atrações Meia · R$ 66",     "MUSEU + MAR - DUAS ATRAÇÕES MEIA|66"],
+    ["Museu + GEX — Duas Atrações · R$ 80",          "MUSEU + GEX - DUAS ATRAÇÕES|80"],
+    ["Museu + GEX — Duas Atrações Meia · R$ 66",     "MUSEU + GEX - DUAS ATRAÇÕES MEIA|66"],
+    ["Mar + Museu + GEX — Três Atrações · R$ 99",    "MAR + MUSEU + GEX - TRÊS ATRAÇÕES|99"],
+    ["Mar + GEX — Duas Atrações · R$ 80",            "MAR + GEX - DUAS ATRAÇÕES|80"],
+    ["Mar + GEX — Duas Atrações Meia · R$ 66",       "MAR + GEX - DUAS ATRAÇÕES MEIA|66"],
+  ],
+};
+
+function onCategoria() {
+  const cat = document.querySelector('input[name="cat"]:checked')?.value;
+  // Resetar produto
+  document.getElementById('f-produto').value = '';
+  document.getElementById('cdd-lbl').textContent = '— Selecione o produto —';
+  document.getElementById('cdd-btn').classList.add('ph');
+  document.querySelectorAll('.cdd-opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById('row-badge').style.display = 'none';
+  document.getElementById('row-vals').style.display  = 'none';
+  document.getElementById('v-total').textContent = 'R$ 0,00';
+
+  // Rebuild painel com itens da categoria
+  const panel = document.getElementById('cdd-panel');
+  panel.innerHTML = '';
+  if (!cat || !produtosPorCat[cat]) return;
+  produtosPorCat[cat].forEach(([label, value]) => {
+    const opt = document.createElement('div');
+    opt.className = 'cdd-opt';
+    opt.textContent = label;
+    opt.dataset.v = value;
+    panel.appendChild(opt);
+  });
+}
+
+// Inicializar painel vazio (aguarda seleção de categoria)
+(function initCdd() {
+  const panel = document.getElementById('cdd-panel');
+  panel.innerHTML = '';
+})();
+
+
+// Abrir/fechar dropdown produto
+document.getElementById('cdd-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  document.getElementById('cdd').classList.toggle('open');
+});
+
+// Selecionar opção
+document.getElementById('cdd-panel').addEventListener('click', function(e) {
+  const opt = e.target.closest('.cdd-opt');
+  if (!opt) return;
+  const value = opt.dataset.v;
+  const label = opt.textContent;
+  document.getElementById('cdd-lbl').textContent = label;
+  document.getElementById('cdd-btn').classList.remove('ph');
+  document.getElementById('f-produto').value = value;
+  document.querySelectorAll('.cdd-opt').forEach(o => o.classList.toggle('sel', o === opt));
+  document.getElementById('cdd').classList.remove('open');
+  onProduto();
+});
+
+// Fechar ao clicar fora
+document.addEventListener('click', function(e) {
+  if (document.getElementById('modal').classList.contains('open')) return;
+  if (!document.getElementById('cdd').contains(e.target))
+    document.getElementById('cdd').classList.remove('open');
+});
+
+// ── Produto selecionado ──
+function onProduto() {
+  const val = document.getElementById('f-produto').value;
+  if (!val) {
+    document.getElementById('row-badge').style.display = 'none';
+    document.getElementById('row-vals').style.display  = 'none';
+    document.getElementById('v-total').textContent = 'R$ 0,00';
+    return;
+  }
+  const [nome, preco] = val.split('|');
+  document.getElementById('badge').textContent = nome;
+  document.getElementById('v-unit').textContent = fmt(Number(preco));
+
+  // Mostrar apenas parcelas que têm valor > 0
+  const p = PRECOS[nome] || {};
+  const parcs = [{id:'aqua',v:p.aqua},{id:'museu',v:p.museu},{id:'gex',v:p.gex},{id:'mar',v:p.mar}];
+  parcs.forEach(({id,v}) => {
+    const item = document.getElementById('vi-'+id);
+    const num  = document.getElementById('v-'+id);
+    if (item && num) {
+      if (v && v > 0) { item.style.display = ''; num.textContent = fmt(v); }
+      else            { item.style.display = 'none'; }
+    }
+  });
+
+  document.getElementById('row-badge').style.display = '';
+  document.getElementById('row-vals').style.display  = '';
+  calcTotal();
+}
+
+function calcTotal() {
+  const val = document.getElementById('f-produto').value;
+  if (!val) return;
+  const [, preco] = val.split('|');
+  const qtd = parseInt(document.getElementById('f-qtd').value) || 1;
+  document.getElementById('v-total').textContent = fmt(Number(preco) * qtd);
+}
+
+// ── Vendedores ──
+let vendedores = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
+function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedores)); }
+
+function togglePainelVend() {
+  const p = document.getElementById('painel-vend');
+  const aberto = p.style.display === 'block';
+  p.style.display = aberto ? 'none' : 'block';
+  if (!aberto) { renderLista(); document.getElementById('m-nome').focus(); }
+}
+
+function renderSelect() {
+  const sel = document.getElementById('f-vendedor');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecione —</option>';
+  vendedores.forEach(n => {
+    const o = document.createElement('option');
+    o.value = n; o.textContent = n; sel.appendChild(o);
+  });
+  if (cur) sel.value = cur;
+}
+
+function renderLista() {
+  const list = document.getElementById('v-list');
+  list.innerHTML = '';
+  if (!vendedores.length) {
+    list.innerHTML = '<div style="text-align:center;font-size:13px;color:var(--muted2);padding:10px 0">Nenhum vendedor cadastrado ainda</div>';
+    return;
+  }
+  vendedores.forEach((n, i) => {
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--white);border-radius:10px;font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px;';
+    d.innerHTML = `<span>${n}</span><button type="button" data-i="${i}" style="background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;">×</button>`;
+    list.appendChild(d);
+  });
+}
+
+document.getElementById('v-list').addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-i]');
+  if (!btn) return;
+  vendedores.splice(parseInt(btn.dataset.i), 1);
+  saveVend(); renderSelect(); renderLista();
+});
+
+function addVendedor() {
+  const inp = document.getElementById('m-nome');
+  const nome = inp.value.trim();
+  if (!nome) return;
+  if (vendedores.includes(nome)) { showToast('Nome já cadastrado'); return; }
+  vendedores.push(nome);
+  saveVend(); renderSelect(); renderLista();
+  inp.value = ''; inp.focus();
+  showToast(nome + ' adicionado');
+}
+
+document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key === 'Enter') addVendedor(); });
+
+// ── Integração Google Sheets ──
+const SHEET_ID        = "1YnzKPPFKNk-j1iYL9YGi2hnHFG1yClYAdGJ63iLXyGY";
+const PRECOS_GID      = "412546681";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRlsQBdwLgNmcOxIGq-qPLpPMztVGDfPlYj62mw_hmxA1G5MPjsC9Mut2PAuF0vM3i6g/exec";
+
+// Carrega preços do Sheets e atualiza PRECOS + dropdown de produtos
+async function carregarPrecos() {
+  if (PRECOS_GID === 'COLE_O_GID_DA_ABA_PRECOS') return;
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${PRECOS_GID}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const linhas = txt.trim().split('\n');
+    const hdrs = linhas[0].split(',').map(h => h.replace(/"/g,'').trim());
+    const novos = {};
+    linhas.slice(1).forEach(linha => {
+      const vals = linha.split(',').map(v => v.replace(/"/g,'').trim());
+      const obj  = {}; hdrs.forEach((h,i) => obj[h] = vals[i] || '');
+      const prod = obj['Produto'] || obj['produto'] || '';
+      if (!prod) return;
+      const aqua  = Number(obj['Aqua']  || obj['AQUA']  || 0);
+      const museu = Number(obj['Museu'] || obj['MUSEU'] || 0);
+      const gex   = Number(obj['GEX']   || obj['gex']   || 0);
+      const mar   = Number(obj['MAR']   || obj['mar']   || 0);
+      const total = Number(obj['Total'] || obj['TOTAL'] || (aqua+museu+gex+mar));
+      const cat   = obj['Categoria'] || obj['categoria'] || '';
+      PRECOS[prod] = { aqua, museu, gex, mar, total };
+      novos[prod]  = { total, cat };
+    });
+    // Atualizar museuVal derivado
+    Object.entries(PRECOS).forEach(([k,v]) => museuVal[k] = v.museu);
+    // Reconstruir produtosPorCat com os novos produtos
+    Object.entries(novos).forEach(([prod, {total, cat}]) => {
+      const catKey = cat.toLowerCase().replace(/ /g,'_') || 'avulso';
+      if (!produtosPorCat[catKey]) produtosPorCat[catKey] = [];
+      const label = `${prod} · R$ ${total}`;
+      const val   = `${prod}|${total}`;
+      const existe = produtosPorCat[catKey].some(([,v]) => v.startsWith(prod+'|'));
+      if (!existe) produtosPorCat[catKey].push([label, val]);
+      // Atualizar label se já existe com preço diferente
+      else {
+        const idx = produtosPorCat[catKey].findIndex(([,v]) => v.startsWith(prod+'|'));
+        if (idx >= 0) produtosPorCat[catKey][idx] = [label, val];
+      }
+    });
+    console.log('Preços carregados do Sheets:', Object.keys(novos).length, 'produtos');
+  } catch(e) {
+    console.warn('Preços não carregados do Sheets, usando tabela fixa.', e.message);
+  }
+}
+
+// Inicializar: carregar preços e renderizar
+carregarPrecos();
+
+// ── Salvar ──
+async function salvar() {
+  const data     = document.getElementById('f-data').value;
+  const vendedor = document.getElementById('f-vendedor').value;
+  const produto  = document.getElementById('f-produto').value;
+  const qtd      = parseInt(document.getElementById('f-qtd').value) || 1;
+  const canal    = document.querySelector('input[name="canal"]:checked').value;
+  const pax      = document.getElementById('f-pax').value;
+  const paxGex   = document.getElementById('f-pax-gex').value;
+  const paxMar   = document.getElementById('f-pax-mar').value;
+  const catEl    = document.querySelector('input[name="cat"]:checked');
+  const categoria = catEl ? catEl.value : '';
+
+  if (!data || !vendedor || !produto) {
+    alert('Preencha Data, Vendedor e Produto antes de registrar.');
+    return;
+  }
+
+  const [nomeProd, preco] = produto.split('|');
+  const precoProd = PRECOS[nomeProd] || {};
+  const reg = {
+    data, vendedor, categoria,
+    produto: nomeProd,
+    valorUnitario: Number(preco),
+    valorMuseu: precoProd.museu || 0,
+    quantidade: qtd,
+    total: Number(preco) * qtd,
+    canal,
+    pax:    pax    ? Number(pax)    : null,
+    paxGex: paxGex ? Number(paxGex) : null,
+    paxMar: paxMar ? Number(paxMar) : null,
+    ts: new Date().toISOString()
+  };
+
+  // Salvar localmente como backup
+  const lista = JSON.parse(localStorage.getItem('mcera_vendas') || '[]');
+  lista.push(reg);
+  localStorage.setItem('mcera_vendas', JSON.stringify(lista));
+
+  // Enviar para Google Sheets
+  const btn = document.querySelector('.btn-primary');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_AQUI_A_URL_DO_WEB_APP') {
+    // Modo offline — só salva local
+    showToast('Salvo localmente (configure a URL do Sheets)');
+    btn.textContent = 'Registrar venda';
+    btn.disabled = false;
+    limpar();
+    return;
+  }
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reg)
+    });
+    showToast('Venda registrada no Sheets!');
+    limpar();
+  } catch (err) {
+    showToast('Salvo localmente — sem conexão');
+    limpar();
+  } finally {
+    btn.textContent = 'Registrar venda';
+    btn.disabled = false;
+  }
+}
+
+function limpar() {
+  document.getElementById('f-vendedor').value = '';
+  document.getElementById('f-produto').value  = '';
+  document.getElementById('cdd-lbl').textContent = '— Selecione —';
+  document.getElementById('cdd-btn').classList.add('ph');
+  document.querySelectorAll('.cdd-opt').forEach(o => o.classList.remove('sel'));
+  document.querySelectorAll('input[name="cat"]').forEach(r => r.checked = false);
+  document.getElementById('cdd-panel').innerHTML = '';
+  document.getElementById('f-qtd').value   = 1;
+  document.getElementById('f-pax').value    = '';
+  document.getElementById('f-pax-gex').value = '';
+  document.getElementById('f-pax-mar').value = '';
+  document.querySelector('input[name="canal"][value="Bilheteria"]').checked = true;
+  document.getElementById('row-badge').style.display = 'none';
+  document.getElementById('row-vals').style.display  = 'none';
+  document.getElementById('v-total').textContent = 'R$ 0,00';
+  document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+renderSelect();
+</script>
+</body>
+</html>

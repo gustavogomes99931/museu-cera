@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Museu de Cera RJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#127369;--g2:#10403B;--gl:#e8f0ef;--gm:rgba(18,115,105,0.12);
+  --bg:#f4f5f5;--white:#fff;--text:#10403B;--mu:#4C5958;--mu2:#8AA6A3;
+  --bd:#BFBFBF;--danger:#c0392b;
+}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;font-size:14px}
+
+/* HEADER */
+.hdr{background:var(--white);border-bottom:1px solid var(--bd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.hdr-l{display:flex;align-items:center;gap:12px}
+.back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--mu);text-decoration:none;padding:6px 12px;border:1.5px solid var(--bd);border-radius:20px;transition:all .15s}
+.back:hover{border-color:var(--g);color:var(--g)}
+.hdr-title{font-size:15px;font-weight:600}
+.hdr-sub{font-size:11px;color:var(--mu2);margin-top:1px}
+
+/* FILTROS */
+.flt{background:var(--white);border-bottom:1px solid var(--bd);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.flt-grp{display:flex;align-items:center;gap:6px}
+.flt-lbl{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.flt select,.flt input[type=date]{background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;padding:6px 10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;color:var(--text);outline:none;max-width:160px}
+.flt select:focus,.flt input:focus{border-color:var(--g)}
+.flt-sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+.btn-ref{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--g);color:#fff;border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-ref:hover{background:var(--g2)}
+.loading-bar{height:3px;background:var(--g);position:fixed;top:0;left:0;z-index:999;transition:width .3s;width:0}
+
+/* LAYOUT */
+.page{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+.sec-title{font-size:13px;font-weight:600;color:var(--text);margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:14px;background:var(--g);border-radius:2px}
+
+/* CARDS KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--white);border-radius:14px;padding:16px;border:1px solid var(--bd);box-shadow:0 1px 8px rgba(0,0,0,0.04)}
+.kpi-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.kpi-ico svg{width:16px;height:16px}
+.kpi-lbl{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.kpi-val{font-size:22px;font-weight:600;line-height:1.1}
+.kpi-cmp{display:flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;flex-wrap:wrap}
+.kpi-a1{color:var(--mu2)}
+.kpi-var{padding:1px 5px;border-radius:5px;font-weight:600;font-size:11px}
+.kpi-var.up{background:#d6eae8;color:#10403B}
+.kpi-var.dn{background:#fde8e8;color:#c0392b}
+.kpi-var.ne{background:var(--bg);color:var(--mu)}
+
+/* GRID CHARTS */
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.g1{margin-bottom:20px}
+.card{background:var(--white);border-radius:14px;padding:18px;border:1px solid var(--bd);box-shadow:0 1px 8px rgba(0,0,0,0.04);box-sizing:border-box;min-width:0;overflow:hidden}
+.ch{position:relative;height:200px;width:100%}
+.ch-tall{position:relative;height:250px;width:100%}
+.ch-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;display:flex;justify-content:center;align-items:flex-start}
+.ch-scroll::-webkit-scrollbar{height:4px}
+.ch-scroll::-webkit-scrollbar-track{background:transparent}
+.ch-scroll::-webkit-scrollbar-thumb{background:var(--mu2);border-radius:2px}
+/* Wrapper interno dos gráficos de barra — sem min-width para permitir scroll */
+.ch-bar-wrap{position:relative;height:220px}
+
+/* Card donut duplo — altura auto para acomodar legenda */
+.donut-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.donut-wrap{display:flex;flex-direction:column;align-items:center;min-width:0;width:100%}
+.donut-lbl{font-size:9px;color:var(--mu2);text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.donut-ch{position:relative;width:100%;height:140px}
+
+/* TABELA */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
+.tbl-wrap::-webkit-scrollbar{height:3px}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--mu2);border-radius:2px}
+.tbl{width:100%;border-collapse:collapse;min-width:0;table-layout:fixed}
+.tbl th{text-align:left;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl th.r,.tbl td.r{text-align:right}
+.tbl td{padding:8px 8px;border-bottom:1px solid var(--bd);font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.vr:hover>td{background:var(--gl);cursor:pointer}
+/* exp-btn: overflow visible para não ser cortado pela célula */
+.tbl td:first-child{overflow:visible}
+.exp-btn{width:20px;height:20px;border-radius:5px;background:var(--bg);border:1.5px solid var(--bd);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:600;color:var(--mu);user-select:none;transition:all .15s;flex-shrink:0}
+.exp-btn.op{background:var(--g);border-color:var(--g);color:#fff}
+.sub-row{display:none}
+.sub-row.op{display:table-row}
+.tag{display:inline-block;padding:1px 5px;border-radius:6px;font-size:9px;font-weight:600;white-space:nowrap}
+.tag-bil{background:#dde8e7;color:#127369}
+.tag-pos{background:#e8f0ef;color:#4C5958}
+.val-g{color:var(--g);font-weight:600}
+
+/* GRID TABELAS 3+3 */
+.tbl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.tbl-grid .card{margin-bottom:0}
+
+/* RANKING — número visível */
+.rank-num{font-weight:700;color:var(--mu);font-size:12px;display:inline-block}
+
+/* MOBILE */
+@media(max-width:1000px){.tbl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.donut-pair{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .flt{justify-content:flex-start;padding:8px 12px;gap:6px}
+  .flt-grp{flex:1 1 calc(50% - 6px);min-width:0}
+  .flt-grp select,.flt-grp input{width:100%;max-width:100%;font-size:12px}
+  .flt-sep{display:none}
+  .btn-ref{width:100%;justify-content:center;margin-top:2px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .kpi-conv-mobile{display:none}
+  .kpi-meta-mobile{grid-column:1 / -1}
+  .g2,.g3{grid-template-columns:minmax(0,1fr)}
+  .donut-pair{grid-template-columns:1fr 1fr}
+  .tbl-grid{grid-template-columns:minmax(0,1fr)}
+  .page{padding:14px 10px 60px}
+}
+</style>
+</head>
+<body>
+<div class="loading-bar" id="lb"></div>
+
+<div class="hdr">
+  <div class="hdr-l">
+    <a href="lancamento_museu.html" class="back">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Lançamento
+    </a>
+    <div><div class="hdr-title">Dashboard de Vendas</div><div class="hdr-sub">Museu de Cera RJ</div></div>
+  </div>
+  <div id="last-upd" style="font-size:11px;color:var(--mu2)"></div>
+</div>
+
+<div class="flt">
+  <div class="flt-grp">
+    <span class="flt-lbl">Período</span>
+    <select id="f-per" onchange="onPerChange()">
+      <option value="mes_atual">Mês atual</option>
+      <option value="mes_ant">Mês anterior</option>
+      <option value="u30">Últimos 30 dias</option>
+      <option value="u90">Últimos 90 dias</option>
+      <option value="ano">Ano atual</option>
+      <option value="custom">Personalizado</option>
+    </select>
+  </div>
+  <div id="custom-dts" style="display:none;align-items:center;gap:6px" class="flt-grp">
+    <input type="date" id="f-de" onchange="aplicar()">
+    <span style="font-size:11px;color:var(--mu)">até</span>
+    <input type="date" id="f-ate" onchange="aplicar()">
+  </div>
+  <div class="flt-sep"></div>
+  <div class="flt-grp">
+    <span class="flt-lbl">Vendedor</span>
+    <select id="f-vend" onchange="aplicar()"><option value="">Todos</option></select>
+  </div>
+  <div class="flt-grp">
+    <span class="flt-lbl">Canal</span>
+    <select id="f-canal" onchange="aplicar()">
+      <option value="">Todos</option><option value="Bilheteria">Bilheteria</option><option value="POS">POS</option>
+    </select>
+  </div>
+  <div class="flt-sep"></div>
+  <div class="flt-grp">
+    <span class="flt-lbl">Categoria</span>
+    <select id="f-cat" onchange="onCatChange()">
+      <option value="">Todas</option>
+      <option value="avulso">Avulso</option>
+      <option value="combo_duplo">Combo Duplo</option>
+      <option value="combo_triplo">Combo Triplo</option>
+      <option value="exp_completa">Exp. Completa</option>
+      <option value="complementos">Complementos</option>
+    </select>
+  </div>
+  <div class="flt-grp">
+    <span class="flt-lbl">Atração / Produto</span>
+    <select id="f-atr" onchange="aplicar()"><option value="">Todas</option></select>
+  </div>
+  <div class="flt-grp">
+    <span class="flt-lbl">Tipo</span>
+    <select id="f-tipo" onchange="aplicar()">
+      <option value="">Todos</option>
+      <option value="museu">Museu</option>
+      <option value="gex">GEX</option>
+      <option value="mar">MAR</option>
+      <option value="aqua">AQUA</option>
+    </select>
+  </div>
+  <div class="flt-sep"></div>
+  <button class="btn-ref" onclick="carregar()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    Atualizar
+  </button>
+</div>
+
+<div class="page">
+
+<!-- ── KPIs ── -->
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-ico" style="background:#d6eae8"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="kpi-lbl">Vendas Totais</div><div class="kpi-val" id="k-vend">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-vend-a1"></span><span class="kpi-var ne" id="k-vend-v"></span></div></div>
+  <div class="kpi"><div class="kpi-ico" style="background:#dde8e7"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="kpi-lbl">Ingressos Vendidos</div><div class="kpi-val" id="k-ing">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-ing-a1"></span><span class="kpi-var ne" id="k-ing-v"></span></div></div>
+  <div class="kpi"><div class="kpi-ico" style="background:#e8f0ef"><svg viewBox="0 0 24 24" fill="none" stroke="#4C5958" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg></div><div class="kpi-lbl">Ticket Médio</div><div class="kpi-val" id="k-tkt">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-tkt-a1"></span><span class="kpi-var ne" id="k-tkt-v"></span></div></div>
+  <div class="kpi"><div class="kpi-ico" style="background:#dde8e7"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="kpi-lbl">PAX Aquário</div><div class="kpi-val" id="k-pax">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-pax-a1"></span><span class="kpi-var ne" id="k-pax-v"></span></div></div>
+  <div class="kpi kpi-conv-mobile"><div class="kpi-ico" style="background:#e8f0ef"><svg viewBox="0 0 24 24" fill="none" stroke="#4C5958" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="kpi-lbl">Conversão Museu</div><div class="kpi-val" id="k-conv">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-conv-a1"></span><span class="kpi-var ne" id="k-conv-v"></span></div></div>
+</div>
+
+<!-- ── GRÁFICOS LINHA 1 ── -->
+<div class="g2">
+  <div class="card">
+    <div class="sec-title">Vendas por Vendedor</div>
+    <div class="ch-scroll"><div class="ch-bar-wrap" id="w-vv"><canvas id="ch-vv"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Ingressos por Vendedor</div>
+    <div class="ch-scroll"><div class="ch-bar-wrap" id="w-vq"><canvas id="ch-vq"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ── GRÁFICOS LINHA 2 ── -->
+<div class="g2">
+  <div class="card">
+    <div class="sec-title">Por Tipo de Venda</div>
+    <div class="donut-pair">
+      <div class="donut-wrap">
+        <div class="donut-lbl">Valor R$</div>
+        <div class="donut-ch"><canvas id="ch-tipo"></canvas></div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut-lbl">Quantidade</div>
+        <div class="donut-ch"><canvas id="ch-tipo-qtd"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Por Atração</div>
+    <div class="donut-pair">
+      <div class="donut-wrap">
+        <div class="donut-lbl">Valor R$</div>
+        <div class="donut-ch"><canvas id="ch-atr"></canvas></div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut-lbl">Quantidade</div>
+        <div class="donut-ch"><canvas id="ch-atr-qtd"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VENDAS A0 vs A1 POR DIA ── -->
+<div class="g1 card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div class="sec-title" style="margin-bottom:0">Vendas por Dia — Ano Atual vs Ano Anterior</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
+      <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#10403B">
+        <span style="width:12px;height:12px;border-radius:3px;background:#127369cc;display:inline-block;flex-shrink:0"></span>Ano Atual
+      </span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4C5958">
+        <span style="width:12px;height:12px;border-radius:3px;background:#8AA6A399;display:inline-block;flex-shrink:0"></span>Ano Anterior
+      </span>
+    </div>
+  </div>
+  <div class="ch-scroll"><div class="ch-bar-wrap" id="w-meta" style="height:270px"><canvas id="ch-meta"></canvas></div></div>
+</div>
+
+<!-- ── TABELAS LINHA 1 ── -->
+<div class="tbl-grid">
+  <div class="card">
+    <div class="sec-title">Tipo de Venda e Produto</div>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col style="width:22px"><col><col style="width:44px"><col style="width:70px"><col style="width:48px"></colgroup>
+      <thead><tr><th></th><th>Categoria / Produto</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <tbody id="tbl-tipo-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Por Atração</div>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col><col style="width:80px"><col style="width:48px"></colgroup>
+      <thead><tr><th>Atração</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <tbody id="tbl-atr-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card" style="overflow:visible">
+    <div class="sec-title">Conversão por Atração · por Vendedor</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%">
+      <table style="border-collapse:collapse;table-layout:auto;white-space:nowrap">
+        <thead>
+          <tr>
+            <th rowspan="2" style="text-align:left;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">Vendedor</th>
+            <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Museu</th>
+            <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">GEX</th>
+            <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">MAR</th>
+            <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">AQUA</th>
+          </tr>
+          <tr>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-conv-atr-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── TABELAS LINHA 2 ── -->
+<div class="tbl-grid">
+  <div class="card">
+    <div class="sec-title">Exp. Completa + 3 Passeios</div>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col><col style="width:40px"><col style="width:80px"><col style="width:50px"></colgroup>
+      <thead><tr><th>Grupo</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <tbody id="tbl-exp-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Ranking — Base Museu</div>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:72px"><col style="width:48px"></colgroup>
+      <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <tbody id="tbl-rank-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Conversão PAX por Atração</div>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col><col style="width:52px"><col style="width:70px"><col style="width:116px"></colgroup>
+      <thead><tr><th>Atração</th><th class="r">PAX</th><th class="r">PAX Aquá.</th><th class="r">Conv.%</th></tr></thead>
+      <tbody id="tbl-pax-conv-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+</div><!-- /page -->
+<script>
+const SHEET_ID    = "1YnzKPPFKNk-j1iYL9YGi2hnHFG1yClYAdGJ63iLXyGY";
+const ABA_GID     = "0";
+const SHEET_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ABA_GID}`;
+// GID da aba Precos — Gustavo deve criar a aba e colar o GID aqui
+// Para obter o GID: abrir a aba Precos no Sheets → copiar o número após "gid=" na URL
+const PRECOS_GID  = "412546681";
+const PRECOS_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${PRECOS_GID}`;
+
+Chart.register(ChartDataLabels);
+
+const CORES = ['#127369','#8AA6A3','#4C5958','#10403B','#6B9E9A','#2E6B65','#A8C5C2','#1A5550'];
+// Paleta viva para os gráficos de donut
+const CORES_DONUT_TIPO = ['#024959','#8AA6A3','#F2AE30','#593E25','#A1A2A6'];
+const CORES_DONUT_ATR  = ['#024959','#593E25','#F2AE30'];
+const fmt   = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtN  = v => Number(v).toLocaleString('pt-BR');
+const pct   = (a,b) => b > 0 ? ((a/b)*100).toFixed(1)+'%' : '—';
+
+// Produtos por categoria — para popular o filtro de Atração/Produto
+const PRODS_POR_CAT = {
+  avulso: ['MUSEU DE CERA - VISITANTES','MUSEU DE CERA - INTEIRA','MUSEU DE CERA - MEIA','GEX - INTEIRA','GEX - MEIA','GEX - COMPLEMENTO','GEX - INFANTIL','MAR DE ESPELHOS - INTEIRA','MAR DE ESPELHOS - MEIA'],
+  combo_duplo: ['COMBO AQUA + MUSEU - INTEIRA','COMBO AQUA + MUSEU - MEIA','COMBO AQUA + MUSEU - PROMO RJ','COMBO AQUA + MUSEU - INFANTIL','COMBO AQUA + GEX - INTEIRA','COMBO AQUA + GEX - MEIA','COMBO AQUA + GEX - PROMO RJ','COMBO AQUA + GEX - INFANTIL','COMBO AQUA + MAR - INTEIRA','COMBO AQUA + MAR - MEIA','COMBO AQUA + MAR - PROMO RJ','COMBO AQUA + MAR - INFANTIL'],
+  combo_triplo: ['COMBO AQUA + MAR + MUSEU - INTEIRA','COMBO AQUA + MAR + MUSEU - MEIA','COMBO AQUA + MAR + MUSEU - PROMO RJ','COMBO AQUA + MAR + MUSEU - INFANTIL','COMBO AQUA + MUSEU + GEX - INTEIRA','COMBO AQUA + MUSEU + GEX - MEIA','COMBO AQUA + MUSEU + GEX - PROMO RJ','COMBO AQUA + MUSEU + GEX - INFANTIL','COMBO AQUA + MAR + GEX - INTEIRA','COMBO AQUA + MAR + GEX - MEIA','COMBO AQUA + MAR + GEX - PROMO RJ','COMBO AQUA + MAR + GEX - INFANTIL'],
+  exp_completa: ['EXPERIENCIA COMPLETA + GEX - INTEIRA','EXPERIENCIA COMPLETA + GEX - MEIA','EXPERIENCIA COMPLETA + GEX - PROMO RJ','EXPERIENCIA COMPLETA + GEX - INFANTIL'],
+  complementos: ['MUSEU + MAR - DUAS ATRAÇÕES','MUSEU + MAR - DUAS ATRAÇÕES MEIA','MUSEU + GEX - DUAS ATRAÇÕES','MUSEU + GEX - DUAS ATRAÇÕES MEIA','MAR + MUSEU + GEX - TRÊS ATRAÇÕES','MAR + GEX - DUAS ATRAÇÕES','MAR + GEX - DUAS ATRAÇÕES MEIA'],
+};
+const TODOS_PRODS = Object.values(PRODS_POR_CAT).flat();
+
+function onCatChange() {
+  const cat = document.getElementById('f-cat').value;
+  const sel = document.getElementById('f-atr');
+  const cur = sel.value;
+  const lista = cat ? (PRODS_POR_CAT[cat] || []) : TODOS_PRODS;
+  sel.innerHTML = '<option value="">Todas</option>';
+  lista.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p; sel.appendChild(o);
+  });
+  // Manter seleção se ainda válida
+  if (cur && lista.includes(cur)) sel.value = cur;
+  aplicar();
+}
+
+// ── Tabela completa de preços por atração ──
+const PRECOS = {
+  'MUSEU DE CERA - VISITANTES':   {aqua:0,   museu:50,  gex:0,   mar:0,   total:50},
+  'MUSEU DE CERA - INTEIRA':      {aqua:0,   museu:66,  gex:0,   mar:0,   total:66},
+  'MUSEU DE CERA - MEIA':         {aqua:0,   museu:33,  gex:0,   mar:0,   total:33},
+  'GEX - INTEIRA':                {aqua:0,   museu:0,   gex:50,  mar:0,   total:50},
+  'GEX - MEIA':                   {aqua:0,   museu:0,   gex:66,  mar:0,   total:66},
+  'GEX - COMPLEMENTO':            {aqua:0,   museu:0,   gex:45,  mar:0,   total:45},
+  'GEX - INFANTIL':               {aqua:0,   museu:0,   gex:33,  mar:0,   total:33},
+  'MAR DE ESPELHOS - VISITANTE':  {aqua:0,   museu:0,   gex:0,   mar:50,  total:50},
+  'MAR DE ESPELHOS - INTEIRA':    {aqua:0,   museu:0,   gex:0,   mar:66,  total:66},
+  'MAR DE ESPELHOS - MEIA':       {aqua:0,   museu:0,   gex:0,   mar:33,  total:33},
+  'COMBO AQUA + MUSEU - INTEIRA':  {aqua:150, museu:66,  gex:0,   mar:0,   total:216},
+  'COMBO AQUA + MUSEU - MEIA':     {aqua:80,  museu:33,  gex:0,   mar:0,   total:113},
+  'COMBO AQUA + MUSEU - PROMO RJ': {aqua:99,  museu:66,  gex:0,   mar:0,   total:165},
+  'COMBO AQUA + MUSEU - INFANTIL': {aqua:70,  museu:33,  gex:0,   mar:0,   total:103},
+  'COMBO AQUA + GEX - INTEIRA':    {aqua:150, museu:0,   gex:66,  mar:0,   total:216},
+  'COMBO AQUA + GEX - MEIA':       {aqua:80,  museu:0,   gex:33,  mar:0,   total:113},
+  'COMBO AQUA + GEX - PROMO RJ':   {aqua:99,  museu:0,   gex:66,  mar:0,   total:165},
+  'COMBO AQUA + GEX - INFANTIL':   {aqua:70,  museu:0,   gex:33,  mar:0,   total:103},
+  'COMBO AQUA + MAR - INTEIRA':    {aqua:150, museu:0,   gex:0,   mar:66,  total:216},
+  'COMBO AQUA + MAR - MEIA':       {aqua:80,  museu:0,   gex:0,   mar:33,  total:113},
+  'COMBO AQUA + MAR - PROMO RJ':   {aqua:99,  museu:0,   gex:0,   mar:66,  total:165},
+  'COMBO AQUA + MAR - INFANTIL':   {aqua:70,  museu:0,   gex:0,   mar:33,  total:103},
+  'COMBO AQUA + MAR + MUSEU - INTEIRA':  {aqua:150, museu:40,  gex:0,   mar:40,  total:230},
+  'COMBO AQUA + MAR + MUSEU - MEIA':     {aqua:80,  museu:33,  gex:0,   mar:33,  total:146},
+  'COMBO AQUA + MAR + MUSEU - PROMO RJ': {aqua:99,  museu:40,  gex:0,   mar:40,  total:179},
+  'COMBO AQUA + MAR + MUSEU - INFANTIL': {aqua:70,  museu:33,  gex:0,   mar:33,  total:136},
+  'COMBO AQUA + MUSEU + GEX - INTEIRA':  {aqua:150, museu:40,  gex:40,  mar:0,   total:230},
+  'COMBO AQUA + MUSEU + GEX - MEIA':     {aqua:80,  museu:33,  gex:33,  mar:0,   total:146},
+  'COMBO AQUA + MUSEU + GEX - PROMO RJ': {aqua:99,  museu:40,  gex:40,  mar:0,   total:179},
+  'COMBO AQUA + MUSEU + GEX - INFANTIL': {aqua:70,  museu:33,  gex:33,  mar:0,   total:136},
+  'COMBO AQUA + MAR + GEX - INTEIRA':    {aqua:150, museu:0,   gex:40,  mar:40,  total:230},
+  'COMBO AQUA + MAR + GEX - MEIA':       {aqua:80,  museu:0,   gex:33,  mar:28,  total:141},
+  'COMBO AQUA + MAR + GEX - PROMO RJ':   {aqua:99,  museu:0,   gex:40,  mar:40,  total:179},
+  'COMBO AQUA + MAR + GEX - INFANTIL':   {aqua:70,  museu:0,   gex:33,  mar:33,  total:136},
+  'EXPERIENCIA COMPLETA + GEX - INTEIRA':  {aqua:140, museu:33,  gex:33,  mar:33,  total:239},
+  'EXPERIENCIA COMPLETA + GEX - MEIA':     {aqua:80,  museu:33,  gex:33,  mar:33,  total:179},
+  'EXPERIENCIA COMPLETA + GEX - PROMO RJ': {aqua:99,  museu:33,  gex:33,  mar:33,  total:198},
+  'EXPERIENCIA COMPLETA + GEX - INFANTIL': {aqua:70,  museu:33,  gex:33,  mar:33,  total:169},
+  'MUSEU + MAR - DUAS ATRAÇÕES':      {aqua:0, museu:40, gex:0,  mar:40,  total:80},
+  'MUSEU + MAR - DUAS ATRAÇÕES MEIA': {aqua:0, museu:33, gex:0,  mar:33,  total:66},
+  'MUSEU + GEX - DUAS ATRAÇÕES':      {aqua:0, museu:40, gex:40, mar:0,   total:80},
+  'MUSEU + GEX - DUAS ATRAÇÕES MEIA': {aqua:0, museu:33, gex:33, mar:0,   total:66},
+  'MAR + MUSEU + GEX - TRÊS ATRAÇÕES':{aqua:0, museu:33, gex:33, mar:33,  total:99},
+  'MAR + GEX - DUAS ATRAÇÕES':        {aqua:0, museu:0,  gex:40, mar:40,  total:80},
+  'MAR + GEX - DUAS ATRAÇÕES MEIA':   {aqua:0, museu:0,  gex:33, mar:33,  total:66},
+};
+// Derivar listas de pertencimento automaticamente do PRECOS
+// Estas são as referências VIVAS — serão atualizadas ao carregar preços do Sheets
+const TEM_MUSEU = Object.entries(PRECOS).filter(([,v])=>v.museu>0).map(([k])=>k);
+const TEM_GEX   = Object.entries(PRECOS).filter(([,v])=>v.gex>0).map(([k])=>k);
+const TEM_MAR   = Object.entries(PRECOS).filter(([,v])=>v.mar>0).map(([k])=>k);
+// Produtos de Exp Completa e 3 passeios
+const EXP_COMPLETA = ['EXPERIENCIA COMPLETA + GEX - INTEIRA','EXPERIENCIA COMPLETA + GEX - MEIA','EXPERIENCIA COMPLETA + GEX - PROMO RJ','EXPERIENCIA COMPLETA + GEX - INFANTIL'];
+const TRES_PASS = ['MAR + MUSEU + GEX - TRÊS ATRAÇÕES','COMBO AQUA + MAR + MUSEU - INTEIRA','COMBO AQUA + MAR + MUSEU - MEIA','COMBO AQUA + MAR + MUSEU - PROMO RJ','COMBO AQUA + MAR + MUSEU - INFANTIL','COMBO AQUA + MAR + GEX - INTEIRA','COMBO AQUA + MAR + GEX - MEIA','COMBO AQUA + MAR + GEX - PROMO RJ','COMBO AQUA + MAR + GEX - INFANTIL','COMBO AQUA + MUSEU + GEX - INTEIRA','COMBO AQUA + MUSEU + GEX - MEIA','COMBO AQUA + MUSEU + GEX - PROMO RJ','COMBO AQUA + MUSEU + GEX - INFANTIL'];
+
+let todos = [], charts = {};
+
+// ── CSV PARSER ──
+function parseCSV(txt) {
+  const lines = txt.trim().split('\n');
+  const hdrs  = lines[0].split(',').map(h => h.replace(/"/g,'').trim());
+  return lines.slice(1).map(line => {
+    const vals=[]; let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){inQ=!inQ;continue}if(c===','&&!inQ){vals.push(cur.trim());cur='';continue}cur+=c}
+    vals.push(cur.trim());
+    const o={};hdrs.forEach((h,i)=>o[h]=vals[i]??'');return o;
+  });
+}
+function parseData(d){
+  if(!d)return null;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(d))return new Date(d+'T12:00:00');
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(d)){const[dd,mm,aa]=d.split('/');return new Date(`${aa}-${mm}-${dd}T12:00:00`);}
+  const dt=new Date(d);return isNaN(dt)?null:dt;
+}
+
+// ── CARREGAR PREÇOS DO SHEETS ──
+async function carregarPrecos() {
+  if (PRECOS_GID === 'COLE_O_GID_DA_ABA_PRECOS') return; // ainda não configurado
+  try {
+    const res = await fetch(PRECOS_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const rows = parseCSV(txt);
+    let atualizados = 0;
+    rows.forEach(r => {
+      const prod = (r['Produto'] || r['produto'] || '').trim();
+      if (!prod) return;
+      const aqua  = Number(r['Aqua']  || r['AQUA']  || r['aqua']  || 0);
+      const museu = Number(r['Museu'] || r['MUSEU'] || r['museu'] || 0);
+      const gex   = Number(r['GEX']   || r['gex']   || 0);
+      const mar   = Number(r['MAR']   || r['mar']   || 0);
+      const total = Number(r['Total'] || r['TOTAL'] || r['total'] || (aqua+museu+gex+mar));
+      PRECOS[prod] = { aqua, museu, gex, mar, total };
+      atualizados++;
+    });
+    // Rederiva as listas de pertencimento
+    TEM_MUSEU_DYN.length = 0; TEM_GEX_DYN.length = 0; TEM_MAR_DYN.length = 0;
+    Object.entries(PRECOS).forEach(([k,v]) => {
+      if(v.museu > 0) TEM_MUSEU_DYN.push(k);
+      if(v.gex   > 0) TEM_GEX_DYN.push(k);
+      if(v.mar   > 0) TEM_MAR_DYN.push(k);
+    });
+    console.log(`Preços carregados do Sheets: ${atualizados} produtos`);
+  } catch(e) {
+    console.warn('Não foi possível carregar preços do Sheets, usando tabela fixa.', e.message);
+  }
+}
+
+// Arrays dinâmicos derivados (inicializados com os valores fixos)
+const TEM_MUSEU_DYN = [...TEM_MUSEU];
+const TEM_GEX_DYN   = [...TEM_GEX];
+const TEM_MAR_DYN   = [...TEM_MAR];
+
+// ── CARREGAR DADOS ──
+async function carregar(){
+  setLoad(true);
+  try{
+    // Carrega preços e vendas em paralelo
+    await Promise.all([
+      carregarPrecos(),
+      fetch(SHEET_URL).then(async res => {
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const txt = await res.text();
+        todos = parseCSV(txt).map(r=>{r._data=parseData(r['Data']);return r;}).filter(r=>r._data&&!isNaN(r._data));
+      })
+    ]);
+    popVendFiltro();
+    aplicar();
+    document.getElementById('last-upd').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){console.error('Erro ao carregar:',e.message,e);}
+  finally{setLoad(false);}
+}
+
+function setLoad(on){const b=document.getElementById('lb');b.style.width=on?'70%':'100%';if(!on)setTimeout(()=>b.style.width='0%',400);}
+
+function popVendFiltro(){
+  const sel=document.getElementById('f-vend');const cur=sel.value;
+  const vends=[...new Set(todos.map(r=>r['Vendedor']).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">Todos</option>';
+  vends.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});
+  if(cur)sel.value=cur;
+}
+
+function onPerChange(){
+  const v=document.getElementById('f-per').value;
+  document.getElementById('custom-dts').style.display=v==='custom'?'flex':'none';
+  if(v!=='custom')aplicar();
+}
+
+function getRange(per){
+  const h=new Date();h.setHours(23,59,59,999);
+  const s=new Date();s.setHours(0,0,0,0);
+  if(per==='mes_atual'){s.setDate(1);return[s,h];}
+  if(per==='mes_ant'){s.setDate(1);s.setMonth(s.getMonth()-1);const e=new Date(s);e.setMonth(e.getMonth()+1);e.setDate(0);e.setHours(23,59,59,999);return[s,e];}
+  if(per==='u30'){s.setDate(s.getDate()-30);return[s,h];}
+  if(per==='u90'){s.setDate(s.getDate()-90);return[s,h];}
+  if(per==='ano'){s.setMonth(0);s.setDate(1);return[s,h];}
+  if(per==='custom'){const de=document.getElementById('f-de').value;const ate=document.getElementById('f-ate').value;if(de&&ate)return[new Date(de),new Date(ate+'T23:59:59')];}
+  s.setDate(1);return[s,h];
+}
+function getA1([de,ate]){return[new Date(de-365*864e5),new Date(ate-365*864e5)];}
+function filtrar(recs,de,ate,vend,canal,cat,atr,tipo){
+  return recs.filter(r=>{
+    if(r._data<de||r._data>ate)return false;
+    if(vend&&r['Vendedor']!==vend)return false;
+    if(canal&&r['Canal']!==canal)return false;
+    if(cat&&r['Categoria']!==cat)return false;
+    if(atr&&r['Produto']!==atr)return false;
+    if(tipo){
+      const p=r['Produto'];
+      if(tipo==='museu'&&!TEM_MUSEU.includes(p))return false;
+      if(tipo==='gex'  &&!TEM_GEX.includes(p))  return false;
+      if(tipo==='mar'  &&!TEM_MAR.includes(p))   return false;
+      if(tipo==='aqua' &&!(PRECOS[p]&&PRECOS[p].aqua>0))return false;
+    }
+    return true;
+  });
+}
+
+function aplicar(){
+  const per=document.getElementById('f-per').value;
+  const vend=document.getElementById('f-vend').value;
+  const canal=document.getElementById('f-canal').value;
+  const cat=document.getElementById('f-cat').value;
+  const atr=document.getElementById('f-atr').value;
+  const tipo=document.getElementById('f-tipo').value;
+  const[de,ate]=getRange(per);
+  const[deA,ateA]=getA1([de,ate]);
+  const at=filtrar(todos,de,ate,vend,canal,cat,atr,tipo);
+  const a1=filtrar(todos,deA,ateA,vend,canal,cat,atr,tipo);
+  try { renderKPIs(at,a1,tipo); } catch(e) { console.error('renderKPIs:',e); }
+  try { renderCharts(at,de,ate,tipo); } catch(e) { console.error('renderCharts:',e); }
+  try { renderTipoProduto(at,tipo); } catch(e) { console.error('renderTipoProduto:',e); }
+  try { renderAtracao(at); } catch(e) { console.error('renderAtracao:',e); }
+  try { renderConvAtracao(at,a1); } catch(e) { console.error('renderConvAtracao:',e); }
+  try { renderExpCompleta(at,tipo); } catch(e) { console.error('renderExpCompleta:',e); }
+  try { renderRankingMuseu(at); } catch(e) { console.error('renderRankingMuseu:',e); }
+  try { renderPaxConv(at,a1); } catch(e) { console.error('renderPaxConv:',e); }
+}
+
+// Valor do registro: quando filtro por atração específica, usa parcela dessa atração
+function valorReg(r, tipo) {
+  if(tipo==='museu') return parcelaAtr(r,'museu');
+  if(tipo==='gex')   return parcelaAtr(r,'gex');
+  if(tipo==='mar')   return parcelaAtr(r,'mar');
+  if(tipo==='aqua')  return parcelaAtr(r,'aqua');
+  return Number(r['Total'])||0;
+}
+// Parcela de uma atração específica
+function parcelaAtr(r, atr) {
+  const p = PRECOS[r['Produto']] || {};
+  return (p[atr] || 0) * (Number(r['Quantidade']) || 0);
+}
+
+// ── KPIs ──
+function setEl(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function kpiSet(id, val, idA1, valA1, idV, varPct) {
+  setEl(id, val);
+  if (idA1 && valA1 !== null && valA1 !== undefined) {
+    setEl(idA1, 'A-1: ' + valA1);
+  }
+  if (idV && varPct !== null && varPct !== undefined) {
+    const el = document.getElementById(idV);
+    if (el) {
+      const cls = varPct >= 0 ? 'up' : 'dn';
+      el.className = 'kpi-var ' + cls;
+      el.textContent = (varPct >= 0 ? '+' : '') + varPct.toFixed(1) + '%';
+    }
+  }
+}
+function renderKPIs(at, a1, tipo) {
+  const v = s => s.reduce((a,r) => a + valorReg(r, tipo), 0);
+  const q = s => s.reduce((a,r) => a + (Number(r['Quantidade']) || 0), 0);
+  const vAt = v(at), vA1 = v(a1), qAt = q(at), qA1 = q(a1);
+  const tAt = qAt > 0 ? vAt / qAt : 0;
+  const tA1 = qA1 > 0 ? vA1 / qA1 : 0;
+
+  kpiSet('k-vend', fmt(vAt),  'k-vend-a1', vA1 > 0 ? fmt(vA1)   : null, 'k-vend-v', vA1 > 0 ? ((vAt - vA1) / vA1) * 100 : null);
+  kpiSet('k-ing',  fmtN(qAt), 'k-ing-a1',  qA1 > 0 ? fmtN(qA1)  : null, 'k-ing-v',  qA1 > 0 ? ((qAt - qA1) / qA1) * 100 : null);
+  kpiSet('k-tkt',  fmt(tAt),  'k-tkt-a1',  tA1 > 0 ? fmt(tA1)   : null, 'k-tkt-v',  tA1 > 0 ? ((tAt - tA1) / tA1) * 100 : null);
+
+  // PAX Aquário (soma do maior PAX por dia)
+  function calcPax(recs) {
+    const m={};
+    recs.forEach(r=>{const d=r._data.toISOString().split('T')[0];const p=Number(r['PAX Aquário'])||0;if(!m[d]||p>m[d])m[d]=p;});
+    return Object.values(m).reduce((a,b)=>a+b,0);
+  }
+  const paxAt = calcPax(at), paxA1 = calcPax(a1);
+  setEl('k-pax', fmtN(paxAt) || '—');
+  if(paxA1 > 0){
+    setEl('k-pax-a1','A-1: '+fmtN(paxA1));
+    const diff = paxAt > 0 ? ((paxAt - paxA1) / paxA1) * 100 : null;
+    if(diff !== null){
+      const el = document.getElementById('k-pax-v');
+      if(el){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=(diff>=0?'+':'')+diff.toFixed(1)+'%';}
+    }
+  }
+
+  // Conversão Museu com A-1
+  const ingMuseuAt = at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
+  const ingMuseuA1 = a1.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
+  const convAt = paxAt > 0 ? (ingMuseuAt / paxAt) * 100 : null;
+  const convA1 = paxA1 > 0 ? (ingMuseuA1 / paxA1) * 100 : null;
+  setEl('k-conv', convAt !== null ? convAt.toFixed(1)+'%' : '—');
+  if(convA1 !== null){
+    setEl('k-conv-a1','A-1: '+convA1.toFixed(1)+'%');
+    if(convAt !== null){
+      const diff = convAt - convA1;
+      const el = document.getElementById('k-conv-v');
+      if(el){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=(diff>=0?'+':'')+diff.toFixed(1)+'%';}
+    }
+  }
+}
+
+// ── GRÁFICOS ──
+function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+const DL_BAR={anchor:'end',align:'end',color:'#10403B',font:{family:'Rajdhani',size:10,weight:'600'},clip:false};
+const DL_BAR_H={anchor:'end',align:'right',color:'#10403B',font:{family:'Rajdhani',size:10,weight:'600'},clip:false,formatter:v=>fmt(v)};
+
+function optsBarV(fmtFn){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{...DL_BAR,formatter:fmtFn||fmtN}},scales:{x:{grid:{display:false},ticks:{font:{family:'Rajdhani',size:10},color:'#4C5958'}},y:{display:false,grace:'20%'}},layout:{padding:{top:24}}};}
+
+const _legendOpts = {position:'bottom',labels:{font:{family:'Rajdhani',size:9},boxWidth:8,padding:5,color:'#10403B'}};
+const _dlBase = {color:'#fff',font:{family:'Rajdhani',size:9,weight:'600'}};
+const _dlDisplay = ctx=>{const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);return t>0&&(ctx.dataset.data[ctx.dataIndex]/t)>0.06;};
+
+function optsDoughnut(){
+  return{responsive:true,maintainAspectRatio:false,cutout:'52%',layout:{padding:0},
+    plugins:{legend:_legendOpts,datalabels:{..._dlBase,
+      formatter:(v,ctx)=>{const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);const p=t>0?((v/t)*100).toFixed(0):0;return Number(p)>6?p+'%':'';},
+      display:_dlDisplay}}};
+}
+function optsDoughnutQtd(){
+  return{responsive:true,maintainAspectRatio:false,cutout:'52%',layout:{padding:0},
+    plugins:{legend:_legendOpts,datalabels:{..._dlBase,
+      formatter:(v,ctx)=>{const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);return t>0&&(v/t)>0.06?fmtN(v):'';},
+      display:_dlDisplay}}};
+}
+
+function renderCharts(at,de,ate,tipo){
+  // Vendas por vendedor
+  const pv={};at.forEach(r=>{const v=r['Vendedor']||'S/N';if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
+  const vends=Object.keys(pv).sort((a,b)=>pv[b].val-pv[a].val);
+  const BW=Math.max(80, Math.floor(300/Math.max(vends.length,1)));
+  const wVend=Math.max(300, vends.length*BW);
+  document.getElementById('w-vv').style.width=wVend+'px';
+  document.getElementById('w-vq').style.width=wVend+'px';
+  dc('vv');charts['vv']=new Chart(document.getElementById('ch-vv'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].val),backgroundColor:CORES,borderRadius:5,borderSkipped:false}]},options:optsBarV(fmt)});
+  dc('vq');charts['vq']=new Chart(document.getElementById('ch-vq'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].qtd),backgroundColor:CORES.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},options:optsBarV(fmtN)});
+
+  // Por tipo — donut valor + donut qtd
+  const tiposVal={Avulso:0,'Combo Duplo':0,'Combo Triplo':0,'Exp. Completa':0,Complementos:0};
+  const tiposQtd={Avulso:0,'Combo Duplo':0,'Combo Triplo':0,'Exp. Completa':0,Complementos:0};
+  const mapCat={'avulso':'Avulso','combo_duplo':'Combo Duplo','combo_triplo':'Combo Triplo','exp_completa':'Exp. Completa','complementos':'Complementos'};
+  at.forEach(r=>{const t=mapCat[r['Categoria']]||'Outros';if(tiposVal[t]!==undefined){tiposVal[t]+=valorReg(r,tipo);tiposQtd[t]+=(Number(r['Quantidade'])||0);}});
+  const labsTipo=Object.keys(tiposVal).filter(k=>tiposVal[k]>0);
+  dc('tipo');charts['tipo']=new Chart(document.getElementById('ch-tipo'),{type:'doughnut',data:{labels:labsTipo,datasets:[{data:labsTipo.map(k=>tiposVal[k]),backgroundColor:CORES_DONUT_TIPO,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnut()});
+  dc('tipo-qtd');charts['tipo-qtd']=new Chart(document.getElementById('ch-tipo-qtd'),{type:'doughnut',data:{labels:Object.keys(tiposQtd).filter(k=>tiposQtd[k]>0),datasets:[{data:Object.keys(tiposQtd).filter(k=>tiposQtd[k]>0).map(k=>tiposQtd[k]),backgroundColor:CORES_DONUT_TIPO,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnutQtd()});
+
+  // Por atração — donut valor + donut qtd
+  const atrVal={Museu:0,GEX:0,MAR:0};
+  const atrQtd={Museu:0,GEX:0,MAR:0};
+  at.forEach(r=>{
+    atrVal.Museu+=parcelaAtr(r,'museu');atrVal.GEX+=parcelaAtr(r,'gex');atrVal.MAR+=parcelaAtr(r,'mar');
+    if(TEM_MUSEU.includes(r['Produto']))atrQtd.Museu+=Number(r['Quantidade'])||0;
+    if(TEM_GEX.includes(r['Produto']))  atrQtd.GEX+=Number(r['Quantidade'])||0;
+    if(TEM_MAR.includes(r['Produto']))  atrQtd.MAR+=Number(r['Quantidade'])||0;
+  });
+  dc('atr');charts['atr']=new Chart(document.getElementById('ch-atr'),{type:'doughnut',data:{labels:['Museu','GEX','MAR'],datasets:[{data:[atrVal.Museu,atrVal.GEX,atrVal.MAR],backgroundColor:CORES_DONUT_ATR,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnut()});
+  dc('atr-qtd');charts['atr-qtd']=new Chart(document.getElementById('ch-atr-qtd'),{type:'doughnut',data:{labels:['Museu','GEX','MAR'],datasets:[{data:[atrQtd.Museu,atrQtd.GEX,atrQtd.MAR],backgroundColor:CORES_DONUT_ATR,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnutQtd()});
+
+  // Vendas A0 vs A1 por dia
+  const dmA0={};const dqA0={};
+  at.forEach(r=>{
+    const d=r._data.toISOString().split('T')[0];
+    if(!dmA0[d])dmA0[d]=0; dmA0[d]+=valorReg(r,tipo);
+    if(!dqA0[d])dqA0[d]=0; dqA0[d]+=Number(r['Quantidade'])||0;
+  });
+  // A1: usar registros do ano anterior com data deslocada para o mesmo dia corrente
+  const a1Recs=filtrar(todos,...getA1([de,ate]),document.getElementById('f-vend').value,document.getElementById('f-canal').value,document.getElementById('f-cat').value,document.getElementById('f-atr').value,tipo);
+  const dmA1={};const dqA1={};
+  a1Recs.forEach(r=>{
+    const d=new Date(r._data.getTime()+365*864e5).toISOString().split('T')[0];
+    if(!dmA1[d])dmA1[d]=0; dmA1[d]+=valorReg(r,tipo);
+    if(!dqA1[d])dqA1[d]=0; dqA1[d]+=Number(r['Quantidade'])||0;
+  });
+  const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
+  const dias=[...diasSet].sort();
+  // Largura fixa por par de barras — centraliza quando cabe, scroll quando ultrapassa
+  const isMobile = window.innerWidth <= 600;
+  const pxPorDia = isMobile ? 70 : 110;
+  const wCalculado = dias.length * pxPorDia;
+  const wContainer = document.getElementById('w-meta').parentElement.clientWidth || 600;
+  document.getElementById('w-meta').style.width = wCalculado <= wContainer
+    ? '100%'
+    : wCalculado + 'px';
+  dc('meta');charts['meta']=new Chart(document.getElementById('ch-meta'),{
+    type:'bar',
+    data:{
+      labels:dias.map(d=>{const[,m,dd]=d.split('-');return`${dd}/${m}`;}),
+      datasets:[
+        {label:'Ano Atual',data:dias.map(d=>dmA0[d]||0),backgroundColor:CORES[0]+'cc',borderRadius:3,borderSkipped:false,
+          datalabels:{anchor:'end',align:'end',textAlign:'center',clamp:false,clip:false,color:'#10403B',font:{family:'Rajdhani',size:9,weight:'600'},
+            formatter:(v,ctx)=>{
+              if(!v) return '';
+              const d=dias[ctx.dataIndex];
+              const ing=dqA0[d]||0;
+              return [fmt(v), ing+' ing'];
+            }}},
+        {label:'Ano Anterior',data:dias.map(d=>dmA1[d]||0),backgroundColor:CORES[1]+'99',borderRadius:3,borderSkipped:false,
+          datalabels:{anchor:'end',align:'end',textAlign:'center',clamp:false,clip:false,color:'#4C5958',font:{family:'Rajdhani',size:9,weight:'600'},
+            formatter:(v,ctx)=>{
+              if(!v) return '';
+              const d=dias[ctx.dataIndex];
+              const ing=dqA1[d]||0;
+              return [fmt(v), ing+' ing'];
+            }}}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.raw)}}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'Rajdhani',size:11},color:'#4C5958',maxRotation:45}},
+        y:{display:false,grace:'30%'}
+      },
+      layout:{padding:{top:44,left:4,right:4,bottom:4}},
+      barPercentage:0.85,
+      categoryPercentage:0.7
+    }
+  });
+}
+
+// ── ANÁLISE TIPO PRODUTO ──
+function renderTipoProduto(at,tipo){
+  const mapCat={'avulso':'Avulso','combo_duplo':'Combo Duplo','combo_triplo':'Combo Triplo','exp_completa':'Exp. Completa','complementos':'Complementos'};
+  const grupos={};
+  at.forEach(r=>{const cat=mapCat[r['Categoria']]||'Outros';if(!grupos[cat])grupos[cat]={qtd:0,val:0,prods:{}};grupos[cat].qtd+=Number(r['Quantidade'])||0;grupos[cat].val+=valorReg(r,tipo);const p=r['Produto']||'—';if(!grupos[cat].prods[p])grupos[cat].prods[p]={qtd:0,val:0};grupos[cat].prods[p].qtd+=Number(r['Quantidade'])||0;grupos[cat].prods[p].val+=valorReg(r,tipo);});
+  const totalVal=Object.values(grupos).reduce((a,b)=>a+b.val,0);
+  const tb=document.getElementById('tbl-tipo-body');tb.innerHTML='';
+  Object.entries(grupos).forEach(([cat,d],gi)=>{
+    const tr=document.createElement('tr');
+    tr.className='vr';
+    tr.innerHTML=`<td><div class="exp-btn" id="etp-${gi}" onclick="toggleSub2('tp',${gi})">+</div></td><td style="font-weight:600">${cat}</td><td class="r">${fmtN(d.qtd)}</td><td class="r val-g">${fmt(d.val)}</td><td class="r">${pct(d.val,totalVal)}</td>`;
+    tb.appendChild(tr);
+    const subTr=document.createElement('tr');subTr.className='sub-row';subTr.id=`stp-${gi}`;
+    const prods=Object.entries(d.prods).sort((a,b)=>b[1].val-a[1].val);
+    subTr.innerHTML=`<td colspan="5" style="padding:0"><table style="width:100%;border-collapse:collapse;background:var(--gl);table-layout:fixed"><tr style="border-bottom:1px solid var(--bd)"><th style="padding:5px 5px 5px 32px;font-size:9px;font-weight:600;color:var(--mu2);text-align:left">Produto</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:40px">Qtd</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:72px">Valor</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:46px">Part.%</th></tr>${prods.map(([p,v])=>`<tr><td style="padding:5px 5px 5px 32px;font-size:10px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</td><td style="text-align:right;padding:5px;font-size:10px;white-space:nowrap">${fmtN(v.qtd)}</td><td style="text-align:right;padding:5px;font-size:10px;color:var(--g);font-weight:600;white-space:nowrap">${fmt(v.val)}</td><td style="text-align:right;padding:5px;font-size:10px;white-space:nowrap">${pct(v.val,totalVal)}</td></tr>`).join('')}</table></td>`;
+    tb.appendChild(subTr);
+  });
+}
+
+// ── ANÁLISE ATRAÇÃO ──
+function renderAtracao(at){
+  const atr={Museu:{val:0},GEX:{val:0},MAR:{val:0}};
+  at.forEach(r=>{
+    if(TEM_MUSEU.includes(r['Produto'])) atr.Museu.val += parcelaAtr(r,'museu');
+    if(TEM_GEX.includes(r['Produto']))   atr.GEX.val   += parcelaAtr(r,'gex');
+    if(TEM_MAR.includes(r['Produto']))   atr.MAR.val   += parcelaAtr(r,'mar');
+  });
+  const totalVal = atr.Museu.val + atr.GEX.val + atr.MAR.val;
+  const tb = document.getElementById('tbl-atr-body'); tb.innerHTML='';
+  Object.entries(atr).forEach(([n,d]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-weight:600">${n}</td><td class="r val-g">${fmt(d.val)}</td><td class="r">${pct(d.val,totalVal)}</td>`;
+    tb.appendChild(tr);
+  });
+  // Linha de total
+  const tot = document.createElement('tr');
+  tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td><td class="r val-g" style="border-top:2px solid var(--bd)">${fmt(totalVal)}</td><td class="r" style="border-top:2px solid var(--bd)">100%</td>`;
+  tb.appendChild(tot);
+}
+
+// ── ATRAÇÃO POR VENDEDOR ──
+// Colunas: Vendedor | Museu (R$) | GEX (R$) | MAR (R$) | Part.% Museu sobre total Museu do time
+function renderAtracaoVend(at){
+  const por={};
+  at.forEach(r=>{
+    const v=r['Vendedor']||'S/N';
+    if(!por[v])por[v]={museu:0,gex:0,mar:0};
+    por[v].museu += parcelaAtr(r,'museu');
+    por[v].gex   += parcelaAtr(r,'gex');
+    por[v].mar   += parcelaAtr(r,'mar');
+  });
+  const totalMuseuTime = Object.values(por).reduce((a,b)=>a+b.museu,0);
+  const tb = document.getElementById('tbl-atr-vend-body'); tb.innerHTML='';
+  Object.entries(por).sort((a,b)=>b[1].museu-a[1].museu).forEach(([v,d])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="font-weight:600">${v}</td><td class="r val-g">${fmt(d.museu)}</td><td class="r">${fmt(d.gex)}</td><td class="r">${fmt(d.mar)}</td><td class="r">${pct(d.museu,totalMuseuTime)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ── CONVERSÃO POR ATRAÇÃO · POR VENDEDOR ──
+// Linhas: vendedores | Colunas: Museu | GEX | MAR | AQUA — cada uma com Qtd, R$, % R$ (sobre total da coluna)
+function renderConvAtracao(at, a1) {
+  const por = {};
+  at.forEach(r => {
+    const v = r['Vendedor'] || 'S/N';
+    if (!por[v]) por[v] = {
+      museu:{qtd:0,val:0}, gex:{qtd:0,val:0}, mar:{qtd:0,val:0}, aqua:{qtd:0,val:0}
+    };
+    const q = Number(r['Quantidade']) || 0;
+    if (TEM_MUSEU.includes(r['Produto'])) { por[v].museu.qtd+=q; por[v].museu.val+=parcelaAtr(r,'museu'); }
+    if (TEM_GEX.includes(r['Produto']))   { por[v].gex.qtd+=q;   por[v].gex.val+=parcelaAtr(r,'gex'); }
+    if (TEM_MAR.includes(r['Produto']))   { por[v].mar.qtd+=q;   por[v].mar.val+=parcelaAtr(r,'mar'); }
+    // AQUA: todos os produtos com parcela aqua > 0
+    const pa = parcelaAtr(r,'aqua');
+    if (pa > 0) { por[v].aqua.qtd+=q; por[v].aqua.val+=pa; }
+  });
+
+  // Totais do time por atração — para o % ser sobre a coluna
+  const totValMuseu = Object.values(por).reduce((a,b)=>a+b.museu.val,0);
+  const totValGex   = Object.values(por).reduce((a,b)=>a+b.gex.val,  0);
+  const totValMar   = Object.values(por).reduce((a,b)=>a+b.mar.val,  0);
+  const totValAqua  = Object.values(por).reduce((a,b)=>a+b.aqua.val, 0);
+  const totQMuseu   = Object.values(por).reduce((a,b)=>a+b.museu.qtd,0);
+  const totQGex     = Object.values(por).reduce((a,b)=>a+b.gex.qtd,  0);
+  const totQMar     = Object.values(por).reduce((a,b)=>a+b.mar.qtd,  0);
+  const totQAqua    = Object.values(por).reduce((a,b)=>a+b.aqua.qtd, 0);
+
+  const tb = document.getElementById('tbl-conv-atr-body'); tb.innerHTML = '';
+
+  const tdBase = `padding:7px 10px;border-bottom:1px solid var(--bd);font-size:11px;font-weight:500;white-space:nowrap`;
+  const tdR    = tdBase+`;text-align:right`;
+  const tdBL   = tdR+`;border-left:1px solid var(--bd)`;
+
+  // % é a participação de cada atração no total geral do vendedor
+  const cel = (atr, totVal, first) => (d, totalVend) => {
+    const q = d[atr].qtd, r = d[atr].val;
+    const p = totalVend > 0 ? (r / totalVend * 100).toFixed(1)+'%' : '—';
+    const brd = first ? tdBL : tdR;
+    return `<td style="${brd}">${fmtN(q)}</td><td style="${tdR};color:var(--g);font-weight:600">${fmt(r)}</td><td style="${tdR}">${p}</td>`;
+  };
+
+  Object.entries(por).sort((a,b)=>b[1].museu.val-a[1].museu.val).forEach(([v,d]) => {
+    // Total do vendedor = soma de todas as atrações
+    const totalVend = d.museu.val + d.gex.val + d.mar.val + d.aqua.val;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="${tdBase};font-weight:600">${v}</td>`
+      + cel('museu',totValMuseu,true)(d, totalVend)
+      + cel('gex',  totValGex,  true)(d, totalVend)
+      + cel('mar',  totValMar,  true)(d, totalVend)
+      + cel('aqua', totValAqua, true)(d, totalVend);
+    tb.appendChild(tr);
+  });
+
+  // Linha de totais — % de cada atração sobre o total geral
+  const totalGeral = totValMuseu + totValGex + totValMar + totValAqua;
+  const pTot = v => totalGeral > 0 ? (v/totalGeral*100).toFixed(1)+'%' : '—';
+  const bt = `border-top:2px solid var(--bd)`;
+  const tTr = document.createElement('tr');
+  tTr.innerHTML = `<td style="${tdBase};font-weight:700;${bt}">Total</td>`
+    +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQMuseu)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValMuseu)}</td><td style="${tdR};${bt}">${pTot(totValMuseu)}</td>`
+    +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQGex)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValGex)}</td><td style="${tdR};${bt}">${pTot(totValGex)}</td>`
+    +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQMar)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValMar)}</td><td style="${tdR};${bt}">${pTot(totValMar)}</td>`
+    +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQAqua)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValAqua)}</td><td style="${tdR};${bt}">${pTot(totValAqua)}</td>`;
+  tb.appendChild(tTr);
+}
+
+// ── EXP COMPLETA + 3 PASSEIOS ──
+function renderExpCompleta(at,tipo){
+  const totalMuseu=at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
+  const grupos=[{label:'Exp. Completa + GEX',prods:EXP_COMPLETA},{label:'3 Passeios (Combos Triplos)',prods:TRES_PASS}];
+  const tb=document.getElementById('tbl-exp-body');tb.innerHTML='';
+  grupos.forEach(g=>{
+    const reg=at.filter(r=>g.prods.includes(r['Produto']));
+    const qtd=reg.reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
+    const val=reg.reduce((a,r)=>a+valorReg(r,tipo),0);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:600">${g.label}</td><td class="r">${fmtN(qtd)}</td><td class="r val-g">${fmt(val)}</td><td class="r">${pct(qtd,totalMuseu)}</td>`;
+    tb.appendChild(tr);
+  });
+  const totalQtd=grupos.reduce((a,g)=>{return a+at.filter(r=>g.prods.includes(r['Produto'])).reduce((b,r)=>b+(Number(r['Quantidade'])||0),0);},0);
+  const totalVal=grupos.reduce((a,g)=>{return a+at.filter(r=>g.prods.includes(r['Produto'])).reduce((b,r)=>b+valorReg(r,tipo),0);},0);
+  const tot=document.createElement('tr');
+  tot.innerHTML=`<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td><td class="r" style="border-top:2px solid var(--bd)">${fmtN(totalQtd)}</td><td class="r val-g" style="border-top:2px solid var(--bd)">${fmt(totalVal)}</td><td class="r" style="border-top:2px solid var(--bd)">${pct(totalQtd,totalMuseu)}</td>`;
+  tb.appendChild(tot);
+}
+
+// ── RANKING MUSEU ──
+function renderRankingMuseu(at){
+  const por={};
+  at.filter(r=>TEM_MUSEU.includes(r['Produto'])).forEach(r=>{const v=r['Vendedor']||'S/N';if(!por[v])por[v]={ing:0,val:0};por[v].ing+=Number(r['Quantidade'])||0;por[v].val+=parcelaAtr(r,'museu');});
+  const totalIng=Object.values(por).reduce((a,b)=>a+b.ing,0);
+  const tb=document.getElementById('tbl-rank-body');tb.innerHTML='';
+  Object.entries(por).sort((a,b)=>b[1].ing-a[1].ing).forEach(([v,d],i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${pct(d.ing,totalIng)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ── CONVERSÃO PAX POR ATRAÇÃO ──
+// Museu  = total ingressos com Museu ÷ PAX Aquário (soma do maior PAX por dia)
+// GEX    = soma do maior PAX GEX por dia ÷ PAX Aquário
+// MAR    = soma do maior PAX MAR por dia ÷ PAX Aquário
+function renderPaxConv(at, a1) {
+  function calcPaxDia(recs, campo) {
+    const m = {};
+    recs.forEach(r => {
+      const d = r._data.toISOString().split('T')[0];
+      const v = Number(r[campo]) || 0;
+      if (v > 0 && (!m[d] || v > m[d])) m[d] = v;
+    });
+    return Object.values(m).reduce((a,b) => a+b, 0);
+  }
+
+  const paxAq  = calcPaxDia(at, 'PAX Aquário');
+  const paxGex = calcPaxDia(at, 'PAX GEX');
+  const paxMar = calcPaxDia(at, 'PAX MAR');
+  const ingMuseu = at.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
+
+  // A-1
+  const paxAqA1   = calcPaxDia(a1, 'PAX Aquário');
+  const paxGexA1  = calcPaxDia(a1, 'PAX GEX');
+  const paxMarA1  = calcPaxDia(a1, 'PAX MAR');
+  const ingMuseuA1 = a1.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
+
+  const conv    = (num, den) => den > 0 ? (num/den*100).toFixed(1)+'%' : '—';
+  const varTag  = (v, v1) => {
+    if (!v || !v1 || v==='—' || v1==='—') return '';
+    const d = parseFloat(v) - parseFloat(v1);
+    const cls = d >= 0 ? 'up' : 'dn';
+    return `<span class="kpi-var ${cls}" style="font-size:9px">${d>=0?'+':''}${d.toFixed(1)}%</span>`;
+  };
+
+  const linhas = [
+    {
+      label: 'Museu',
+      pax:   fmtN(ingMuseu),
+      paxAq: fmtN(paxAq),
+      conv:  conv(ingMuseu, paxAq),
+      convA1:conv(ingMuseuA1, paxAqA1),
+      desc:  'Ing. Museu ÷ PAX Aquá.'
+    },
+    {
+      label: 'GEX',
+      pax:   paxGex > 0 ? fmtN(paxGex) : '—',
+      paxAq: fmtN(paxAq),
+      conv:  conv(paxGex, paxAq),
+      convA1:conv(paxGexA1, paxAqA1),
+      desc:  'PAX GEX ÷ PAX Aquá.'
+    },
+    {
+      label: 'MAR',
+      pax:   paxMar > 0 ? fmtN(paxMar) : '—',
+      paxAq: fmtN(paxAq),
+      conv:  conv(paxMar, paxAq),
+      convA1:conv(paxMarA1, paxAqA1),
+      desc:  'PAX MAR ÷ PAX Aquá.'
+    },
+  ];
+
+  const tb = document.getElementById('tbl-pax-conv-body'); tb.innerHTML = '';
+  linhas.forEach(l => {
+    const vTag = varTag(l.conv, l.convA1);
+    const a1Str = l.convA1 !== '—'
+      ? `<div style="color:var(--mu2);font-size:9px;margin-top:2px">A-1: ${l.convA1} ${vTag}</div>`
+      : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div style="font-weight:600">${l.label}</div>
+        <div style="font-size:9px;color:var(--mu2)">${l.desc}</div>
+      </td>
+      <td class="r" style="font-weight:500">${l.pax}</td>
+      <td class="r" style="font-weight:500">${l.paxAq}</td>
+      <td class="r">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+          <span style="font-weight:700;color:var(--g);font-size:14px">${l.conv}</span>
+          ${vTag}
+        </div>
+        <div style="text-align:right;color:var(--mu2);font-size:9px;margin-top:1px">${l.convA1 !== '—' ? 'A-1: '+l.convA1 : ''}</div>
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function toggleSub2(pref,idx){
+  const sub=document.getElementById(`s${pref}-${idx}`);
+  const btn=document.getElementById(`e${pref}-${idx}`);
+  const op=sub.classList.toggle('op');
+  btn.classList.toggle('op',op);
+  btn.textContent=op?'−':'+';
+}
+
+carregar();
+</script>
+</body>
+</html>
