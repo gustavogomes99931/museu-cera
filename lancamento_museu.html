@@ -429,8 +429,65 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .sec-sep { padding: 0 16px; }
 }
 </style>
+<style>
+/* ── TELA DE SENHA ── */
+#login-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; padding: 20px;
+}
+#login-box {
+  background: var(--white); border-radius: 20px; padding: 40px 32px;
+  border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  width: 100%; max-width: 360px; text-align: center;
+}
+#login-box .logo-area { margin-bottom: 28px; }
+#login-box .logo-area svg { width: 48px; height: 48px; color: var(--green); }
+#login-box h2 { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+#login-box p  { font-size: 13px; color: var(--muted2); margin-bottom: 28px; }
+#login-box input {
+  width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-family: 'Rajdhani', sans-serif;
+  font-size: 16px; color: var(--text); background: var(--bg);
+  outline: none; text-align: center; letter-spacing: 4px;
+  transition: border-color .15s; margin-bottom: 12px;
+}
+#login-box input:focus { border-color: var(--green); }
+#login-box input.erro { border-color: var(--danger); animation: shake .3s; }
+#login-box .btn-entrar {
+  width: 100%; padding: 14px; background: var(--green); color: #fff;
+  border: none; border-radius: 10px; font-family: 'Rajdhani', sans-serif;
+  font-size: 16px; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+#login-box .btn-entrar:hover { background: var(--green2); }
+#login-box .msg-erro {
+  font-size: 12px; color: var(--danger); margin-top: 10px;
+  opacity: 0; transition: opacity .2s;
+}
+#login-box .msg-erro.show { opacity: 1; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+}
+</style>
 </head>
 <body>
+
+<!-- ── TELA DE SENHA ── -->
+<div id="login-screen">
+  <div id="login-box">
+    <div class="logo-area">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h2>Área Restrita</h2>
+    <p>Tela de lançamento de vendas<br>Museu de Cera RJ</p>
+    <input type="password" id="senha-input" placeholder="Digite a senha" maxlength="20"
+      onkeydown="if(event.key==='Enter') verificarSenha()">
+    <button class="btn-entrar" onclick="verificarSenha()">Entrar</button>
+    <div class="msg-erro" id="msg-erro">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
 
 <div class="page">
 
@@ -669,6 +726,30 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <div class="toast" id="toast"></div>
 
 <script>
+// ── SENHA DE ACESSO ──
+// Para trocar a senha, altere o valor abaixo
+const SENHA_ACESSO = 'museu2025';
+
+function verificarSenha() {
+  const input = document.getElementById('senha-input');
+  const erro  = document.getElementById('msg-erro');
+  if (input.value === SENHA_ACESSO) {
+    // Salva sessão para não pedir senha novamente enquanto o navegador estiver aberto
+    sessionStorage.setItem('mcera_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+  } else {
+    input.classList.add('erro');
+    erro.classList.add('show');
+    input.value = '';
+    setTimeout(() => input.classList.remove('erro'), 400);
+  }
+}
+
+// Se já autenticou nessa sessão, pula a tela de senha
+if (sessionStorage.getItem('mcera_auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+}
+
 // ── Data ──
 const hoje = new Date();
 document.getElementById('f-data').value = hoje.toISOString().split('T')[0];
