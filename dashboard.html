@@ -126,10 +126,10 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
 <div class="hdr">
   <div class="hdr-l">
-    <a href="lancamento_museu.html" class="back">
+    <button class="back" onclick="irParaLancamento()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Lançamento
-    </a>
+    </button>
     <div><div class="hdr-title">Dashboard de Vendas</div><div class="hdr-sub">Museu de Cera RJ</div></div>
   </div>
   <div id="last-upd" style="font-size:11px;color:var(--mu2)"></div>
@@ -344,8 +344,71 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
 </div>
 
+<!-- ── MODAL SENHA LANÇAMENTO ── -->
+<div id="modal-senha" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.15)">
+    <div style="width:44px;height:44px;background:#e8f0ef;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:600;color:#10403B;margin-bottom:4px">Área Restrita</div>
+    <div style="font-size:12px;color:#8AA6A3;margin-bottom:20px">Digite a senha para acessar o lançamento</div>
+    <input type="password" id="dash-senha" placeholder="Senha"
+      style="width:100%;padding:12px 14px;border:1.5px solid #BFBFBF;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;text-align:center;letter-spacing:3px;outline:none;margin-bottom:8px;box-sizing:border-box"
+      onkeydown="if(event.key==='Enter') confirmarSenha()"
+      oninput="this.style.borderColor='#BFBFBF';document.getElementById('dash-erro').style.opacity=0">
+    <div id="dash-erro" style="font-size:11px;color:#c0392b;margin-bottom:10px;opacity:0;transition:opacity .2s">Senha incorreta</div>
+    <button onclick="confirmarSenha()"
+      style="width:100%;padding:12px;background:#127369;color:#fff;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:8px">
+      Entrar
+    </button>
+    <button onclick="fecharModalSenha()"
+      style="width:100%;padding:10px;background:transparent;color:#8AA6A3;border:1.5px solid #BFBFBF;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer">
+      Cancelar
+    </button>
+  </div>
+</div>
+
 </div><!-- /page -->
 <script>
+const SENHA_ACESSO = 'museu2025';
+
+function irParaLancamento() {
+  // Se já autenticou nessa sessão, vai direto
+  if (sessionStorage.getItem('mcera_auth') === '1') {
+    window.location.href = 'lancamento_museu.html';
+    return;
+  }
+  // Senão, abre o modal de senha
+  const modal = document.getElementById('modal-senha');
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('dash-senha').focus(), 100);
+}
+
+function confirmarSenha() {
+  const input = document.getElementById('dash-senha');
+  const erro  = document.getElementById('dash-erro');
+  if (input.value === SENHA_ACESSO) {
+    sessionStorage.setItem('mcera_auth', '1');
+    window.location.href = 'lancamento_museu.html';
+  } else {
+    input.style.borderColor = '#c0392b';
+    erro.style.opacity = '1';
+    input.value = '';
+    input.focus();
+  }
+}
+
+function fecharModalSenha() {
+  document.getElementById('modal-senha').style.display = 'none';
+  document.getElementById('dash-senha').value = '';
+  document.getElementById('dash-erro').style.opacity = '0';
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('modal-senha').addEventListener('click', function(e) {
+  if (e.target === this) fecharModalSenha();
+});
+
 const SHEET_ID    = "1GARcdxPGQC7UlDaXTj3Ga-nyUQAQicg09Fmca5-4n-A";
 const ABA_GID     = "0";
 const SHEET_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ABA_GID}`;
