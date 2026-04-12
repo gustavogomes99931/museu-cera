@@ -526,6 +526,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
       </div>
     </div>
+    <div style="padding:10px 16px;border-top:1px solid var(--border)">
+      <button type="button" onclick="salvarPax()"
+        style="width:100%;padding:10px;background:var(--green-l);color:var(--green);border:1.5px solid var(--green);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s"
+        onmouseover="this.style.background='var(--green)';this.style.color='#fff'"
+        onmouseout="this.style.background='var(--green-l)';this.style.color='var(--green)'">
+        Salvar PAX do dia
+      </button>
+    </div>
   </div>
 
   <!-- Card -->
@@ -1084,8 +1092,62 @@ async function carregarPrecos() {
 // Inicializar: carregar preços e renderizar
 carregarPrecos();
 
-// ── Salvar ──
-async function salvar() {
+// ── Salvar apenas PAX ──
+async function salvarPax() {
+  const pax    = document.getElementById('f-pax').value;
+  const paxGex = document.getElementById('f-pax-gex').value;
+  const paxMar = document.getElementById('f-pax-mar').value;
+
+  if (!pax && !paxGex && !paxMar) {
+    showToast('Preencha ao menos um campo de PAX');
+    return;
+  }
+
+  const data = document.getElementById('f-data').value;
+  const reg = {
+    data,
+    vendedor: '—',
+    categoria: '',
+    produto: 'PAX',
+    valorUnitario: 0,
+    valorMuseu: 0,
+    quantidade: 0,
+    total: 0,
+    canal: '—',
+    pax:    pax    ? Number(pax)    : null,
+    paxGex: paxGex ? Number(paxGex) : null,
+    paxMar: paxMar ? Number(paxMar) : null,
+    ts: new Date().toISOString()
+  };
+
+  const btn = document.querySelector('[onclick="salvarPax()"]');
+  const txtOrig = btn.textContent;
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  try {
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_AQUI_A_URL_DO_WEB_APP') {
+      showToast('PAX salvo localmente');
+    } else {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(reg)
+      });
+      showToast('✅ PAX do dia salvo!');
+      // Limpar campos PAX após salvar
+      document.getElementById('f-pax').value     = '';
+      document.getElementById('f-pax-gex').value = '';
+      document.getElementById('f-pax-mar').value = '';
+    }
+  } catch(e) {
+    showToast('Erro ao salvar PAX');
+  } finally {
+    btn.textContent = txtOrig;
+    btn.disabled = false;
+  }
+}
   const data     = document.getElementById('f-data').value;
   const vendedor = document.getElementById('f-vendedor').value;
   const produto  = document.getElementById('f-produto').value;
