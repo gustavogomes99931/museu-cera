@@ -235,8 +235,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     </div>
   </div>
   <div class="card">
-    <div class="sec-title">Por Atração</div>
-    <div class="donut-pair">
+    <div class="sec-title">Mix de Faturamento por Atração</div>
       <div class="donut-wrap">
         <div class="donut-lbl">Valor R$</div>
         <div class="donut-ch"><canvas id="ch-atr"></canvas></div>
@@ -268,7 +267,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 <!-- ── TABELAS LINHA 1 ── -->
 <div class="tbl-grid">
   <div class="card">
-    <div class="sec-title">Tipo de Venda e Produto</div>
+    <div class="sec-title">Mix de Vendas por Categoria</div>
     <div class="tbl-wrap"><table class="tbl">
       <colgroup><col style="width:22px"><col><col style="width:44px"><col style="width:70px"><col style="width:48px"></colgroup>
       <thead><tr><th></th><th>Categoria / Produto</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
@@ -276,20 +275,18 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     </table></div>
   </div>
   <div class="card">
-    <div class="sec-title">Por Atração</div>
-    <div class="tbl-wrap"><table class="tbl">
-      <colgroup><col><col style="width:80px"><col style="width:48px"></colgroup>
+    <div class="sec-title">Mix de Faturamento por Atração</div>
       <thead><tr><th>Atração</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-atr-body"></tbody>
     </table></div>
   </div>
   <div class="card" style="overflow:visible">
-    <div class="sec-title">Conversão por Atração · por Vendedor</div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%">
+    <div class="sec-title">Performance por Vendedor</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;position:relative">
       <table style="border-collapse:collapse;table-layout:auto;white-space:nowrap">
         <thead>
           <tr>
-            <th rowspan="2" style="text-align:left;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">Vendedor</th>
+            <th rowspan="2" style="text-align:left;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap;position:sticky;left:0;z-index:2;border-right:1px solid var(--bd)">Vendedor</th>
             <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Museu</th>
             <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">GEX</th>
             <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">MAR</th>
@@ -319,7 +316,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 <!-- ── TABELAS LINHA 2 ── -->
 <div class="tbl-grid">
   <div class="card">
-    <div class="sec-title">Exp. Completa + Três Atrações</div>
+    <div class="sec-title">Participação por Atração</div>
     <div class="tbl-wrap"><table class="tbl">
       <colgroup><col><col style="width:40px"><col style="width:80px"><col style="width:50px"></colgroup>
       <thead><tr><th>Grupo</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
@@ -962,6 +959,7 @@ function renderConvAtracao(at, a1) {
   const tdBase = `padding:7px 10px;border-bottom:1px solid var(--bd);font-size:11px;font-weight:500;white-space:nowrap`;
   const tdR    = tdBase+`;text-align:right`;
   const tdBL   = tdR+`;border-left:1px solid var(--bd)`;
+  const tdSticky = tdBase+`;font-weight:600;position:sticky;left:0;background:#fff;z-index:1;border-right:1px solid var(--bd)`;
 
   // % é a participação de cada atração no total geral do vendedor
   const cel = (atr, totVal, first) => (d, totalVend) => {
@@ -975,7 +973,7 @@ function renderConvAtracao(at, a1) {
     // Total do vendedor = soma de todas as atrações
     const totalVend = d.museu.val + d.gex.val + d.mar.val + d.aqua.val;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="${tdBase};font-weight:600">${v}</td>`
+    tr.innerHTML = `<td style="${tdSticky}">${v}</td>`
       + cel('museu',totValMuseu,true)(d, totalVend)
       + cel('gex',  totValGex,  true)(d, totalVend)
       + cel('mar',  totValMar,  true)(d, totalVend)
@@ -988,7 +986,7 @@ function renderConvAtracao(at, a1) {
   const pTot = v => totalGeral > 0 ? (v/totalGeral*100).toFixed(1)+'%' : '—';
   const bt = `border-top:2px solid var(--bd)`;
   const tTr = document.createElement('tr');
-  tTr.innerHTML = `<td style="${tdBase};font-weight:700;${bt}">Total</td>`
+  tTr.innerHTML = `<td style="${tdSticky};border-top:2px solid var(--bd);font-weight:700">Total</td>`
     +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQMuseu)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValMuseu)}</td><td style="${tdR};${bt}">${pTot(totValMuseu)}</td>`
     +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQGex)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValGex)}</td><td style="${tdR};${bt}">${pTot(totValGex)}</td>`
     +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQMar)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValMar)}</td><td style="${tdR};${bt}">${pTot(totValMar)}</td>`
@@ -1019,15 +1017,27 @@ function renderExpCompleta(at,tipo){
   tb.appendChild(tot);
 }
 
-// ── RANKING MUSEU ──
+// ── RANKING DE VENDAS ──
 function renderRankingMuseu(at){
   const por={};
-  at.filter(r=>TEM_MUSEU.includes(r['Produto'])).forEach(r=>{const v=r['Vendedor']||'S/N';if(!por[v])por[v]={ing:0,val:0};por[v].ing+=Number(r['Quantidade'])||0;por[v].val+=parcelaAtr(r,'museu');});
-  const totalIng=Object.values(por).reduce((a,b)=>a+b.ing,0);
+  // Acumula museu por vendedor
+  at.filter(r=>TEM_MUSEU.includes(r['Produto'])).forEach(r=>{
+    const v=r['Vendedor']||'S/N';
+    if(!por[v])por[v]={ing:0,val:0};
+    por[v].ing+=Number(r['Quantidade'])||0;
+    por[v].val+=parcelaAtr(r,'museu');
+  });
+  // Total geral Museu + GEX + MAR do time para o denominador
+  const totalMuseu = at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+parcelaAtr(r,'museu'),0);
+  const totalGex   = at.filter(r=>TEM_GEX.includes(r['Produto'])).reduce((a,r)=>a+parcelaAtr(r,'gex'),0);
+  const totalMar   = at.filter(r=>TEM_MAR.includes(r['Produto'])).reduce((a,r)=>a+parcelaAtr(r,'mar'),0);
+  const totalAtr   = totalMuseu + totalGex + totalMar;
+
   const tb=document.getElementById('tbl-rank-body');tb.innerHTML='';
-  Object.entries(por).sort((a,b)=>b[1].ing-a[1].ing).forEach(([v,d],i)=>{
+  Object.entries(por).sort((a,b)=>b[1].val-a[1].val).forEach(([v,d],i)=>{
+    const p = totalAtr > 0 ? (d.val/totalAtr*100).toFixed(1)+'%' : '—';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${pct(d.ing,totalIng)}</td>`;
+    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${p}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -1066,6 +1076,12 @@ function renderPaxConv(at, a1) {
     return `<span class="kpi-var ${cls}" style="font-size:9px">${d>=0?'+':''}${d.toFixed(1)}%</span>`;
   };
 
+  // Exp. Completa + Complemento = soma qtd dos produtos EXP_COMPLETA + TRES_PASS
+  const ingExpComp = at.filter(r => [...EXP_COMPLETA, 'MAR + MUSEU + GEX - TRÊS ATRAÇÕES'].includes(r['Produto']))
+    .reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
+  const ingExpCompA1 = a1.filter(r => [...EXP_COMPLETA, 'MAR + MUSEU + GEX - TRÊS ATRAÇÕES'].includes(r['Produto']))
+    .reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
+
   const linhas = [
     {
       label: 'Museu',
@@ -1073,7 +1089,6 @@ function renderPaxConv(at, a1) {
       paxAq: fmtN(paxAq),
       conv:  conv(ingMuseu, paxAq),
       convA1:conv(ingMuseuA1, paxAqA1),
-      desc:  'Ing. Museu ÷ PAX Aquá.'
     },
     {
       label: 'GEX',
@@ -1081,7 +1096,6 @@ function renderPaxConv(at, a1) {
       paxAq: fmtN(paxAq),
       conv:  conv(paxGex, paxAq),
       convA1:conv(paxGexA1, paxAqA1),
-      desc:  'PAX GEX ÷ PAX Aquá.'
     },
     {
       label: 'MAR',
@@ -1089,7 +1103,13 @@ function renderPaxConv(at, a1) {
       paxAq: fmtN(paxAq),
       conv:  conv(paxMar, paxAq),
       convA1:conv(paxMarA1, paxAqA1),
-      desc:  'PAX MAR ÷ PAX Aquá.'
+    },
+    {
+      label: 'Exp. Completa + Complemento',
+      pax:   fmtN(ingExpComp),
+      paxAq: fmtN(paxAq),
+      conv:  conv(ingExpComp, paxAq),
+      convA1:conv(ingExpCompA1, paxAqA1),
     },
   ];
 
