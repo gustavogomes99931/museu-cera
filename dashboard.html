@@ -730,11 +730,11 @@ function renderKPIs(at, a1Pax, tipo) {
     }
   }
 
-  // Conversão Museu com A-1
+  // Conversão Museu com A-1 — PAX sem filtro de vendedor
   const ingMuseuAt = at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
   const ingMuseuA1 = a1.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
-  const convAt = paxAt > 0 ? (ingMuseuAt / paxAt) * 100 : null;
-  const convA1 = paxA1 > 0 ? (ingMuseuA1 / paxA1) * 100 : null;
+  const convAt = paxAtual > 0 ? (ingMuseuAt / paxAtual) * 100 : null;
+  const convA1 = paxA1    > 0 ? (ingMuseuA1 / paxA1)   * 100 : null;
   setEl('k-conv', convAt !== null ? convAt.toFixed(1)+'%' : '—');
   if(convA1 !== null){
     setEl('k-conv-a1','A-1: '+convA1.toFixed(1)+'%');
