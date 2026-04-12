@@ -985,7 +985,7 @@ function renderConvAtracao(at, a1) {
 function renderExpCompleta(at,tipo){
   const totalMuseu=at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
   const grupos=[
-    {label:'MAR + MUSEU + GEX — Três Atrações (R$ 99)', prods:['MAR + MUSEU + GEX - TRÊS ATRAÇÕES']},
+    {label:'Museu + GEX + Mar', prods:['MAR + MUSEU + GEX - TRÊS ATRAÇÕES']},
     {label:'Experiência Completa + GEX', prods:EXP_COMPLETA}
   ];
   const tb=document.getElementById('tbl-exp-body');tb.innerHTML='';
