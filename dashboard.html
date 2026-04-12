@@ -139,8 +139,9 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="flt-grp">
     <span class="flt-lbl">Período</span>
     <select id="f-per" onchange="onPerChange()">
+      <option value="hoje" selected>Hoje</option>
       <option value="u30">Últimos 30 dias</option>
-      <option value="u90" selected>Últimos 90 dias</option>
+      <option value="u90">Últimos 90 dias</option>
       <option value="mes_atual">Mês atual</option>
       <option value="mes_ant">Mês anterior</option>
       <option value="ano">Ano atual</option>
@@ -606,6 +607,7 @@ function onPerChange(){
 function getRange(per){
   const h=new Date();h.setHours(23,59,59,999);
   const s=new Date();s.setHours(0,0,0,0);
+  if(per==='hoje'){return[s,h];}
   if(per==='mes_atual'){s.setDate(1);return[s,h];}
   if(per==='mes_ant'){s.setDate(1);s.setMonth(s.getMonth()-1);const e=new Date(s);e.setMonth(e.getMonth()+1);e.setDate(0);e.setHours(23,59,59,999);return[s,e];}
   if(per==='u30'){s.setDate(s.getDate()-30);return[s,h];}
