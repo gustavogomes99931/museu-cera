@@ -469,6 +469,31 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
 }
 </style>
+<script>
+// Senha inline no head — carrega antes de qualquer interação
+const SENHA_ACESSO = 'museu2025';
+function verificarSenha() {
+  const input = document.getElementById('senha-input');
+  const erro  = document.getElementById('msg-erro');
+  if (!input) return;
+  if (input.value === SENHA_ACESSO) {
+    sessionStorage.setItem('mcera_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+  } else {
+    input.classList.add('erro');
+    erro.classList.add('show');
+    input.value = '';
+    input.focus();
+    setTimeout(() => input.classList.remove('erro'), 400);
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('mcera_auth') === '1') {
+    const ls = document.getElementById('login-screen');
+    if (ls) ls.style.display = 'none';
+  }
+});
+</script>
 </head>
 <body>
 
@@ -734,31 +759,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <div class="toast" id="toast"></div>
 
 <script>
-// ── SENHA DE ACESSO ──
-// Para trocar a senha, altere o valor abaixo
-const SENHA_ACESSO = 'museu2025';
-
-function verificarSenha() {
-  const input = document.getElementById('senha-input');
-  const erro  = document.getElementById('msg-erro');
-  if (input.value === SENHA_ACESSO) {
-    sessionStorage.setItem('mcera_auth', '1');
-    document.getElementById('login-screen').style.display = 'none';
-  } else {
-    input.classList.add('erro');
-    erro.classList.add('show');
-    input.value = '';
-    setTimeout(() => input.classList.remove('erro'), 400);
-  }
-}
-
-// Se já autenticou nessa sessão, pula a tela de senha
-window.addEventListener('DOMContentLoaded', function() {
-  if (sessionStorage.getItem('mcera_auth') === '1') {
-    document.getElementById('login-screen').style.display = 'none';
-  }
-});
-
 // ── Data ──
 const hoje = new Date();
 document.getElementById('f-data').value = hoje.toISOString().split('T')[0];
