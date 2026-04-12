@@ -644,14 +644,17 @@ function aplicar(){
   const[deA,ateA]=getA1([de,ate]);
   const at=filtrar(todos,de,ate,vend,canal,cat,atr,tipo);
   const a1=filtrar(todos,deA,ateA,vend,canal,cat,atr,tipo);
-  try { renderKPIs(at,a1,tipo); } catch(e) { console.error('renderKPIs:',e); }
+  // PAX e Conversão — apenas filtro de período, ignora vendedor/canal/cat/atr/tipo
+  const atPax=filtrar(todos,de,ate,'','','','','');
+  const a1Pax=filtrar(todos,deA,ateA,'','','','','');
+  try { renderKPIs(at,a1Pax,tipo); } catch(e) { console.error('renderKPIs:',e); }
   try { renderCharts(at,de,ate,tipo); } catch(e) { console.error('renderCharts:',e); }
   try { renderTipoProduto(at,tipo); } catch(e) { console.error('renderTipoProduto:',e); }
   try { renderAtracao(at); } catch(e) { console.error('renderAtracao:',e); }
   try { renderConvAtracao(at,a1); } catch(e) { console.error('renderConvAtracao:',e); }
   try { renderExpCompleta(at,tipo); } catch(e) { console.error('renderExpCompleta:',e); }
   try { renderRankingMuseu(at); } catch(e) { console.error('renderRankingMuseu:',e); }
-  try { renderPaxConv(at,a1); } catch(e) { console.error('renderPaxConv:',e); }
+  try { renderPaxConv(atPax,a1Pax); } catch(e) { console.error('renderPaxConv:',e); }
 }
 
 // Valor do registro: quando filtro por atração específica, usa parcela dessa atração
@@ -687,9 +690,16 @@ function kpiSet(id, val, idA1, valA1, idV, varPct) {
     }
   }
 }
-function renderKPIs(at, a1, tipo) {
+function renderKPIs(at, a1Pax, tipo) {
   const v = s => s.reduce((a,r) => a + valorReg(r, tipo), 0);
   const q = s => s.reduce((a,r) => a + (Number(r['Quantidade']) || 0), 0);
+  // a1 para vendas usa o mesmo filtro de vendedor
+  const a1 = filtrar(todos,...getA1(getRange(document.getElementById('f-per').value)),
+    document.getElementById('f-vend').value,
+    document.getElementById('f-canal').value,
+    document.getElementById('f-cat').value,
+    document.getElementById('f-atr').value,
+    tipo);
   const vAt = v(at), vA1 = v(a1), qAt = q(at), qA1 = q(a1);
   const tAt = qAt > 0 ? vAt / qAt : 0;
   const tA1 = qA1 > 0 ? vA1 / qA1 : 0;
@@ -698,17 +708,22 @@ function renderKPIs(at, a1, tipo) {
   kpiSet('k-ing',  fmtN(qAt), 'k-ing-a1',  qA1 > 0 ? fmtN(qA1)  : null, 'k-ing-v',  qA1 > 0 ? ((qAt - qA1) / qA1) * 100 : null);
   kpiSet('k-tkt',  fmt(tAt),  'k-tkt-a1',  tA1 > 0 ? fmt(tA1)   : null, 'k-tkt-v',  tA1 > 0 ? ((tAt - tA1) / tA1) * 100 : null);
 
-  // PAX Aquário (soma do maior PAX por dia)
-  function calcPax(recs) {
+  // PAX Aquário — usa atPax (sem filtro de vendedor)
+  function calcPax(recs, campo) {
     const m={};
-    recs.forEach(r=>{const d=r._data.toISOString().split('T')[0];const p=Number(r['PAX Aquário'])||0;if(!m[d]||p>m[d])m[d]=p;});
+    recs.forEach(r=>{const d=r._data.toISOString().split('T')[0];const p=Number(r[campo])||0;if(!m[d]||p>m[d])m[d]=p;});
     return Object.values(m).reduce((a,b)=>a+b,0);
   }
-  const paxAt = calcPax(at), paxA1 = calcPax(a1);
-  setEl('k-pax', fmtN(paxAt) || '—');
+  const paxAt = calcPax(a1Pax,'PAX Aquário');
+  // Para o KPI de PAX usar os dados sem filtro de vendedor do período atual
+  const[de,ate]=getRange(document.getElementById('f-per').value);
+  const atPaxKpi=filtrar(todos,de,ate,'','','','','');
+  const paxAtual = calcPax(atPaxKpi,'PAX Aquário');
+  const paxA1    = calcPax(a1Pax,'PAX Aquário');
+  setEl('k-pax', fmtN(paxAtual) || '—');
   if(paxA1 > 0){
     setEl('k-pax-a1','A-1: '+fmtN(paxA1));
-    const diff = paxAt > 0 ? ((paxAt - paxA1) / paxA1) * 100 : null;
+    const diff = paxAtual > 0 ? ((paxAtual - paxA1) / paxA1) * 100 : null;
     if(diff !== null){
       const el = document.getElementById('k-pax-v');
       if(el){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=(diff>=0?'+':'')+diff.toFixed(1)+'%';}
