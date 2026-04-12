@@ -1105,19 +1105,20 @@ async function salvarPax() {
   }
 
   const data = document.getElementById('f-data').value;
+  // Envia APENAS data e PAX — todos os outros campos ficam vazios
   const reg = {
     data,
-    vendedor: '—',
-    categoria: '',
-    produto: 'PAX',
-    valorUnitario: 0,
-    valorMuseu: 0,
-    quantidade: 0,
-    total: 0,
-    canal: '—',
-    pax:    pax    ? Number(pax)    : null,
-    paxGex: paxGex ? Number(paxGex) : null,
-    paxMar: paxMar ? Number(paxMar) : null,
+    vendedor:     '',
+    categoria:    '',
+    produto:      '',
+    valorUnitario: '',
+    valorMuseu:   '',
+    quantidade:   '',
+    total:        '',
+    canal:        '',
+    pax:    pax    ? Number(pax)    : '',
+    paxGex: paxGex ? Number(paxGex) : '',
+    paxMar: paxMar ? Number(paxMar) : '',
     ts: new Date().toISOString()
   };
 
