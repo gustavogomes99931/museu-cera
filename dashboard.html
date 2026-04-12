@@ -139,10 +139,10 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="flt-grp">
     <span class="flt-lbl">Período</span>
     <select id="f-per" onchange="onPerChange()">
+      <option value="u30">Últimos 30 dias</option>
+      <option value="u90" selected>Últimos 90 dias</option>
       <option value="mes_atual">Mês atual</option>
       <option value="mes_ant">Mês anterior</option>
-      <option value="u30">Últimos 30 dias</option>
-      <option value="u90">Últimos 90 dias</option>
       <option value="ano">Ano atual</option>
       <option value="custom">Personalizado</option>
     </select>
@@ -319,7 +319,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 <!-- ── TABELAS LINHA 2 ── -->
 <div class="tbl-grid">
   <div class="card">
-    <div class="sec-title">Exp. Completa + 3 Passeios</div>
+    <div class="sec-title">MAR + MUSEU + GEX — Três Atrações</div>
     <div class="tbl-wrap"><table class="tbl">
       <colgroup><col><col style="width:40px"><col style="width:80px"><col style="width:50px"></colgroup>
       <thead><tr><th>Grupo</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
@@ -327,7 +327,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     </table></div>
   </div>
   <div class="card">
-    <div class="sec-title">Ranking — Base Museu</div>
+    <div class="sec-title">Ranking de Vendas</div>
     <div class="tbl-wrap"><table class="tbl">
       <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:72px"><col style="width:48px"></colgroup>
       <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
@@ -335,7 +335,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     </table></div>
   </div>
   <div class="card">
-    <div class="sec-title">Conversão PAX por Atração</div>
+    <div class="sec-title">Conversão por Atração</div>
     <div class="tbl-wrap"><table class="tbl">
       <colgroup><col><col style="width:52px"><col style="width:70px"><col style="width:116px"></colgroup>
       <thead><tr><th>Atração</th><th class="r">PAX</th><th class="r">PAX Aquá.</th><th class="r">Conv.%</th></tr></thead>
@@ -984,7 +984,7 @@ function renderConvAtracao(at, a1) {
 // ── EXP COMPLETA + 3 PASSEIOS ──
 function renderExpCompleta(at,tipo){
   const totalMuseu=at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
-  const grupos=[{label:'Exp. Completa + GEX',prods:EXP_COMPLETA},{label:'3 Passeios (Combos Triplos)',prods:TRES_PASS}];
+  const grupos=[{label:'MAR + MUSEU + GEX — Três Atrações (R$ 99)',prods:['MAR + MUSEU + GEX - TRÊS ATRAÇÕES']}];
   const tb=document.getElementById('tbl-exp-body');tb.innerHTML='';
   grupos.forEach(g=>{
     const reg=at.filter(r=>g.prods.includes(r['Produto']));
@@ -1083,10 +1083,7 @@ function renderPaxConv(at, a1) {
       : '';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>
-        <div style="font-weight:600">${l.label}</div>
-        <div style="font-size:9px;color:var(--mu2)">${l.desc}</div>
-      </td>
+      <td><div style="font-weight:600">${l.label}</div></td>
       <td class="r" style="font-weight:500">${l.pax}</td>
       <td class="r" style="font-weight:500">${l.paxAq}</td>
       <td class="r">
