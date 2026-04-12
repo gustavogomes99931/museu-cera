@@ -742,7 +742,6 @@ function verificarSenha() {
   const input = document.getElementById('senha-input');
   const erro  = document.getElementById('msg-erro');
   if (input.value === SENHA_ACESSO) {
-    // Salva sessão para não pedir senha novamente enquanto o navegador estiver aberto
     sessionStorage.setItem('mcera_auth', '1');
     document.getElementById('login-screen').style.display = 'none';
   } else {
@@ -754,9 +753,11 @@ function verificarSenha() {
 }
 
 // Se já autenticou nessa sessão, pula a tela de senha
-if (sessionStorage.getItem('mcera_auth') === '1') {
-  document.getElementById('login-screen').style.display = 'none';
-}
+window.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('mcera_auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+  }
+});
 
 // ── Data ──
 const hoje = new Date();
