@@ -557,7 +557,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <div class="field-lbl">Vendedor</div>
           <div class="field-ctrl">
             <div class="vwrap">
-              <select id="f-vendedor">
+              <select id="f-vendedor" onchange="localStorage.setItem('mcera_ultimo_vend', this.value)">
                 <option value="">— Selecione —</option>
               </select>
               <button class="btn-plus" id="btn-vend-open" type="button" onclick="togglePainelVend()">
@@ -985,7 +985,7 @@ function togglePainelVend() {
 
 function renderSelect() {
   const sel = document.getElementById('f-vendedor');
-  const cur = sel.value;
+  const cur = sel.value || localStorage.getItem('mcera_ultimo_vend') || '';
   sel.innerHTML = '<option value="">— Selecione —</option>';
   vendedores.forEach(n => {
     const o = document.createElement('option');
@@ -1156,7 +1156,8 @@ async function salvar() {
 }
 
 function limpar() {
-  document.getElementById('f-vendedor').value = '';
+  // Mantém o vendedor selecionado para agilizar múltiplos lançamentos
+  // document.getElementById('f-vendedor').value = '';
   document.getElementById('f-produto').value  = '';
   document.getElementById('cdd-lbl').textContent = '— Selecione —';
   document.getElementById('cdd-btn').classList.add('ph');
