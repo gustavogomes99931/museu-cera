@@ -76,8 +76,13 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
 /* TABELA */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
-.tbl-wrap::-webkit-scrollbar{height:3px}
+.tbl-wrap::-webkit-scrollbar{height:3px;width:3px}
 .tbl-wrap::-webkit-scrollbar-thumb{background:var(--mu2);border-radius:2px}
+/* Scroll vertical nas tabelas das linhas de cards */
+.tbl-scroll{max-height:260px;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-scroll::-webkit-scrollbar{width:3px;height:3px}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--mu2);border-radius:2px}
+.tbl-scroll thead th{position:sticky;top:0;z-index:1}
 .tbl{width:100%;border-collapse:collapse;min-width:0;table-layout:fixed}
 .tbl th{text-align:left;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tbl th.r,.tbl td.r{text-align:right}
@@ -270,7 +275,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 <div class="tbl-grid">
   <div class="card">
     <div class="sec-title">Mix de Vendas por Categoria</div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="tbl-scroll"><table class="tbl">
       <colgroup><col style="width:22px"><col><col style="width:44px"><col style="width:70px"><col style="width:48px"></colgroup>
       <thead><tr><th></th><th>Categoria / Produto</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-tipo-body"></tbody>
@@ -278,7 +283,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card">
     <div class="sec-title">Mix de Faturamento por Atração</div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="tbl-scroll"><table class="tbl">
       <colgroup><col><col style="width:80px"><col style="width:48px"></colgroup>
       <thead><tr><th>Atração</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-atr-body"></tbody>
@@ -299,16 +304,16 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
           <tr>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">%</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">%</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">%</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">%</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
           </tr>
         </thead>
         <tbody id="tbl-conv-atr-body"></tbody>
@@ -321,7 +326,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 <div class="tbl-grid">
   <div class="card">
     <div class="sec-title">Participação por Atração</div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="tbl-scroll"><table class="tbl">
       <colgroup><col><col style="width:40px"><col style="width:80px"><col style="width:50px"></colgroup>
       <thead><tr><th>Grupo</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-exp-body"></tbody>
@@ -329,7 +334,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="tbl-scroll"><table class="tbl">
       <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:90px"><col style="width:48px"></colgroup>
       <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-rank-body"></tbody>
@@ -337,7 +342,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card">
     <div class="sec-title">Conversão por Atração</div>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="tbl-scroll"><table class="tbl">
       <colgroup><col><col style="width:52px"><col style="width:70px"><col style="width:116px"></colgroup>
       <thead><tr><th>Atração</th><th class="r">PAX</th><th class="r">PAX Aquá.</th><th class="r">Conv.%</th></tr></thead>
       <tbody id="tbl-pax-conv-body"></tbody>
@@ -753,6 +758,12 @@ function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
 const DL_BAR={anchor:'end',align:'end',color:'#10403B',font:{family:'Rajdhani',size:10,weight:'600'},clip:false};
 const DL_BAR_H={anchor:'end',align:'right',color:'#10403B',font:{family:'Rajdhani',size:10,weight:'600'},clip:false,formatter:v=>fmt(v)};
+// Formato abreviado para labels de gráfico (sem decimais desnecessários)
+const fmtK = v => {
+  if(!v) return '';
+  if(v >= 1000) return 'R$' + (v/1000).toFixed(0) + 'k';
+  return 'R$' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+};
 
 function optsBarV(fmtFn){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{...DL_BAR,formatter:fmtFn||fmtN}},scales:{x:{grid:{display:false},ticks:{font:{family:'Rajdhani',size:10},color:'#4C5958'}},y:{display:false,grace:'20%'}},layout:{padding:{top:24}}};}
 
@@ -777,10 +788,12 @@ function renderCharts(at,de,ate,tipo){
   // Vendas por vendedor
   const pv={};at.forEach(r=>{const v=r['Vendedor']||'S/N';if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
   const vends=Object.keys(pv).sort((a,b)=>pv[b].val-pv[a].val);
-  const BW=Math.max(80, Math.floor(300/Math.max(vends.length,1)));
-  const wVend=Math.max(300, vends.length*BW);
-  document.getElementById('w-vv').style.width=wVend+'px';
-  document.getElementById('w-vq').style.width=wVend+'px';
+  // Sempre 5 vendedores visíveis — scroll para o resto
+  const wVendContainer = document.getElementById('w-vv').parentElement.clientWidth || 400;
+  const pxPorVend = Math.floor(wVendContainer / 5);
+  const wVend = vends.length * pxPorVend;
+  document.getElementById('w-vv').style.width = wVend + 'px';
+  document.getElementById('w-vq').style.width = wVend + 'px';
   dc('vv');charts['vv']=new Chart(document.getElementById('ch-vv'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].val),backgroundColor:CORES,borderRadius:5,borderSkipped:false}]},options:optsBarV(fmt)});
   dc('vq');charts['vq']=new Chart(document.getElementById('ch-vq'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].qtd),backgroundColor:CORES.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},options:optsBarV(fmtN)});
 
@@ -822,14 +835,10 @@ function renderCharts(at,de,ate,tipo){
   });
   const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
   const dias=[...diasSet].sort();
-  // Largura fixa por par de barras — centraliza quando cabe, scroll quando ultrapassa
-  const isMobile = window.innerWidth <= 600;
-  const pxPorDia = isMobile ? 70 : 110;
-  const wCalculado = dias.length * pxPorDia;
+  // Sempre 10 dias visíveis — scroll automático quando houver mais
   const wContainer = document.getElementById('w-meta').parentElement.clientWidth || 600;
-  document.getElementById('w-meta').style.width = wCalculado <= wContainer
-    ? '100%'
-    : wCalculado + 'px';
+  const pxPorDia = Math.floor(wContainer / 10);
+  document.getElementById('w-meta').style.width = (dias.length * pxPorDia) + 'px';
   dc('meta');charts['meta']=new Chart(document.getElementById('ch-meta'),{
     type:'bar',
     data:{
