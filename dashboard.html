@@ -61,12 +61,12 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 .card{background:var(--white);border-radius:14px;padding:18px;border:1px solid var(--bd);box-shadow:0 1px 8px rgba(0,0,0,0.04);box-sizing:border-box;min-width:0;overflow:hidden}
 .ch{position:relative;height:200px;width:100%}
 .ch-tall{position:relative;height:250px;width:100%}
-.ch-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;display:flex;justify-content:center;align-items:flex-start}
+.ch-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
 .ch-scroll::-webkit-scrollbar{height:4px}
 .ch-scroll::-webkit-scrollbar-track{background:transparent}
 .ch-scroll::-webkit-scrollbar-thumb{background:var(--mu2);border-radius:2px}
-/* Wrapper interno dos gráficos de barra — sem min-width para permitir scroll */
-.ch-bar-wrap{position:relative;height:220px}
+/* ch-bar-wrap: display block para overflow funcionar */
+.ch-bar-wrap{position:relative;height:220px;display:block}
 
 /* Card donut duplo — altura auto para acomodar legenda */
 .donut-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
@@ -788,11 +788,13 @@ function renderCharts(at,de,ate,tipo){
   // Vendas por vendedor
   const pv={};at.forEach(r=>{const v=r['Vendedor']||'S/N';if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
   const vends=Object.keys(pv).sort((a,b)=>pv[b].val-pv[a].val);
-  // 100px por barra — com 7 vendedores ocupa ~700px (típico de um card)
-  // se tiver mais de 7, ultrapassa o container e o scroll ativa automaticamente
+  // 100px por barra fixa — 7 barras = 700px. Se ultrapassar o card, scroll ativa
   const PX_VEND = 100;
-  document.getElementById('w-vv').style.width = (vends.length * PX_VEND) + 'px';
-  document.getElementById('w-vq').style.width = (vends.length * PX_VEND) + 'px';
+  const wVendTotal = vends.length * PX_VEND;
+  const wVendCard = document.getElementById('w-vv').parentElement.offsetWidth || 9999;
+  const wVendFinal = wVendTotal > wVendCard ? wVendTotal + 'px' : '100%';
+  document.getElementById('w-vv').style.width = wVendFinal;
+  document.getElementById('w-vq').style.width = wVendFinal;
   dc('vv');charts['vv']=new Chart(document.getElementById('ch-vv'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].val),backgroundColor:CORES,borderRadius:5,borderSkipped:false}]},options:optsBarV(fmt)});
   dc('vq');charts['vq']=new Chart(document.getElementById('ch-vq'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].qtd),backgroundColor:CORES.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},options:optsBarV(fmtN)});
 
@@ -834,10 +836,11 @@ function renderCharts(at,de,ate,tipo){
   });
   const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
   const dias=[...diasSet].sort();
-  // 80px por par de barras — com 10 dias ocupa ~800px (típico)
-  // se tiver mais de 10 dias, ultrapassa e o scroll ativa automaticamente
+  // 80px por par de barras fixa — 10 dias = 800px. Se ultrapassar o card, scroll ativa
   const PX_DIA = 80;
-  document.getElementById('w-meta').style.width = (dias.length * PX_DIA) + 'px';
+  const wDiaTotal = dias.length * PX_DIA;
+  const wDiaCard = document.getElementById('w-meta').parentElement.offsetWidth || 9999;
+  document.getElementById('w-meta').style.width = wDiaTotal > wDiaCard ? wDiaTotal + 'px' : '100%';
   dc('meta');charts['meta']=new Chart(document.getElementById('ch-meta'),{
     type:'bar',
     data:{
