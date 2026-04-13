@@ -788,12 +788,11 @@ function renderCharts(at,de,ate,tipo){
   // Vendas por vendedor
   const pv={};at.forEach(r=>{const v=r['Vendedor']||'S/N';if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
   const vends=Object.keys(pv).sort((a,b)=>pv[b].val-pv[a].val);
-  // 7 vendedores visíveis — scroll para o resto
-  const wVendContainer = document.getElementById('w-vv').parentElement.clientWidth || 400;
-  const pxPorVend = Math.floor(wVendContainer / 7);
-  const wVend = vends.length * pxPorVend;
-  document.getElementById('w-vv').style.width = wVend + 'px';
-  document.getElementById('w-vq').style.width = wVend + 'px';
+  // 100px por barra — com 7 vendedores ocupa ~700px (típico de um card)
+  // se tiver mais de 7, ultrapassa o container e o scroll ativa automaticamente
+  const PX_VEND = 100;
+  document.getElementById('w-vv').style.width = (vends.length * PX_VEND) + 'px';
+  document.getElementById('w-vq').style.width = (vends.length * PX_VEND) + 'px';
   dc('vv');charts['vv']=new Chart(document.getElementById('ch-vv'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].val),backgroundColor:CORES,borderRadius:5,borderSkipped:false}]},options:optsBarV(fmt)});
   dc('vq');charts['vq']=new Chart(document.getElementById('ch-vq'),{type:'bar',data:{labels:vends,datasets:[{data:vends.map(v=>pv[v].qtd),backgroundColor:CORES.map(c=>c+'cc'),borderRadius:5,borderSkipped:false}]},options:optsBarV(fmtN)});
 
@@ -835,10 +834,10 @@ function renderCharts(at,de,ate,tipo){
   });
   const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
   const dias=[...diasSet].sort();
-  // 10 dias visíveis — scroll para o resto
-  const wContainer = document.getElementById('w-meta').parentElement.clientWidth || 600;
-  const pxPorDia = Math.floor(wContainer / 10);
-  document.getElementById('w-meta').style.width = (dias.length * pxPorDia) + 'px';
+  // 80px por par de barras — com 10 dias ocupa ~800px (típico)
+  // se tiver mais de 10 dias, ultrapassa e o scroll ativa automaticamente
+  const PX_DIA = 80;
+  document.getElementById('w-meta').style.width = (dias.length * PX_DIA) + 'px';
   dc('meta');charts['meta']=new Chart(document.getElementById('ch-meta'),{
     type:'bar',
     data:{
