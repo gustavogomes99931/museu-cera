@@ -291,7 +291,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card" style="overflow:visible">
     <div class="sec-title">Performance por vendedor</div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%">
+    <div style="overflow-x:auto;overflow-y:auto;max-height:222px;-webkit-overflow-scrolling:touch;width:100%">
       <table style="border-collapse:collapse;table-layout:auto;white-space:nowrap">
         <thead>
           <tr>
@@ -334,7 +334,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
-    <div class="tbl-scroll"><table class="tbl">
+    <div class="tbl-scroll" style="max-height:196px"><table class="tbl">
       <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:90px"><col style="width:48px"></colgroup>
       <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-rank-body"></tbody>
@@ -788,9 +788,9 @@ function renderCharts(at,de,ate,tipo){
   // Vendas por vendedor
   const pv={};at.forEach(r=>{const v=r['Vendedor']||'S/N';if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
   const vends=Object.keys(pv).sort((a,b)=>pv[b].val-pv[a].val);
-  // Sempre 5 vendedores visíveis — scroll para o resto
+  // 7 vendedores visíveis — scroll para o resto
   const wVendContainer = document.getElementById('w-vv').parentElement.clientWidth || 400;
-  const pxPorVend = Math.floor(wVendContainer / 5);
+  const pxPorVend = Math.floor(wVendContainer / 7);
   const wVend = vends.length * pxPorVend;
   document.getElementById('w-vv').style.width = wVend + 'px';
   document.getElementById('w-vq').style.width = wVend + 'px';
@@ -835,7 +835,7 @@ function renderCharts(at,de,ate,tipo){
   });
   const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
   const dias=[...diasSet].sort();
-  // Sempre 10 dias visíveis — scroll automático quando houver mais
+  // 10 dias visíveis — scroll para o resto
   const wContainer = document.getElementById('w-meta').parentElement.clientWidth || 600;
   const pxPorDia = Math.floor(wContainer / 10);
   document.getElementById('w-meta').style.width = (dias.length * pxPorDia) + 'px';
