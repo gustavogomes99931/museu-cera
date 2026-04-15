@@ -432,6 +432,12 @@ const CORES_DONUT_ATR  = ['#024959','#593E25','#F2AE30'];
 const fmt   = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtN  = v => Number(v).toLocaleString('pt-BR');
 const pct   = (a,b) => b > 0 ? ((a/b)*100).toFixed(1)+'%' : '—';
+// Formata variação % — se ultrapassar ±999%, mostra n/a (base muito pequena)
+const fmtVar = (v) => {
+  if(v === null || v === undefined) return null;
+  if(Math.abs(v) > 999) return null; // base muito pequena, variação sem sentido
+  return (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+};
 
 // Produtos por categoria — para popular o filtro de Atração/Produto
 const PRODS_POR_CAT = {
@@ -699,10 +705,10 @@ function kpiSet(id, val, idA1, valA1, idV, varPct) {
   }
   if (idV && varPct !== null && varPct !== undefined) {
     const el = document.getElementById(idV);
+    const txt = fmtVar(varPct);
     if (el) {
-      const cls = varPct >= 0 ? 'up' : 'dn';
-      el.className = 'kpi-var ' + cls;
-      el.textContent = (varPct >= 0 ? '+' : '') + varPct.toFixed(1) + '%';
+      if(txt) { el.className = 'kpi-var ' + (varPct >= 0 ? 'up' : 'dn'); el.textContent = txt; }
+      else    { el.className = 'kpi-var ne'; el.textContent = ''; }
     }
   }
 }
@@ -751,7 +757,8 @@ function renderKPIs(at, a1Pax, tipo) {
     const diff = paxAtual > 0 ? ((paxAtual - paxA1) / paxA1) * 100 : null;
     if(diff !== null){
       const el = document.getElementById('k-pax-v');
-      if(el){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=(diff>=0?'+':'')+diff.toFixed(1)+'%';}
+      const txt = fmtVar(diff);
+      if(el){ if(txt){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=txt;} else {el.className='kpi-var ne';el.textContent='';} }
     }
   } else {
     // Sem dados A-1: limpar exibição
@@ -772,7 +779,8 @@ function renderKPIs(at, a1Pax, tipo) {
     if(convAt !== null){
       const diff = convAt - convA1;
       const el = document.getElementById('k-conv-v');
-      if(el){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=(diff>=0?'+':'')+diff.toFixed(1)+'%';}
+      const txt = fmtVar(diff);
+      if(el){ if(txt){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=txt;} else {el.className='kpi-var ne';el.textContent='';} }
     }
   } else {
     // Sem dados A-1: limpar exibição
