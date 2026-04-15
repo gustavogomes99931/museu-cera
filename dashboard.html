@@ -728,10 +728,14 @@ function renderKPIs(at, a1Pax, tipo) {
   if(!qA1){ setEl('k-ing-a1', ''); const e=document.getElementById('k-ing-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
   if(!tA1){ setEl('k-tkt-a1', ''); const e=document.getElementById('k-tkt-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
 
-  // PAX Aquário — usa atPax (sem filtro de vendedor)
+  // PAX Aquário — pega o MAIOR valor lançado por dia (não soma todos os registros do dia)
   function calcPax(recs, campo) {
     const m={};
-    recs.forEach(r=>{const d=r._data.toISOString().split('T')[0];const p=Number(r[campo])||0;if(!m[d]||p>m[d])m[d]=p;});
+    recs.forEach(r=>{
+      const d=r._data.toISOString().split('T')[0];
+      const p=parseInt(Number(r[campo])||0);
+      if(p>0 && (!m[d]||p>m[d])) m[d]=p;
+    });
     return Object.values(m).reduce((a,b)=>a+b,0);
   }
   // Para o KPI de PAX usar os dados sem filtro de vendedor do período atual
@@ -1085,7 +1089,7 @@ function renderPaxConv(at, a1) {
     const m = {};
     recs.forEach(r => {
       const d = r._data.toISOString().split('T')[0];
-      const v = Number(r[campo]) || 0;
+      const v = parseInt(Number(r[campo]) || 0);
       if (v > 0 && (!m[d] || v > m[d])) m[d] = v;
     });
     return Object.values(m).reduce((a,b) => a+b, 0);
