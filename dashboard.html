@@ -621,7 +621,12 @@ function getRange(per){
   if(per==='custom'){const de=document.getElementById('f-de').value;const ate=document.getElementById('f-ate').value;if(de&&ate)return[new Date(de),new Date(ate+'T23:59:59')];}
   s.setDate(1);return[s,h];
 }
-function getA1([de,ate]){return[new Date(de-365*864e5),new Date(ate-365*864e5)];}
+function getA1([de,ate]){
+  // Subtrai exatamente 1 ano (respeitando anos bissextos)
+  const d1 = new Date(de);  d1.setFullYear(d1.getFullYear()-1);
+  const d2 = new Date(ate); d2.setFullYear(d2.getFullYear()-1);
+  return [d1, d2];
+}
 function filtrar(recs,de,ate,vend,canal,cat,atr,tipo){
   return recs.filter(r=>{
     if(r._data<de||r._data>ate)return false;
@@ -665,7 +670,11 @@ function aplicar(){
 }
 
 // Valor do registro: quando filtro por atração específica, usa parcela dessa atração
+// Para registros de 2025 (só Museu), usa o Total diretamente
 function valorReg(r, tipo) {
+  const ano = r._data ? r._data.getFullYear() : 0;
+  // 2025: dados são apenas do Museu — Total já é o valor correto para qualquer filtro de atração Museu
+  if(ano <= 2025) return Number(r['Total'])||0;
   if(tipo==='museu') return parcelaAtr(r,'museu');
   if(tipo==='gex')   return parcelaAtr(r,'gex');
   if(tipo==='mar')   return parcelaAtr(r,'mar');
@@ -830,7 +839,9 @@ function renderCharts(at,de,ate,tipo){
   const a1Recs=filtrar(todos,...getA1([de,ate]),document.getElementById('f-vend').value,document.getElementById('f-canal').value,document.getElementById('f-cat').value,document.getElementById('f-atr').value,tipo);
   const dmA1={};const dqA1={};
   a1Recs.forEach(r=>{
-    const d=new Date(r._data.getTime()+365*864e5).toISOString().split('T')[0];
+    // Deslocar a data do A-1 para o mesmo dia do ano seguinte
+    const d1 = new Date(r._data); d1.setFullYear(d1.getFullYear()+1);
+    const d=d1.toISOString().split('T')[0];
     if(!dmA1[d])dmA1[d]=0; dmA1[d]+=valorReg(r,tipo);
     if(!dqA1[d])dqA1[d]=0; dqA1[d]+=Number(r['Quantidade'])||0;
   });
