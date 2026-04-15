@@ -726,10 +726,9 @@ function renderKPIs(at, a1Pax, tipo) {
   const tAt = qAt > 0 ? vAt / qAt : 0;
   const tA1 = qA1 > 0 ? vA1 / qA1 : 0;
 
-  kpiSet('k-vend', fmt(vAt),  'k-vend-a1', vA1 > 0 ? fmt(vA1)  : null, 'k-vend-v', vA1 > 0 ? ((vAt-vA1)/vA1)*100 : null);
-  kpiSet('k-ing',  fmtN(qAt), 'k-ing-a1',  qA1 > 0 ? fmtN(qA1) : null, 'k-ing-v',  qA1 > 0 ? ((qAt-qA1)/qA1)*100 : null);
-  kpiSet('k-tkt',  fmt(tAt),  'k-tkt-a1',  tA1 > 0 ? fmt(tA1)  : null, 'k-tkt-v',  tA1 > 0 ? ((tAt-tA1)/tA1)*100 : null);
-  // Limpar campos A-1 se não houver dados anteriores
+  kpiSet('k-vend', fmt(vAt),  'k-vend-a1', vA1 > 0 ? fmt(vA1)  : null, 'k-vend-v', vA1 > 0 && vAt > 0 ? ((vAt-vA1)/vA1)*100 : null);
+  kpiSet('k-ing',  fmtN(qAt), 'k-ing-a1',  qA1 > 0 ? fmtN(qA1) : null, 'k-ing-v',  qA1 > 0 && qAt > 0 ? ((qAt-qA1)/qA1)*100 : null);
+  kpiSet('k-tkt',  fmt(tAt),  'k-tkt-a1',  tA1 > 0 ? fmt(tA1)  : null, 'k-tkt-v',  tA1 > 0 && tAt > 0 ? ((tAt-tA1)/tA1)*100 : null);
   if(!vA1){ setEl('k-vend-a1',''); const e=document.getElementById('k-vend-v'); if(e){e.className='kpi-var ne';e.textContent='';} }
   if(!qA1){ setEl('k-ing-a1', ''); const e=document.getElementById('k-ing-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
   if(!tA1){ setEl('k-tkt-a1', ''); const e=document.getElementById('k-tkt-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
@@ -750,18 +749,19 @@ function renderKPIs(at, a1Pax, tipo) {
   const paxAtual = calcPax(atPaxKpi,'PAX Aquário');
   const paxA1    = calcPax(a1Pax,'PAX Aquário');
 
-  setEl('k-pax', fmtN(paxAtual) || '—');
-  // Só mostra A-1 se realmente tiver dados no período anterior
+  setEl('k-pax', paxAtual > 0 ? fmtN(paxAtual) : '0');
   if(paxA1 > 0){
     setEl('k-pax-a1','A-1: '+fmtN(paxA1));
-    const diff = paxAtual > 0 ? ((paxAtual - paxA1) / paxA1) * 100 : null;
-    if(diff !== null){
+    if(paxAtual > 0){
+      const diff = ((paxAtual - paxA1) / paxA1) * 100;
       const el = document.getElementById('k-pax-v');
       const txt = fmtVar(diff);
       if(el){ if(txt){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=txt;} else {el.className='kpi-var ne';el.textContent='';} }
+    } else {
+      const el = document.getElementById('k-pax-v');
+      if(el){el.className='kpi-var ne';el.textContent='';}
     }
   } else {
-    // Sem dados A-1: limpar exibição
     setEl('k-pax-a1','');
     const el = document.getElementById('k-pax-v');
     if(el){el.className='kpi-var ne';el.textContent='';}
@@ -771,8 +771,7 @@ function renderKPIs(at, a1Pax, tipo) {
   const ingMuseuAt = at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
   const ingMuseuA1 = a1.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
   const convAt = paxAtual > 0 ? (ingMuseuAt / paxAtual) * 100 : null;
-  // Só calcular convA1 se houver PAX real no A-1 (não PAX do ano atual usado como proxy)
-  const convA1 = paxA1 > 0 ? (ingMuseuA1 / paxA1) * 100 : null;
+  const convA1 = paxA1    > 0 ? (ingMuseuA1 / paxA1)   * 100 : null;
   setEl('k-conv', convAt !== null ? convAt.toFixed(1)+'%' : '—');
   if(convA1 !== null){
     setEl('k-conv-a1','A-1: '+convA1.toFixed(1)+'%');
@@ -781,9 +780,11 @@ function renderKPIs(at, a1Pax, tipo) {
       const el = document.getElementById('k-conv-v');
       const txt = fmtVar(diff);
       if(el){ if(txt){el.className='kpi-var '+(diff>=0?'up':'dn');el.textContent=txt;} else {el.className='kpi-var ne';el.textContent='';} }
+    } else {
+      const el = document.getElementById('k-conv-v');
+      if(el){el.className='kpi-var ne';el.textContent='';}
     }
   } else {
-    // Sem dados A-1: limpar exibição
     setEl('k-conv-a1','');
     const el = document.getElementById('k-conv-v');
     if(el){el.className='kpi-var ne';el.textContent='';}
