@@ -982,8 +982,33 @@ function calcTotal() {
 }
 
 // ── Vendedores ──
+const VENDEDORES_GID = "1203004653"; // ex: "123456789"
+
 let vendedores = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
+
 function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedores)); }
+
+// Carrega vendedores da aba Vendedores do Sheets
+async function carregarVendedores() {
+  if (VENDEDORES_GID === 'COLE_O_GID_DA_ABA_VENDEDORES') return;
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const nomes = txt.trim().split('\n')
+      .map(l => l.replace(/"/g,'').trim())
+      .filter(l => l && l.toLowerCase() !== 'nome' && l.toLowerCase() !== 'vendedor');
+    if (nomes.length > 0) {
+      vendedores = nomes;
+      saveVend(); // atualiza cache local
+    }
+  } catch(e) {
+    console.warn('Falha ao carregar vendedores do Sheets, usando cache local:', e);
+  }
+  renderSelect();
+  renderLista();
+}
 
 function togglePainelVend() {
   const p = document.getElementById('painel-vend');
@@ -1022,7 +1047,10 @@ document.getElementById('v-list').addEventListener('click', function(e) {
   const btn = e.target.closest('button[data-i]');
   if (!btn) return;
   vendedores.splice(parseInt(btn.dataset.i), 1);
-  saveVend(); renderSelect(); renderLista();
+  saveVend();
+  // Salva remoção no Sheets também
+  salvarVendedoresNoSheets();
+  renderSelect(); renderLista();
 });
 
 function addVendedor() {
@@ -1031,9 +1059,25 @@ function addVendedor() {
   if (!nome) return;
   if (vendedores.includes(nome)) { showToast('Nome já cadastrado'); return; }
   vendedores.push(nome);
-  saveVend(); renderSelect(); renderLista();
+  saveVend();
+  // Salva adição no Sheets também
+  salvarVendedoresNoSheets();
+  renderSelect(); renderLista();
   inp.value = ''; inp.focus();
   showToast(nome + ' adicionado');
+}
+
+// Envia lista completa de vendedores para o Apps Script salvar na aba Vendedores
+async function salvarVendedoresNoSheets() {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_AQUI_A_URL_DO_WEB_APP') return;
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ acao: 'salvarVendedores', vendedores })
+    });
+  } catch(e) { console.warn('Falha ao salvar vendedores no Sheets:', e); }
 }
 
 document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key === 'Enter') addVendedor(); });
@@ -1092,6 +1136,7 @@ async function carregarPrecos() {
 
 // Inicializar: carregar preços e renderizar
 carregarPrecos();
+carregarVendedores();
 
 // ── Salvar apenas PAX ──
 async function salvarPax() {
