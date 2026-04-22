@@ -989,7 +989,7 @@ function calcTotal() {
 }
 
 // ── Vendedores ──
-const VENDEDORES_GID = "COLE_O_GID_DA_ABA_VENDEDORES"; // ex: "123456789"
+const VENDEDORES_GID = "1203004653"; // ex: "123456789"
 
 let vendedores = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
 
@@ -997,60 +997,28 @@ function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedor
 
 // Carrega vendedores da aba Vendedores do Sheets
 async function carregarVendedores() {
-  // Se já tem cache local, usa imediatamente (não espera o Sheets)
-  if (vendedores.length > 0) {
+  // Se não tem GID configurado, usa cache local e para
+  if (VENDEDORES_GID === '1203004653') {
     renderSelect();
     renderLista();
+    return;
   }
-
-  // Tenta carregar da aba Vendedores se GID configurado
-  if (VENDEDORES_GID !== 'COLE_O_GID_DA_ABA_VENDEDORES') {
-    try {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const txt = await res.text();
-      const nomes = txt.trim().split('\n')
-        .map(l => l.replace(/"/g,'').trim())
-        .filter(l => l && l.toLowerCase() !== 'nome' && l.toLowerCase() !== 'vendedor');
-      if (nomes.length > 0) {
-        vendedores = nomes;
-        saveVend();
-        renderSelect();
-        renderLista();
-        return;
-      }
-    } catch(e) {
-      console.warn('Falha ao carregar aba Vendedores:', e);
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    // Pega coluna A a partir da linha 2 (ignora header)
+    const nomes = txt.trim().split('\n').slice(1)
+      .map(l => l.split(',')[0].replace(/"/g,'').trim())
+      .filter(n => n.length > 0);
+    if (nomes.length > 0) {
+      vendedores = nomes;
+      saveVend();
     }
+  } catch(e) {
+    console.warn('Falha ao carregar vendedores:', e);
   }
-
-  // Fallback: extrai vendedores únicos da aba Vendas (coluna B, GID=0)
-  if (vendedores.length === 0) {
-    try {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const txt = await res.text();
-      const linhas = txt.trim().split('\n').slice(1); // pula header
-      const nomes = [...new Set(
-        linhas
-          .map(l => {
-            // CSV pode ter campos entre aspas — pega coluna B corretamente
-            const cols = l.match(/(".*?"|[^,]+)/g) || [];
-            return (cols[1] || '').replace(/"/g,'').trim();
-          })
-          .filter(n => n && n.length > 1 && n !== '—')
-      )].sort();
-      if (nomes.length > 0) {
-        vendedores = nomes;
-        saveVend();
-      }
-    } catch(e) {
-      console.warn('Falha ao carregar vendedores da aba Vendas:', e);
-    }
-  }
-
   renderSelect();
   renderLista();
 }
@@ -1134,7 +1102,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5fJmNbX-fUiJk
 
 // Carrega preços do Sheets e atualiza PRECOS + dropdown de produtos
 async function carregarPrecos() {
-  if (PRECOS_GID === 'COLE_O_GID_DA_ABA_PRECOS') return;
+  if (PRECOS_GID === '2116371882') return;
   try {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${PRECOS_GID}`;
     const res = await fetch(url);
