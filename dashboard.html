@@ -334,16 +334,20 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
-    <div class="tbl-scroll" style="max-height:196px"><table class="tbl">
+    <div class="tbl-scroll" style="max-height:196px;position:relative"><table class="tbl">
       <colgroup><col style="width:32px"><col style="min-width:120px;max-width:160px"><col style="width:44px"><col style="width:90px"><col style="width:76px"><col style="width:48px"></colgroup>
-      <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Ticket Méd.</th><th class="r">Part.%</th></tr></thead>
+      <thead><tr>
+        <th style="overflow:visible">#</th>
+        <th style="position:sticky;left:0;z-index:2;background:var(--bg);border-right:2px solid var(--bd)">Vendedor</th>
+        <th class="r">Ing.</th><th class="r">Valor</th><th class="r">Ticket Méd.</th><th class="r">Part.%</th>
+      </tr></thead>
       <tbody id="tbl-rank-body"></tbody>
     </table></div>
   </div>
   <div class="card">
     <div class="sec-title">Conversão por Atração</div>
     <div class="tbl-scroll"><table class="tbl">
-      <colgroup><col><col style="width:60px"><col style="width:72px"><col style="width:70px"></colgroup>
+      <colgroup><col><col style="width:55px"><col style="width:80px"><col style="width:90px"></colgroup>
       <thead><tr><th>Atração</th><th class="r">PAX</th><th class="r">PAX Aquário</th><th class="r">Conv.%</th></tr></thead>
       <tbody id="tbl-pax-conv-body"></tbody>
     </table></div>
@@ -1090,7 +1094,7 @@ function renderRankingMuseu(at){
     const p = totAtr > 0 ? (d.val/totAtr*100).toFixed(1)+'%' : '—';
     const tkt = d.ing > 0 ? fmt(d.val / d.ing) : '—';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600;white-space:normal;word-break:break-word">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${tkt}</td><td class="r">${p}</td>`;
+    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600;white-space:normal;word-break:break-word;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--bd)">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${tkt}</td><td class="r">${p}</td>`;
     tb.appendChild(tr);
   });
 }
