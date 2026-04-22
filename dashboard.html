@@ -335,8 +335,8 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
     <div class="tbl-scroll" style="max-height:196px"><table class="tbl">
-      <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:90px"><col style="width:48px"></colgroup>
-      <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:90px"><col style="width:76px"><col style="width:48px"></colgroup>
+      <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Ticket Méd.</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-rank-body"></tbody>
     </table></div>
   </div>
@@ -1083,8 +1083,9 @@ function renderRankingMuseu(at){
   const tb=document.getElementById('tbl-rank-body');tb.innerHTML='';
   Object.entries(por).sort((a,b)=>b[1].val-a[1].val).forEach(([v,d],i)=>{
     const p = totAtr > 0 ? (d.val/totAtr*100).toFixed(1)+'%' : '—';
+    const tkt = d.ing > 0 ? fmt(d.val / d.ing) : '—';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${p}</td>`;
+    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${tkt}</td><td class="r">${p}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -1104,18 +1105,19 @@ function renderPaxConv(at, a1) {
     return Object.values(m).reduce((a,b) => a+b, 0);
   }
 
-  const paxAq  = calcPaxDia(at, 'PAX Aquário');
-  const paxGex = calcPaxDia(at, 'PAX GEX');
-  const paxMar = calcPaxDia(at, 'PAX MAR');
+  const paxAq    = calcPaxDia(at, 'PAX Aquário');
+  const paxMuseu = calcPaxDia(at, 'PAX Museu');
+  const paxGex   = calcPaxDia(at, 'PAX GEX');
+  const paxMar   = calcPaxDia(at, 'PAX MAR');
   const ingMuseu = at.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
-  // Exp. Completa + Complemento = EXP_COMPLETA + MAR+MUSEU+GEX TRÊS ATRAÇÕES
   const ingExpComp   = at.filter(r => [...EXP_COMPLETA,'MAR + MUSEU + GEX - TRÊS ATRAÇÕES'].includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
   const ingExpCompA1 = a1.filter(r => [...EXP_COMPLETA,'MAR + MUSEU + GEX - TRÊS ATRAÇÕES'].includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
 
   // A-1
-  const paxAqA1   = calcPaxDia(a1, 'PAX Aquário');
-  const paxGexA1  = calcPaxDia(a1, 'PAX GEX');
-  const paxMarA1  = calcPaxDia(a1, 'PAX MAR');
+  const paxAqA1    = calcPaxDia(a1, 'PAX Aquário');
+  const paxMuseuA1 = calcPaxDia(a1, 'PAX Museu');
+  const paxGexA1   = calcPaxDia(a1, 'PAX GEX');
+  const paxMarA1   = calcPaxDia(a1, 'PAX MAR');
   const ingMuseuA1 = a1.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
 
   const conv    = (num, den) => den > 0 ? (num/den*100).toFixed(1)+'%' : '—';
@@ -1130,10 +1132,9 @@ function renderPaxConv(at, a1) {
     {
       label: 'Museu',
       pax:   fmtN(ingMuseu),
-      paxAq: fmtN(paxAq),
-      conv:  conv(ingMuseu, paxAq),
-      convA1:conv(ingMuseuA1, paxAqA1),
-      desc:  'Ing. Museu ÷ PAX Aquá.'
+      paxAq: paxMuseu > 0 ? fmtN(paxMuseu) : fmtN(paxAq),
+      conv:  paxMuseu > 0 ? conv(ingMuseu, paxMuseu) : conv(ingMuseu, paxAq),
+      convA1:paxMuseuA1 > 0 ? conv(ingMuseuA1, paxMuseuA1) : conv(ingMuseuA1, paxAqA1),
     },
     {
       label: 'GEX',
