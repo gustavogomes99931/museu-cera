@@ -589,7 +589,12 @@ async function carregar(){
       fetch(SHEET_URL).then(async res => {
         if(!res.ok) throw new Error('HTTP '+res.status);
         const txt = await res.text();
-        todos = parseCSV(txt).map(r=>{r._data=parseData(r['Data']);return r;}).filter(r=>r._data&&!isNaN(r._data));
+        todos = parseCSV(txt).map(r=>{
+          // Usa Data; se vazia, extrai do Timestamp
+          const dataStr = r['Data'] || (r['Timestamp'] ? r['Timestamp'].substring(0,10) : '');
+          r._data = parseData(dataStr);
+          return r;
+        }).filter(r=>r._data&&!isNaN(r._data));
       })
     ]);
     popVendFiltro();
@@ -1099,14 +1104,24 @@ function renderPaxConv(at, a1) {
     const m = {};
     recs.forEach(r => {
       const d = r._data.toISOString().split('T')[0];
-      const v = parseInt(Number(r[campo]) || 0);
+      // Tenta o campo exato e variações com espaço/acento
+      const raw = r[campo] ?? r[campo.trim()] ?? '';
+      const v = parseInt(Number(raw) || 0);
       if (v > 0 && (!m[d] || v > m[d])) m[d] = v;
     });
     return Object.values(m).reduce((a,b) => a+b, 0);
   }
 
+  // Detecta o nome real da coluna PAX Museu no dataset (pode variar)
+  const campoPaxMuseu = (() => {
+    const opcoes = ['PAX Museu', 'PAX MUSEU', 'Pax Museu', 'PAX Museu '];
+    if (!at.length) return 'PAX Museu';
+    const keys = Object.keys(at[0]);
+    return opcoes.find(o => keys.includes(o)) || 'PAX Museu';
+  })();
+
   const paxAq    = calcPaxDia(at, 'PAX Aquário');
-  const paxMuseu = calcPaxDia(at, 'PAX Museu');
+  const paxMuseu = calcPaxDia(at, campoPaxMuseu);
   const paxGex   = calcPaxDia(at, 'PAX GEX');
   const paxMar   = calcPaxDia(at, 'PAX MAR');
   const ingMuseu = at.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
@@ -1115,7 +1130,7 @@ function renderPaxConv(at, a1) {
 
   // A-1
   const paxAqA1    = calcPaxDia(a1, 'PAX Aquário');
-  const paxMuseuA1 = calcPaxDia(a1, 'PAX Museu');
+  const paxMuseuA1 = calcPaxDia(a1, campoPaxMuseu);
   const paxGexA1   = calcPaxDia(a1, 'PAX GEX');
   const paxMarA1   = calcPaxDia(a1, 'PAX MAR');
   const ingMuseuA1 = a1.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
