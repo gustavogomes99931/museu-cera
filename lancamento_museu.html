@@ -534,18 +534,23 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Card PAX do dia — topo -->
   <div class="card" style="margin-bottom:12px">
     <div class="card-section-title">PAX do dia</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
-      <div style="padding:12px 20px;border-right:1px solid var(--border)">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr">
+      <div style="padding:12px 16px;border-right:1px solid var(--border)">
         <div class="val-lbl" style="margin-bottom:4px">Aquário</div>
         <input type="number" id="f-pax" placeholder="350" min="0"
           style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
       </div>
-      <div style="padding:12px 20px;border-right:1px solid var(--border)">
+      <div style="padding:12px 16px;border-right:1px solid var(--border)">
+        <div class="val-lbl" style="margin-bottom:4px">Museu</div>
+        <input type="number" id="f-pax-museu" placeholder="200" min="0"
+          style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
+      </div>
+      <div style="padding:12px 16px;border-right:1px solid var(--border)">
         <div class="val-lbl" style="margin-bottom:4px">GEX</div>
         <input type="number" id="f-pax-gex" placeholder="120" min="0"
           style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
       </div>
-      <div style="padding:12px 20px">
+      <div style="padding:12px 16px">
         <div class="val-lbl" style="margin-bottom:4px">MAR</div>
         <input type="number" id="f-pax-mar" placeholder="80" min="0"
           style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--text)">
@@ -982,7 +987,7 @@ function calcTotal() {
 }
 
 // ── Vendedores ──
-const VENDEDORES_GID = "1203004653"; // ex: "123456789"
+const VENDEDORES_GID = "COLE_O_GID_DA_ABA_VENDEDORES"; // ex: "123456789"
 
 let vendedores = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
 
@@ -1140,30 +1145,31 @@ carregarVendedores();
 
 // ── Salvar apenas PAX ──
 async function salvarPax() {
-  const pax    = document.getElementById('f-pax').value;
-  const paxGex = document.getElementById('f-pax-gex').value;
-  const paxMar = document.getElementById('f-pax-mar').value;
+  const pax      = document.getElementById('f-pax').value;
+  const paxMuseu = document.getElementById('f-pax-museu').value;
+  const paxGex   = document.getElementById('f-pax-gex').value;
+  const paxMar   = document.getElementById('f-pax-mar').value;
 
-  if (!pax && !paxGex && !paxMar) {
+  if (!pax && !paxMuseu && !paxGex && !paxMar) {
     showToast('Preencha ao menos um campo de PAX');
     return;
   }
 
   const data = document.getElementById('f-data').value;
-  // Envia APENAS data e PAX — todos os outros campos ficam vazios
   const reg = {
     data,
-    vendedor:     '',
-    categoria:    '',
-    produto:      '',
+    vendedor:      '',
+    categoria:     '',
+    produto:       '',
     valorUnitario: '',
-    valorMuseu:   '',
-    quantidade:   '',
-    total:        '',
-    canal:        '',
-    pax:    pax    ? Number(pax)    : '',
-    paxGex: paxGex ? Number(paxGex) : '',
-    paxMar: paxMar ? Number(paxMar) : '',
+    valorMuseu:    '',
+    quantidade:    '',
+    total:         '',
+    canal:         '',
+    pax:      pax      ? Number(pax)      : '',
+    paxMuseu: paxMuseu ? Number(paxMuseu) : '',
+    paxGex:   paxGex   ? Number(paxGex)   : '',
+    paxMar:   paxMar   ? Number(paxMar)   : '',
     ts: new Date().toISOString()
   };
 
@@ -1183,10 +1189,10 @@ async function salvarPax() {
         body: JSON.stringify(reg)
       });
       showToast('✅ PAX do dia salvo!');
-      // Limpar campos PAX após salvar
-      document.getElementById('f-pax').value     = '';
-      document.getElementById('f-pax-gex').value = '';
-      document.getElementById('f-pax-mar').value = '';
+      document.getElementById('f-pax').value       = '';
+      document.getElementById('f-pax-museu').value = '';
+      document.getElementById('f-pax-gex').value   = '';
+      document.getElementById('f-pax-mar').value   = '';
     }
   } catch(e) {
     showToast('Erro ao salvar PAX');
