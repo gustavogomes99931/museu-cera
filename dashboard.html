@@ -335,7 +335,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
     <div class="tbl-scroll" style="max-height:196px"><table class="tbl">
-      <colgroup><col style="width:32px"><col><col style="width:44px"><col style="width:90px"><col style="width:76px"><col style="width:48px"></colgroup>
+      <colgroup><col style="width:32px"><col style="min-width:120px;max-width:160px"><col style="width:44px"><col style="width:90px"><col style="width:76px"><col style="width:48px"></colgroup>
       <thead><tr><th style="overflow:visible">#</th><th>Vendedor</th><th class="r">Ing.</th><th class="r">Valor</th><th class="r">Ticket Méd.</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-rank-body"></tbody>
     </table></div>
@@ -343,8 +343,8 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="card">
     <div class="sec-title">Conversão por Atração</div>
     <div class="tbl-scroll"><table class="tbl">
-      <colgroup><col><col style="width:52px"><col style="width:70px"><col style="width:116px"></colgroup>
-      <thead><tr><th>Atração</th><th class="r">Ing./PAX</th><th class="r">PAX Ref.</th><th class="r">Conv.%</th></tr></thead>
+      <colgroup><col><col style="width:60px"><col style="width:72px"><col style="width:70px"></colgroup>
+      <thead><tr><th>Atração</th><th class="r">PAX</th><th class="r">PAX Aquário</th><th class="r">Conv.%</th></tr></thead>
       <tbody id="tbl-pax-conv-body"></tbody>
     </table></div>
   </div>
@@ -881,11 +881,11 @@ function renderCharts(at,de,ate,tipo){
   });
   const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
   const dias=[...diasSet].sort();
-  // 80px por par de barras fixa — 10 dias = 800px. Se ultrapassar o card, scroll ativa
-  const PX_DIA = 80;
-  const wDiaTotal = dias.length * PX_DIA;
-  const wDiaCard = document.getElementById('w-meta').parentElement.offsetWidth || 9999;
-  document.getElementById('w-meta').style.width = wDiaTotal > wDiaCard ? wDiaTotal + 'px' : '100%';
+  // Mobile: 5 dias visíveis | Desktop: 10 dias visíveis
+  const isMobile = window.innerWidth <= 600;
+  const diasVisiveis = isMobile ? 5 : 10;
+  const PX_DIA = Math.floor((document.getElementById('w-meta').parentElement.offsetWidth || (isMobile ? 320 : 800)) / diasVisiveis);
+  document.getElementById('w-meta').style.width = (dias.length * PX_DIA) + 'px';
   dc('meta');charts['meta']=new Chart(document.getElementById('ch-meta'),{
     type:'bar',
     data:{
@@ -1090,7 +1090,7 @@ function renderRankingMuseu(at){
     const p = totAtr > 0 ? (d.val/totAtr*100).toFixed(1)+'%' : '—';
     const tkt = d.ing > 0 ? fmt(d.val / d.ing) : '—';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${tkt}</td><td class="r">${p}</td>`;
+    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600;white-space:normal;word-break:break-word">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${tkt}</td><td class="r">${p}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -1146,10 +1146,10 @@ function renderPaxConv(at, a1) {
   const linhas = [
     {
       label: 'Museu',
-      pax:   fmtN(ingMuseu),                          // ingressos vendidos
-      paxAq: paxMuseu > 0 ? fmtN(paxMuseu) : '—',    // PAX Museu lançado (coluna PAX AQUÁ. reaproveitada)
-      conv:  conv(ingMuseu, paxMuseu),                 // ingressos ÷ PAX Museu
-      convA1:conv(ingMuseuA1, paxMuseuA1),
+      pax:   paxMuseu > 0 ? fmtN(paxMuseu) : '—',  // PAX Museu lançado
+      paxAq: fmtN(paxAq),
+      conv:  conv(paxMuseu, paxAq),                  // PAX Museu ÷ PAX Aquário
+      convA1:conv(paxMuseuA1, paxAqA1),
     },
     {
       label: 'GEX',
@@ -1157,7 +1157,6 @@ function renderPaxConv(at, a1) {
       paxAq: fmtN(paxAq),
       conv:  conv(paxGex, paxAq),
       convA1:conv(paxGexA1, paxAqA1),
-      desc:  'PAX GEX ÷ PAX Aquá.'
     },
     {
       label: 'MAR',
@@ -1165,15 +1164,13 @@ function renderPaxConv(at, a1) {
       paxAq: fmtN(paxAq),
       conv:  conv(paxMar, paxAq),
       convA1:conv(paxMarA1, paxAqA1),
-      desc:  'PAX MAR ÷ PAX Aquá.'
     },
     {
       label: 'Exp. Completa + Compl.',
-      pax:   fmtN(ingExpComp),
+      pax:   ingExpComp > 0 ? fmtN(ingExpComp) : '—',
       paxAq: fmtN(paxAq),
       conv:  conv(ingExpComp, paxAq),
       convA1:conv(ingExpCompA1, paxAqA1),
-      desc:  'Ing. ÷ PAX Aquá.'
     },
   ];
 
