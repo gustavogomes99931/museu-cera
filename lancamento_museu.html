@@ -997,22 +997,56 @@ function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedor
 
 // Carrega vendedores da aba Vendedores do Sheets
 async function carregarVendedores() {
-  if (VENDEDORES_GID === 'COLE_O_GID_DA_ABA_VENDEDORES') return;
-  try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const txt = await res.text();
-    const nomes = txt.trim().split('\n')
-      .map(l => l.replace(/"/g,'').trim())
-      .filter(l => l && l.toLowerCase() !== 'nome' && l.toLowerCase() !== 'vendedor');
-    if (nomes.length > 0) {
-      vendedores = nomes;
-      saveVend(); // atualiza cache local
-    }
-  } catch(e) {
-    console.warn('Falha ao carregar vendedores do Sheets, usando cache local:', e);
+  // Se já tem cache local, usa imediatamente (não espera o Sheets)
+  if (vendedores.length > 0) {
+    renderSelect();
+    renderLista();
   }
+
+  // Tenta carregar da aba Vendedores se GID configurado
+  if (VENDEDORES_GID !== 'COLE_O_GID_DA_ABA_VENDEDORES') {
+    try {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const txt = await res.text();
+      const nomes = txt.trim().split('\n')
+        .map(l => l.replace(/"/g,'').trim())
+        .filter(l => l && l.toLowerCase() !== 'nome' && l.toLowerCase() !== 'vendedor');
+      if (nomes.length > 0) {
+        vendedores = nomes;
+        saveVend();
+        renderSelect();
+        renderLista();
+        return;
+      }
+    } catch(e) {
+      console.warn('Falha ao carregar aba Vendedores:', e);
+    }
+  }
+
+  // Fallback: extrai vendedores únicos da aba Vendas (coluna B)
+  if (vendedores.length === 0) {
+    try {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ABA_GID}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const txt = await res.text();
+      const linhas = txt.trim().split('\n').slice(1); // pula header
+      const nomes = [...new Set(
+        linhas
+          .map(l => l.split(',')[1]?.replace(/"/g,'').trim())
+          .filter(n => n && n.length > 1)
+      )].sort();
+      if (nomes.length > 0) {
+        vendedores = nomes;
+        saveVend();
+      }
+    } catch(e) {
+      console.warn('Falha ao carregar vendedores da aba Vendas:', e);
+    }
+  }
+
   renderSelect();
   renderLista();
 }
