@@ -148,16 +148,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .vwrap { display: flex; align-items: center; gap: 8px; }
 .vwrap select {
   flex: 1;
-  background: none;
+  min-width: 0;
+  background: #fff;
   border: none;
   outline: none;
   font-family: 'Rajdhani', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
-  appearance: none;
-  -webkit-appearance: none;
   cursor: pointer;
+  /* Mantém aparência nativa no mobile para funcionar no iOS/Android */
+  -webkit-appearance: auto;
+  appearance: auto;
 }
 .vwrap select option { background: #fff; color: var(--text); }
 
