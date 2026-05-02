@@ -852,11 +852,28 @@ function renderCharts(at,de,ate,tipo){
   // Por tipo — donut valor + donut qtd
   const tiposVal={Avulso:0,'Combo Duplo':0,'Combo Triplo':0,'Exp. Completa':0,Complementos:0};
   const tiposQtd={Avulso:0,'Combo Duplo':0,'Combo Triplo':0,'Exp. Completa':0,Complementos:0};
-  const mapCat={'avulso':'Avulso','combo_duplo':'Combo Duplo','combo_triplo':'Combo Triplo','exp_completa':'Exp. Completa','complementos':'Complementos'};
-  at.forEach(r=>{const t=mapCat[r['Categoria']]||'Outros';if(tiposVal[t]!==undefined){tiposVal[t]+=valorReg(r,tipo);tiposQtd[t]+=(Number(r['Quantidade'])||0);}});
-  const labsTipo=Object.keys(tiposVal).filter(k=>tiposVal[k]>0);
+  const mapCat={
+    'avulso':'Avulso','AVULSO':'Avulso',
+    'combo_duplo':'Combo Duplo','COMBO_DUPLO':'Combo Duplo','combo duplo':'Combo Duplo',
+    'combo_triplo':'Combo Triplo','COMBO_TRIPLO':'Combo Triplo','combo triplo':'Combo Triplo',
+    'exp_completa':'Exp. Completa','EXP_COMPLETA':'Exp. Completa','exp completa':'Exp. Completa',
+    'complementos':'Complementos','COMPLEMENTOS':'Complementos',
+  };
+  const resolveCat = cat => {
+    if(!cat) return null; // sem categoria — não classificar
+    const c = cat.toString().trim();
+    return mapCat[c] || mapCat[c.toLowerCase()] || null;
+  };
+  at.forEach(r=>{
+    const t = resolveCat(r['Categoria']);
+    if(!t) return; // ignora registros sem categoria (ex: PAX)
+    tiposVal[t] = (tiposVal[t]||0) + valorReg(r,tipo);
+    tiposQtd[t] = (tiposQtd[t]||0) + (Number(r['Quantidade'])||0);
+  });
+  const labsTipo = Object.keys(tiposVal).filter(k=>tiposVal[k]>0);
+  const labsTipoQtd = Object.keys(tiposQtd).filter(k=>tiposQtd[k]>0);
   dc('tipo');charts['tipo']=new Chart(document.getElementById('ch-tipo'),{type:'doughnut',data:{labels:labsTipo,datasets:[{data:labsTipo.map(k=>tiposVal[k]),backgroundColor:CORES_DONUT_TIPO,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnut()});
-  dc('tipo-qtd');charts['tipo-qtd']=new Chart(document.getElementById('ch-tipo-qtd'),{type:'doughnut',data:{labels:Object.keys(tiposQtd).filter(k=>tiposQtd[k]>0),datasets:[{data:Object.keys(tiposQtd).filter(k=>tiposQtd[k]>0).map(k=>tiposQtd[k]),backgroundColor:CORES_DONUT_TIPO,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnutQtd()});
+  dc('tipo-qtd');charts['tipo-qtd']=new Chart(document.getElementById('ch-tipo-qtd'),{type:'doughnut',data:{labels:labsTipoQtd,datasets:[{data:labsTipoQtd.map(k=>tiposQtd[k]),backgroundColor:CORES_DONUT_TIPO,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnutQtd()});
 
   // Por atração — donut valor + donut qtd
   const atrVal={Museu:0,GEX:0,MAR:0};
@@ -937,12 +954,37 @@ function renderCharts(at,de,ate,tipo){
 
 // ── ANÁLISE TIPO PRODUTO ──
 function renderTipoProduto(at,tipo){
-  const mapCat={'avulso':'Avulso','combo_duplo':'Combo Duplo','combo_triplo':'Combo Triplo','exp_completa':'Exp. Completa','complementos':'Complementos'};
+  const mapCatTP={
+    'avulso':'Avulso','AVULSO':'Avulso',
+    'combo_duplo':'Combo Duplo','combo duplo':'Combo Duplo',
+    'combo_triplo':'Combo Triplo','combo triplo':'Combo Triplo',
+    'exp_completa':'Exp. Completa','exp completa':'Exp. Completa',
+    'complementos':'Complementos','COMPLEMENTOS':'Complementos',
+  };
+  const resolveCatTP = cat => {
+    if(!cat) return null;
+    const c = cat.toString().trim();
+    return mapCatTP[c] || mapCatTP[c.toLowerCase()] || null;
+  };
+  // Ordem fixa das categorias
+  const ordemCat = ['Avulso','Combo Duplo','Combo Triplo','Exp. Completa','Complementos'];
   const grupos={};
-  at.forEach(r=>{const cat=mapCat[r['Categoria']]||'Outros';if(!grupos[cat])grupos[cat]={qtd:0,val:0,prods:{}};grupos[cat].qtd+=Number(r['Quantidade'])||0;grupos[cat].val+=valorReg(r,tipo);const p=r['Produto']||'—';if(!grupos[cat].prods[p])grupos[cat].prods[p]={qtd:0,val:0};grupos[cat].prods[p].qtd+=Number(r['Quantidade'])||0;grupos[cat].prods[p].val+=valorReg(r,tipo);});
+  at.forEach(r=>{
+    const cat = resolveCatTP(r['Categoria']);
+    if(!cat) return; // ignora linhas sem categoria (PAX, etc.)
+    if(!grupos[cat])grupos[cat]={qtd:0,val:0,prods:{}};
+    grupos[cat].qtd+=Number(r['Quantidade'])||0;
+    grupos[cat].val+=valorReg(r,tipo);
+    const p=r['Produto']||'—';
+    if(!grupos[cat].prods[p])grupos[cat].prods[p]={qtd:0,val:0};
+    grupos[cat].prods[p].qtd+=Number(r['Quantidade'])||0;
+    grupos[cat].prods[p].val+=valorReg(r,tipo);
+  });
   const totalVal=Object.values(grupos).reduce((a,b)=>a+b.val,0);
   const tb=document.getElementById('tbl-tipo-body');tb.innerHTML='';
-  Object.entries(grupos).forEach(([cat,d],gi)=>{
+  // Renderiza na ordem fixa, só categorias com dados
+  ordemCat.filter(cat=>grupos[cat]&&grupos[cat].val>0).forEach((cat,gi)=>{
+    const d=grupos[cat];
     const tr=document.createElement('tr');
     tr.className='vr';
     tr.innerHTML=`<td><div class="exp-btn" id="etp-${gi}" onclick="toggleSub2('tp',${gi})">+</div></td><td style="font-weight:600">${cat}</td><td class="r">${fmtN(d.qtd)}</td><td class="r val-g">${fmt(d.val)}</td><td class="r">${pct(d.val,totalVal)}</td>`;
