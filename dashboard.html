@@ -129,9 +129,55 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   .tbl-scroll { overflow-x:auto !important; }
 }
 </style>
+
+<style>
+/* ── TELA LOGIN DASHBOARD ── */
+#dash-login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+#dash-login-box{background:#fff;border-radius:20px;padding:40px 32px;border:1px solid var(--bd);box-shadow:0 4px 24px rgba(0,0,0,0.08);width:100%;max-width:360px;text-align:center}
+#dash-login-box .dl-icon{margin-bottom:24px}
+#dash-login-box .dl-icon svg{width:44px;height:44px;color:var(--g)}
+#dash-login-box h2{font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px}
+#dash-login-box p{font-size:13px;color:var(--mu2);margin-bottom:24px}
+#dash-login-box .dl-field{display:flex;gap:8px;margin-bottom:10px}
+#dash-login-box input{flex:1;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--text);background:var(--bg);outline:none;text-align:left;transition:border-color .15s}
+#dash-login-box input:focus{border-color:var(--g)}
+#dash-login-box input.dl-erro{border-color:var(--danger)}
+#dash-login-box .dl-btn{padding:12px 20px;background:var(--g);color:#fff;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;cursor:pointer;width:100%;transition:background .15s;margin-top:4px}
+#dash-login-box .dl-btn:hover{background:var(--g2)}
+#dash-login-box .dl-err-msg{font-size:12px;color:var(--danger);margin-top:8px;opacity:0;transition:opacity .2s}
+#dash-login-box .dl-err-msg.show{opacity:1}
+/* modo restrito — esconde elementos */
+body.modo-restrito .hide-restrito{display:none!important}
+body.modo-restrito .rank-no-scroll{max-height:none!important;overflow-y:visible!important}
+@keyframes dl-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.dl-shake{animation:dl-shake .3s}
+</style>
 </head>
 <body>
 <div class="loading-bar" id="lb"></div>
+
+<!-- ── LOGIN DASHBOARD ── -->
+<div id="dash-login">
+  <div id="dash-login-box">
+    <div class="dl-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h2>Dashboard de Vendas</h2>
+    <p>Museu de Cera RJ</p>
+    <div class="dl-field">
+      <input type="text" id="dl-user" placeholder="Usuário" autocomplete="username"
+        onkeydown="if(event.key==='Enter')document.getElementById('dl-pass').focus()">
+    </div>
+    <div class="dl-field">
+      <input type="password" id="dl-pass" placeholder="Senha" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <button class="dl-btn" onclick="fazerLogin()">Entrar</button>
+    <div class="dl-err-msg" id="dl-err">Usuário ou senha incorretos.</div>
+  </div>
+</div>
 
 <div class="hdr">
   <div class="hdr-l">
@@ -303,7 +349,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
             <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Museu</th>
             <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">GEX</th>
             <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">MAR</th>
-            <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">AQUA</th>
+            <th colspan="3" style="text-align:center;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap" class="hide-restrito">AQUA</th>
           </tr>
           <tr>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
@@ -315,10 +361,9 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
             <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap">Qtd</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">R$</th>
-            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap">% R$</th>
-          </tr>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);white-space:nowrap" class="hide-restrito">Qtd</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap" class="hide-restrito">R$</th>
+            <th style="text-align:right;font-size:9px;font-weight:600;color:var(--mu);text-transform:uppercase;padding:5px 8px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap" class="hide-restrito">% R$</th>
         </thead>
         <tbody id="tbl-conv-atr-body"></tbody>
       </table>
@@ -338,7 +383,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
-    <div class="tbl-scroll" style="max-height:196px;position:relative"><table class="tbl">
+    <div class="tbl-scroll rank-no-scroll" style="max-height:196px;position:relative"><table class="tbl">
       <colgroup><col style="width:32px"><col style="min-width:120px;max-width:160px"><col style="width:44px"><col style="width:90px"><col style="width:76px"><col style="width:48px"></colgroup>
       <thead><tr>
         <th style="overflow:visible">#</th>
@@ -352,7 +397,14 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     <div class="sec-title">Conversão por Atração</div>
     <div class="tbl-scroll"><table class="tbl">
       <colgroup><col><col style="width:55px"><col style="width:80px"><col style="width:90px"></colgroup>
-      <thead><tr><th>Atração</th><th class="r">PAX</th><th class="r">PAX Aquário</th><th class="r">Conv.%</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Atração</th>
+          <th class="r">PAX</th>
+          <th class="r">PAX Aquário</th>
+          <th class="r">Conv.%</th>
+        </tr>
+      </thead>
       <tbody id="tbl-pax-conv-body"></tbody>
     </table></div>
   </div>
@@ -385,6 +437,59 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 </div><!-- /page -->
 <script>
 const SENHA_ACESSO = 'museu2025';
+
+// ── SISTEMA DE LOGIN ──
+const LOGINS = {
+  'admin':       { senha: 'museu2025',  modo: 'admin' },
+  'museu2026':   { senha: '@museu2026', modo: 'restrito' },
+};
+
+function fazerLogin() {
+  const user  = (document.getElementById('dl-user').value || '').trim();
+  const pass  = (document.getElementById('dl-pass').value || '').trim();
+  const err   = document.getElementById('dl-err');
+  const cred  = LOGINS[user];
+  if (cred && cred.senha === pass) {
+    sessionStorage.setItem('mcera_dash_auth', '1');
+    sessionStorage.setItem('mcera_dash_modo', cred.modo);
+    document.getElementById('dash-login').style.display = 'none';
+    if (cred.modo === 'restrito') ativarModoRestrito();
+    carregar();
+  } else {
+    err.classList.add('show');
+    const box = document.getElementById('dash-login-box');
+    box.classList.add('dl-shake');
+    setTimeout(() => { box.classList.remove('dl-shake'); err.classList.remove('show'); }, 1500);
+    document.getElementById('dl-pass').value = '';
+    document.getElementById('dl-pass').focus();
+  }
+}
+
+function ativarModoRestrito() {
+  document.body.classList.add('modo-restrito');
+  // Filtro TIPO fixo em Museu e oculto
+  const fTipo = document.getElementById('f-tipo');
+  fTipo.value = 'museu';
+  fTipo.disabled = true;
+  fTipo.closest('.flt-grp').style.display = 'none';
+  // Filtros de vendedor/canal/cat/atr ocultos
+  ['f-vend','f-canal','f-cat','f-atr'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.closest('.flt-grp').style.display = 'none';
+  });
+  // Separadores extras podem ficar — não afeta
+}
+
+// Verificar sessão ao carregar
+window.addEventListener('DOMContentLoaded', function() {
+  const auth = sessionStorage.getItem('mcera_dash_auth');
+  const modo = sessionStorage.getItem('mcera_dash_modo');
+  if (auth === '1') {
+    document.getElementById('dash-login').style.display = 'none';
+    if (modo === 'restrito') ativarModoRestrito();
+    carregar();
+  }
+});
 
 function irParaLancamento() {
   // Se já autenticou nessa sessão, vai direto
@@ -954,6 +1059,7 @@ function renderCharts(at,de,ate,tipo){
 
 // ── ANÁLISE TIPO PRODUTO ──
 function renderTipoProduto(at,tipo){
+  const modoRestrito = document.body.classList.contains('modo-restrito');
   const mapCatTP={
     'avulso':'Avulso','AVULSO':'Avulso',
     'combo_duplo':'Combo Duplo','combo duplo':'Combo Duplo',
@@ -987,7 +1093,7 @@ function renderTipoProduto(at,tipo){
     const d=grupos[cat];
     const tr=document.createElement('tr');
     tr.className='vr';
-    tr.innerHTML=`<td><div class="exp-btn" id="etp-${gi}" onclick="toggleSub2('tp',${gi})">+</div></td><td style="font-weight:600">${cat}</td><td class="r" style="font-size:10px">${fmtN(d.qtd)}</td><td class="r val-g" style="font-size:10px;white-space:nowrap">${fmt(d.val)}</td><td class="r" style="font-size:10px">${pct(d.val,totalVal)}</td>`;
+    tr.innerHTML=`<td><div class="exp-btn" id="etp-${gi}" onclick="toggleSub2('tp',${gi})">+</div></td><td style="font-weight:600">${cat}</td><td class="r" style="font-size:10px">${fmtN(d.qtd)}</td>${modoRestrito ? '' : `<td class="r val-g" style="font-size:10px;white-space:nowrap">${fmt(d.val)}</td>`}<td class="r" style="font-size:10px">${pct(d.val,totalVal)}</td>`;
     tb.appendChild(tr);
     const subTr=document.createElement('tr');subTr.className='sub-row';subTr.id=`stp-${gi}`;
     const prods=Object.entries(d.prods).sort((a,b)=>b[1].val-a[1].val);
@@ -998,6 +1104,7 @@ function renderTipoProduto(at,tipo){
 
 // ── ANÁLISE ATRAÇÃO ──
 function renderAtracao(at){
+  const modoRestrito = document.body.classList.contains('modo-restrito');
   const atr={Museu:{val:0},GEX:{val:0},MAR:{val:0}};
   at.forEach(r=>{
     if(TEM_MUSEU.includes(r['Produto'])) atr.Museu.val += parcelaAtr(r,'museu');
@@ -1008,12 +1115,11 @@ function renderAtracao(at){
   const tb = document.getElementById('tbl-atr-body'); tb.innerHTML='';
   Object.entries(atr).forEach(([n,d]) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="font-weight:600">${n}</td><td class="r val-g">${fmt(d.val)}</td><td class="r">${pct(d.val,totalVal)}</td>`;
+    tr.innerHTML = `<td style="font-weight:600">${n}</td>${modoRestrito?'':` <td class="r val-g">${fmt(d.val)}</td>`}<td class="r">${pct(d.val,totalVal)}</td>`;
     tb.appendChild(tr);
   });
-  // Linha de total
   const tot = document.createElement('tr');
-  tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td><td class="r val-g" style="border-top:2px solid var(--bd)">${fmt(totalVal)}</td><td class="r" style="border-top:2px solid var(--bd)">100%</td>`;
+  tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td>${modoRestrito?'':` <td class="r val-g" style="border-top:2px solid var(--bd)">${fmt(totalVal)}</td>`}<td class="r" style="border-top:2px solid var(--bd)">100%</td>`;
   tb.appendChild(tot);
 }
 
@@ -1070,6 +1176,7 @@ function renderConvAtracao(at, a1) {
   const tdBase = `padding:7px 10px;border-bottom:1px solid var(--bd);font-size:11px;font-weight:500;white-space:nowrap`;
   const tdR    = tdBase+`;text-align:right`;
   const tdBL   = tdR+`;border-left:1px solid var(--bd)`;
+  const modoRestrito = document.body.classList.contains('modo-restrito');
   const tdVend = tdBase+`;font-weight:600;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--bd)`;
 
   // % é a participação de cada atração no total geral do vendedor
@@ -1079,27 +1186,33 @@ function renderConvAtracao(at, a1) {
     const brd = first ? tdBL : tdR;
     return `<td style="${brd}">${fmtN(q)}</td><td style="${tdR};color:var(--g);font-weight:600">${fmt(r)}</td><td style="${tdR}">${p}</td>`;
   };
+  const celAqua = (d, totalVend) => {
+    if (modoRestrito) return ''; // oculta AQUA no modo restrito
+    return cel('aqua', totValAqua, true)(d, totalVend);
+  };
 
   Object.entries(por).sort((a,b)=>b[1].museu.val-a[1].museu.val).forEach(([v,d]) => {
-    const totalVend = d.museu.val + d.gex.val + d.mar.val + d.aqua.val;
+    const totalVend = d.museu.val + d.gex.val + d.mar.val + (modoRestrito ? 0 : d.aqua.val);
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="${tdVend}">${v}</td>`
       + cel('museu',totValMuseu,true)(d, totalVend)
       + cel('gex',  totValGex,  true)(d, totalVend)
       + cel('mar',  totValMar,  true)(d, totalVend)
-      + cel('aqua', totValAqua, true)(d, totalVend);
+      + celAqua(d, totalVend);
     tb.appendChild(tr);
   });
 
-  const totalGeral = totValMuseu + totValGex + totValMar + totValAqua;
+  const totalGeral = totValMuseu + totValGex + totValMar + (modoRestrito ? 0 : totValAqua);
   const pTot = v => totalGeral > 0 ? (v/totalGeral*100).toFixed(1)+'%' : '—';
   const bt = `border-top:2px solid var(--bd)`;
   const tTr = document.createElement('tr');
+  const aquaTotCels = modoRestrito ? '' :
+    `<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQAqua)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValAqua)}</td><td style="${tdR};${bt}">${pTot(totValAqua)}</td>`;
   tTr.innerHTML = `<td style="${tdVend};font-weight:700;${bt}">Total</td>`
     +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQMuseu)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValMuseu)}</td><td style="${tdR};${bt}">${pTot(totValMuseu)}</td>`
     +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQGex)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValGex)}</td><td style="${tdR};${bt}">${pTot(totValGex)}</td>`
     +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQMar)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValMar)}</td><td style="${tdR};${bt}">${pTot(totValMar)}</td>`
-    +`<td style="${tdBL};font-weight:700;${bt}">${fmtN(totQAqua)}</td><td style="${tdR};color:var(--g);font-weight:700;${bt}">${fmt(totValAqua)}</td><td style="${tdR};${bt}">${pTot(totValAqua)}</td>`;
+    + aquaTotCels;
   tb.appendChild(tTr);
 }
 
@@ -1150,6 +1263,7 @@ function renderRankingMuseu(at){
 // GEX    = soma do maior PAX GEX por dia ÷ PAX Aquário
 // MAR    = soma do maior PAX MAR por dia ÷ PAX Aquário
 function renderPaxConv(at, a1) {
+  const modoRestrito = document.body.classList.contains('modo-restrito');
   function calcPaxDia(recs, campo) {
     const m = {};
     recs.forEach(r => {
@@ -1216,11 +1330,11 @@ function renderPaxConv(at, a1) {
       convA1:conv(paxMarA1, paxAqA1),
     },
     {
-      label: 'Exp. Completa + Compl.',
-      pax:   ingExpComp > 0 ? fmtN(ingExpComp) : '—',
+      label: modoRestrito ? 'GEX Time Museu' : 'Exp. Completa + Compl.',
+      pax:   modoRestrito ? (paxGex > 0 ? fmtN(paxGex) : '—') : (ingExpComp > 0 ? fmtN(ingExpComp) : '—'),
       paxAq: fmtN(paxAq),
-      conv:  conv(ingExpComp, paxAq),
-      convA1:conv(ingExpCompA1, paxAqA1),
+      conv:  modoRestrito ? conv(paxGex, paxAq) : conv(ingExpComp, paxAq),
+      convA1:modoRestrito ? conv(paxGexA1, paxAqA1) : conv(ingExpCompA1, paxAqA1),
     },
   ];
 
