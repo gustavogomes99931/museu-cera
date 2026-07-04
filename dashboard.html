@@ -291,17 +291,12 @@ body.modo-restrito .rank-no-scroll{max-height:none!important;overflow-y:visible!
     </div>
   </div>
   <div class="card">
-    <div class="sec-title">Por Atração</div>
-    <div class="donut-pair">
-      <div class="donut-wrap">
-        <div class="donut-lbl">Valor R$</div>
-        <div class="donut-ch"><canvas id="ch-atr"></canvas></div>
-      </div>
-      <div class="donut-wrap">
-        <div class="donut-lbl">Quantidade</div>
-        <div class="donut-ch"><canvas id="ch-atr-qtd"></canvas></div>
-      </div>
-    </div>
+    <div class="sec-title">Visitação por Atração</div>
+    <div class="tbl-scroll"><table class="tbl">
+      <colgroup><col><col style="width:68px"><col style="width:68px"><col style="width:56px"><col style="width:60px"></colgroup>
+      <thead><tr><th>Atração</th><th class="r">Ano Atual</th><th class="r">Ano Anterior</th><th class="r">LY %</th><th class="r">% Aqua</th></tr></thead>
+      <tbody id="tbl-pax-atr-body"></tbody>
+    </table></div>
   </div>
 </div>
 
@@ -326,22 +321,22 @@ body.modo-restrito .rank-no-scroll{max-height:none!important;overflow-y:visible!
   <div class="card">
     <div class="sec-title">Mix de Vendas por Categoria</div>
     <div class="tbl-scroll"><table class="tbl">
-      <colgroup><col style="width:22px"><col><col style="width:38px"><col style="width:88px"><col style="width:44px"></colgroup>
-      <thead><tr><th></th><th>Categoria / Produto</th><th class="r">Qtd</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <colgroup><col style="width:22px"><col><col style="width:44px"><col style="width:48px"></colgroup>
+      <thead><tr><th></th><th>Categoria / Produto</th><th class="r">Qtd</th><th class="r">Part.%</th></tr></thead>
       <tbody id="tbl-tipo-body"></tbody>
     </table></div>
   </div>
   <div class="card">
     <div class="sec-title">Mix de Faturamento por Atração</div>
     <div class="tbl-scroll"><table class="tbl">
-      <colgroup><col><col style="width:80px"><col style="width:48px"></colgroup>
-      <thead><tr><th>Atração</th><th class="r">Valor</th><th class="r">Part.%</th></tr></thead>
+      <colgroup><col><col style="width:72px"><col style="width:64px"></colgroup>
+      <thead><tr><th>Atração</th><th class="r">Qtd Ing.</th><th class="r">% Aqua</th></tr></thead>
       <tbody id="tbl-atr-body"></tbody>
     </table></div>
   </div>
   <div class="card" style="overflow:visible">
     <div class="sec-title">Performance por vendedor</div>
-    <div style="overflow-x:auto;overflow-y:auto;max-height:222px;-webkit-overflow-scrolling:touch;width:100%">
+    <div style="overflow-x:auto;overflow-y:auto;max-height:300px;-webkit-overflow-scrolling:touch;width:100%">
       <table style="border-collapse:collapse;table-layout:auto;white-space:nowrap">
         <thead>
           <tr>
@@ -383,12 +378,12 @@ body.modo-restrito .rank-no-scroll{max-height:none!important;overflow-y:visible!
   </div>
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
-    <div class="tbl-scroll rank-no-scroll" style="max-height:196px;position:relative"><table class="tbl">
-      <colgroup><col style="width:32px"><col style="min-width:120px;max-width:160px"><col style="width:44px"><col style="width:90px"><col style="width:76px"><col style="width:48px"></colgroup>
+    <div class="tbl-scroll rank-no-scroll" style="max-height:196px;overflow-x:hidden"><table class="tbl" style="width:100%;table-layout:fixed">
+      <colgroup><col style="width:28px"><col><col style="width:38px"><col style="width:72px"><col style="width:60px"><col style="width:42px"></colgroup>
       <thead><tr>
         <th style="overflow:visible">#</th>
         <th style="position:sticky;left:0;z-index:2;background:var(--bg);border-right:2px solid var(--bd)">Vendedor</th>
-        <th class="r">Ing.</th><th class="r">Valor</th><th class="r">Ticket Méd.</th><th class="r">Part.%</th>
+        <th class="r">Ing.</th><th class="r">Valor</th><th class="r">Ticket</th><th class="r">Part.%</th>
       </tr></thead>
       <tbody id="tbl-rank-body"></tbody>
     </table></div>
@@ -787,6 +782,7 @@ function aplicar(){
   try { renderCharts(at,de,ate,tipo); } catch(e) { console.error('renderCharts:',e); }
   try { renderTipoProduto(at,tipo); } catch(e) { console.error('renderTipoProduto:',e); }
   try { renderAtracao(at); } catch(e) { console.error('renderAtracao:',e); }
+  try { renderVisitacaoPorAtracao(at, a1); } catch(e) { console.error('renderVisitacaoPorAtracao:',e); }
   try { renderConvAtracao(at,a1); } catch(e) { console.error('renderConvAtracao:',e); }
   try { renderExpCompleta(at,tipo); } catch(e) { console.error('renderExpCompleta:',e); }
   try { renderRankingMuseu(at); } catch(e) { console.error('renderRankingMuseu:',e); }
@@ -989,8 +985,7 @@ function renderCharts(at,de,ate,tipo){
     if(TEM_GEX.includes(r['Produto']))  atrQtd.GEX+=Number(r['Quantidade'])||0;
     if(TEM_MAR.includes(r['Produto']))  atrQtd.MAR+=Number(r['Quantidade'])||0;
   });
-  dc('atr');charts['atr']=new Chart(document.getElementById('ch-atr'),{type:'doughnut',data:{labels:['Museu','GEX','MAR'],datasets:[{data:[atrVal.Museu,atrVal.GEX,atrVal.MAR],backgroundColor:CORES_DONUT_ATR,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnut()});
-  dc('atr-qtd');charts['atr-qtd']=new Chart(document.getElementById('ch-atr-qtd'),{type:'doughnut',data:{labels:['Museu','GEX','MAR'],datasets:[{data:[atrQtd.Museu,atrQtd.GEX,atrQtd.MAR],backgroundColor:CORES_DONUT_ATR,borderWidth:2,borderColor:'#fff'}]},options:optsDoughnutQtd()});
+  // donuts de atração removidos — substituídos pela tabela Visitação por Atração
 
   // Vendas A0 vs A1 por dia
   const dmA0={};const dqA0={};
@@ -1093,11 +1088,12 @@ function renderTipoProduto(at,tipo){
     const d=grupos[cat];
     const tr=document.createElement('tr');
     tr.className='vr';
-    tr.innerHTML=`<td><div class="exp-btn" id="etp-${gi}" onclick="toggleSub2('tp',${gi})">+</div></td><td style="font-weight:600">${cat}</td><td class="r" style="font-size:10px">${fmtN(d.qtd)}</td>${modoRestrito ? '' : `<td class="r val-g" style="font-size:10px;white-space:nowrap">${fmt(d.val)}</td>`}<td class="r" style="font-size:10px">${pct(d.val,totalVal)}</td>`;
+    tr.innerHTML=`<td><div class="exp-btn" id="etp-${gi}" onclick="toggleSub2('tp',${gi})">+</div></td><td style="font-weight:600">${cat}</td><td class="r" style="font-size:10px">${fmtN(d.qtd)}</td><td class="r" style="font-size:10px">${pct(d.qtd, Object.values(grupos).reduce((a,b)=>a+b.qtd,0))}</td>`;
     tb.appendChild(tr);
     const subTr=document.createElement('tr');subTr.className='sub-row';subTr.id=`stp-${gi}`;
-    const prods=Object.entries(d.prods).sort((a,b)=>b[1].val-a[1].val);
-    subTr.innerHTML=`<td colspan="5" style="padding:0"><table style="width:100%;border-collapse:collapse;background:var(--gl);table-layout:fixed"><tr style="border-bottom:1px solid var(--bd)"><th style="padding:5px 5px 5px 32px;font-size:9px;font-weight:600;color:var(--mu2);text-align:left">Produto</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:40px">Qtd</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:72px">Valor</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:46px">Part.%</th></tr>${prods.map(([p,v])=>`<tr><td style="padding:5px 5px 5px 32px;font-size:10px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</td><td style="text-align:right;padding:5px;font-size:10px;white-space:nowrap">${fmtN(v.qtd)}</td><td style="text-align:right;padding:5px;font-size:10px;color:var(--g);font-weight:600;white-space:nowrap">${fmt(v.val)}</td><td style="text-align:right;padding:5px;font-size:10px;white-space:nowrap">${pct(v.val,totalVal)}</td></tr>`).join('')}</table></td>`;
+    const prods=Object.entries(d.prods).sort((a,b)=>b[1].qtd-a[1].qtd);
+    const totalQtd=Object.values(grupos).reduce((a,b)=>a+b.qtd,0);
+    subTr.innerHTML=`<td colspan="4" style="padding:0"><table style="width:100%;border-collapse:collapse;background:var(--gl);table-layout:fixed"><tr style="border-bottom:1px solid var(--bd)"><th style="padding:5px 5px 5px 32px;font-size:9px;font-weight:600;color:var(--mu2);text-align:left">Produto</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:44px">Qtd</th><th style="padding:5px;font-size:9px;font-weight:600;color:var(--mu2);text-align:right;width:48px">Part.%</th></tr>${prods.map(([p,v])=>`<tr><td style="padding:5px 5px 5px 32px;font-size:10px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</td><td style="text-align:right;padding:5px;font-size:10px;white-space:nowrap">${fmtN(v.qtd)}</td><td style="text-align:right;padding:5px;font-size:10px;white-space:nowrap">${pct(v.qtd,totalQtd)}</td></tr>`).join('')}</table></td>`;
     tb.appendChild(subTr);
   });
 }
@@ -1105,25 +1101,75 @@ function renderTipoProduto(at,tipo){
 // ── ANÁLISE ATRAÇÃO ──
 function renderAtracao(at){
   const modoRestrito = document.body.classList.contains('modo-restrito');
-  const atr={Museu:{val:0},GEX:{val:0},MAR:{val:0}};
+  const atr={Museu:{qtd:0},GEX:{qtd:0},MAR:{qtd:0}};
   at.forEach(r=>{
-    if(TEM_MUSEU.includes(r['Produto'])) atr.Museu.val += parcelaAtr(r,'museu');
-    if(TEM_GEX.includes(r['Produto']))   atr.GEX.val   += parcelaAtr(r,'gex');
-    if(TEM_MAR.includes(r['Produto']))   atr.MAR.val   += parcelaAtr(r,'mar');
+    if(TEM_MUSEU.includes(r['Produto'])) atr.Museu.qtd += Number(r['Quantidade'])||0;
+    if(TEM_GEX.includes(r['Produto']))   atr.GEX.qtd   += Number(r['Quantidade'])||0;
+    if(TEM_MAR.includes(r['Produto']))   atr.MAR.qtd   += Number(r['Quantidade'])||0;
   });
-  const totalVal = atr.Museu.val + atr.GEX.val + atr.MAR.val;
+  // PAX Aquário do período para calcular % Aqua
+  const paxAqTotal = calcPaxKpi(at,'PAX Aquário');
   const tb = document.getElementById('tbl-atr-body'); tb.innerHTML='';
   Object.entries(atr).forEach(([n,d]) => {
+    const percAqua = paxAqTotal > 0 ? (d.qtd / paxAqTotal * 100).toFixed(1)+'%' : '—';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="font-weight:600">${n}</td>${modoRestrito?'':` <td class="r val-g">${fmt(d.val)}</td>`}<td class="r">${pct(d.val,totalVal)}</td>`;
+    tr.innerHTML = `<td style="font-weight:600">${n}</td><td class="r">${fmtN(d.qtd)}</td><td class="r">${percAqua}</td>`;
     tb.appendChild(tr);
   });
+  const totQtd = atr.Museu.qtd + atr.GEX.qtd + atr.MAR.qtd;
+  const percTot = paxAqTotal > 0 ? (totQtd / paxAqTotal * 100).toFixed(1)+'%' : '—';
   const tot = document.createElement('tr');
-  tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td>${modoRestrito?'':` <td class="r val-g" style="border-top:2px solid var(--bd)">${fmt(totalVal)}</td>`}<td class="r" style="border-top:2px solid var(--bd)">100%</td>`;
+  tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td><td class="r" style="border-top:2px solid var(--bd)">${fmtN(totQtd)}</td><td class="r" style="border-top:2px solid var(--bd)">${percTot}</td>`;
   tb.appendChild(tot);
 }
 
-// ── ATRAÇÃO POR VENDEDOR ──
+// Helper: soma PAX por dia (maior valor por dia) para qualquer campo
+function calcPaxKpi(recs, campo) {
+  const m={};
+  recs.forEach(r=>{
+    if(!r._data) return;
+    const d=r._data.toISOString().split('T')[0];
+    const v=parseInt(Number(r[campo])||0);
+    if(v>0&&(!m[d]||v>m[d]))m[d]=v;
+  });
+  return Object.values(m).reduce((a,b)=>a+b,0);
+}
+
+// ── VISITAÇÃO POR ATRAÇÃO (nova tabela substitui donut Por Atração) ──
+function renderVisitacaoPorAtracao(at, a1) {
+  const paxAq   = calcPaxKpi(at,'PAX Aquário');
+  const paxMdc  = calcPaxKpi(at,'PAX Museu');
+  const paxGex  = calcPaxKpi(at,'PAX GEX');
+  const paxMar  = calcPaxKpi(at,'PAX MAR');
+  const paxAqA1  = calcPaxKpi(a1,'PAX Aquário');
+  const paxMdcA1 = calcPaxKpi(a1,'PAX Museu');
+  const paxGexA1 = calcPaxKpi(a1,'PAX GEX');
+  const paxMarA1 = calcPaxKpi(a1,'PAX MAR');
+
+  const ly = (a,b) => {
+    if(!b) return '—';
+    const v = ((a-b)/b*100);
+    const cls = v>=0?'color:var(--g)':'color:var(--danger)';
+    return `<span style="${cls};font-weight:600">${v>=0?'+':''}${v.toFixed(3)}%</span>`;
+  };
+  const percAq = (v) => paxAq>0 ? (v/paxAq*100).toFixed(3)+'%' : '—';
+
+  const linhas = [
+    {label:'AquaRio', at:paxAq,  a1:paxAqA1,  percAqua:'—'},
+    {label:'MDC',     at:paxMdc, a1:paxMdcA1, percAqua:percAq(paxMdc)},
+    {label:'GEX',     at:paxGex, a1:paxGexA1, percAqua:percAq(paxGex)},
+    {label:'MAR',     at:paxMar, a1:paxMarA1, percAqua:percAq(paxMar)},
+  ];
+
+  const tb = document.getElementById('tbl-pax-atr-body');
+  if (!tb) return;
+  tb.innerHTML='';
+  linhas.forEach(l => {
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:600">${l.label}</td><td class="r">${fmtN(l.at)||'—'}</td><td class="r">${l.a1?fmtN(l.a1):'—'}</td><td class="r">${ly(l.at,l.a1)}</td><td class="r">${l.percAqua}</td>`;
+    tb.appendChild(tr);
+  });
+}
 // Colunas: Vendedor | Museu (R$) | GEX (R$) | MAR (R$) | Part.% Museu sobre total Museu do time
 function renderAtracaoVend(at){
   const por={};
@@ -1251,9 +1297,10 @@ function renderRankingMuseu(at){
   const tb=document.getElementById('tbl-rank-body');tb.innerHTML='';
   Object.entries(por).sort((a,b)=>b[1].val-a[1].val).forEach(([v,d],i)=>{
     const p = totAtr > 0 ? (d.val/totAtr*100).toFixed(1)+'%' : '—';
-    const tkt = d.ing > 0 ? fmt(d.val / d.ing) : '—';
+    const tkt = d.ing > 0 ? 'R$'+(d.val/d.ing).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
+    const valFmt = 'R$'+d.val.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="overflow:visible"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600;white-space:normal;word-break:break-word;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--bd)">${v}</td><td class="r val-g">${fmtN(d.ing)}</td><td class="r">${fmt(d.val)}</td><td class="r">${tkt}</td><td class="r">${p}</td>`;
+    tr.innerHTML=`<td style="overflow:visible;font-size:10px"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600;font-size:10px;white-space:normal;word-break:break-word;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--bd)">${v}</td><td class="r" style="font-size:10px" >${fmtN(d.ing)}</td><td class="r" style="font-size:10px">${valFmt}</td><td class="r" style="font-size:10px">${tkt}</td><td class="r" style="font-size:10px">${p}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -1307,12 +1354,16 @@ function renderPaxConv(at, a1) {
     return `<span class="kpi-var ${cls}" style="font-size:9px">${d>=0?'+':''}${d.toFixed(1)}%</span>`;
   };
 
+  // GEX Time Museu = qtd de ingressos GEX vendidos (mesma fonte da Performance)
+  const ingGex   = at.filter(r => TEM_GEX.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
+  const ingGexA1 = a1.filter(r => TEM_GEX.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
+
   const linhas = [
     {
       label: 'Museu',
-      pax:   paxMuseu > 0 ? fmtN(paxMuseu) : '—',  // PAX Museu lançado
+      pax:   paxMuseu > 0 ? fmtN(paxMuseu) : '—',
       paxAq: fmtN(paxAq),
-      conv:  conv(paxMuseu, paxAq),                  // PAX Museu ÷ PAX Aquário
+      conv:  conv(paxMuseu, paxAq),
       convA1:conv(paxMuseuA1, paxAqA1),
     },
     {
@@ -1331,10 +1382,10 @@ function renderPaxConv(at, a1) {
     },
     {
       label: modoRestrito ? 'GEX Time Museu' : 'Exp. Completa + Compl.',
-      pax:   modoRestrito ? (paxGex > 0 ? fmtN(paxGex) : '—') : (ingExpComp > 0 ? fmtN(ingExpComp) : '—'),
+      pax:   modoRestrito ? (ingGex > 0 ? fmtN(ingGex) : '—') : (ingExpComp > 0 ? fmtN(ingExpComp) : '—'),
       paxAq: fmtN(paxAq),
-      conv:  modoRestrito ? conv(paxGex, paxAq) : conv(ingExpComp, paxAq),
-      convA1:modoRestrito ? conv(paxGexA1, paxAqA1) : conv(ingExpCompA1, paxAqA1),
+      conv:  modoRestrito ? conv(ingGex, paxAq) : conv(ingExpComp, paxAq),
+      convA1:modoRestrito ? conv(ingGexA1, paxAqA1) : conv(ingExpCompA1, paxAqA1),
     },
   ];
 
