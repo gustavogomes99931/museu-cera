@@ -1028,7 +1028,8 @@ function renderCharts(at,de,ate,tipo){
     if(!dqA1[d])dqA1[d]=0; dqA1[d]+=Number(r['Quantidade'])||0;
   });
   const diasSet=new Set([...Object.keys(dmA0),...Object.keys(dmA1)]);
-  const dias=[...diasSet].sort();
+  // Mostrar apenas dias que tenham valor > 0 em pelo menos um dos anos
+  const dias=[...diasSet].sort().filter(d=>(dmA0[d]||0)>0||(dmA1[d]||0)>0);
   // Mobile: 5 dias visíveis | Desktop: 10 dias visíveis
   const isMobile = window.innerWidth <= 600;
   const diasVisiveis = isMobile ? 5 : 10;
