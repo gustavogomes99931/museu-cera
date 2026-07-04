@@ -1417,11 +1417,11 @@ function renderPaxConv(at, a1, atFiltrado, a1Filtrado) {
       convA1:conv(paxMarA1, paxAqA1),
     },
     {
-      label: modoRestrito ? 'GEX Time Museu' : 'Exp. Completa + Compl.',
-      pax:   modoRestrito ? (ingGex > 0 ? fmtN(ingGex) : '—') : (ingExpComp > 0 ? fmtN(ingExpComp) : '—'),
+      label: 'GEX Time Museu',
+      pax:   ingGex > 0 ? fmtN(ingGex) : '—',
       paxAq: fmtN(paxAq),
-      conv:  modoRestrito ? conv(ingGex, paxAq) : conv(ingExpComp, paxAq),
-      convA1:modoRestrito ? conv(ingGexA1, paxAqA1) : conv(ingExpCompA1, paxAqA1),
+      conv:  conv(ingGex, paxAq),
+      convA1:conv(ingGexA1, paxAqA1),
     },
   ];
 
