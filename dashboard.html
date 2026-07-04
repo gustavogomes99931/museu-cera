@@ -335,7 +335,7 @@ body.modo-restrito .hide-restrito{display:none!important}
     <div class="sec-title">Mix de Faturamento por Atração</div>
     <div class="tbl-scroll"><table class="tbl">
       <colgroup><col><col style="width:72px"><col style="width:64px"></colgroup>
-      <thead><tr><th>Atração</th><th class="r">Ing.</th><th class="r">% Aqua</th></tr></thead>
+      <thead><tr><th>Atração</th><th class="r">Ing.</th><th class="r">Conv.</th></tr></thead>
       <tbody id="tbl-atr-body"></tbody>
     </table></div>
   </div>
@@ -384,7 +384,7 @@ body.modo-restrito .hide-restrito{display:none!important}
   </div>
   <div class="card">
     <div class="sec-title">Ranking de Vendas</div>
-    <div id="rank-scroll-wrap" style="max-height:162px;overflow-y:auto;overflow-x:hidden"><table class="tbl" style="width:100%;table-layout:fixed">
+    <div id="rank-scroll-wrap" style="max-height:200px;overflow-y:auto;overflow-x:hidden"><table class="tbl" style="width:100%;table-layout:fixed">
       <colgroup><col style="width:28px"><col><col style="width:38px"><col style="width:72px"><col style="width:60px"><col style="width:42px"></colgroup>
       <thead style="position:sticky;top:0;z-index:2">
         <tr>
@@ -562,7 +562,7 @@ const CORES_DONUT_TIPO = ['#024959','#8AA6A3','#F2AE30','#593E25','#A1A2A6'];
 const CORES_DONUT_ATR  = ['#024959','#593E25','#F2AE30'];
 const fmt   = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtN  = v => Number(v).toLocaleString('pt-BR');
-const pct   = (a,b) => b > 0 ? ((a/b)*100).toFixed(1)+'%' : '—';
+const pct   = (a,b) => b > 0 ? ((a/b)*100).toFixed(3)+'%' : '—';
 // Formata variação % — se ultrapassar ±999%, mostra n/a (base muito pequena)
 const fmtVar = (v) => {
   if(v === null || v === undefined) return null;
@@ -909,9 +909,9 @@ function renderKPIs(at, a1Pax, tipo) {
   const ingMuseuA1 = a1.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+(Number(r['Quantidade'])||0),0);
   const convAt = paxAtual > 0 ? (ingMuseuAt / paxAtual) * 100 : null;
   const convA1 = paxA1    > 0 ? (ingMuseuA1 / paxA1)   * 100 : null;
-  setEl('k-conv', convAt !== null ? convAt.toFixed(1)+'%' : '—');
+  setEl('k-conv', convAt !== null ? convAt.toFixed(3)+'%' : '—');
   if(convA1 !== null){
-    setEl('k-conv-a1','A-1: '+convA1.toFixed(1)+'%');
+    setEl('k-conv-a1','A-1: '+convA1.toFixed(3)+'%');
     if(convAt !== null){
       const diff = convAt - convA1;
       const el = document.getElementById('k-conv-v');
@@ -1135,13 +1135,13 @@ function renderAtracao(at){
   const paxAqTotal = calcPaxKpi(at,'PAX Aquário');
   const tb = document.getElementById('tbl-atr-body'); tb.innerHTML='';
   Object.entries(atr).forEach(([n,d]) => {
-    const percAqua = paxAqTotal > 0 ? (d.qtd / paxAqTotal * 100).toFixed(1)+'%' : '—';
+    const percAqua = paxAqTotal > 0 ? (d.qtd / paxAqTotal * 100).toFixed(3)+'%' : '—';
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="font-weight:600">${n}</td><td class="r">${fmtN(d.qtd)}</td><td class="r">${percAqua}</td>`;
     tb.appendChild(tr);
   });
   const totQtd = atr.Museu.qtd + atr.GEX.qtd + atr.MAR.qtd;
-  const percTot = paxAqTotal > 0 ? (totQtd / paxAqTotal * 100).toFixed(1)+'%' : '—';
+  const percTot = paxAqTotal > 0 ? (totQtd / paxAqTotal * 100).toFixed(3)+'%' : '—';
   const tot = document.createElement('tr');
   tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td><td class="r" style="border-top:2px solid var(--bd)">${fmtN(totQtd)}</td><td class="r" style="border-top:2px solid var(--bd)">${percTot}</td>`;
   tb.appendChild(tot);
@@ -1330,7 +1330,7 @@ function renderRankingMuseu(at){
   const tb=document.getElementById('tbl-rank-body');tb.innerHTML='';
   Object.entries(por).sort((a,b)=>b[1].val-a[1].val).forEach(([v,d],i)=>{
     const p = totAtr > 0 ? (d.val/totAtr*100).toFixed(1)+'%' : '—';
-    const tkt = d.ing > 0 ? 'R$'+(d.val/d.ing).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
+    const tkt = d.ing > 0 ? 'R$'+(d.val/d.ing).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
     const valFmt = 'R$'+d.val.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
     const tr=document.createElement('tr');
     tr.innerHTML=`<td style="overflow:visible;font-size:10px"><span class="rank-num">#${i+1}</span></td><td style="font-weight:600;font-size:10px;white-space:normal;word-break:break-word;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--bd)">${v}</td><td class="r" style="font-size:10px" >${fmtN(d.ing)}</td><td class="r" style="font-size:10px">${valFmt}</td><td class="r" style="font-size:10px">${tkt}</td><td class="r" style="font-size:10px">${p}</td>`;
@@ -1382,7 +1382,7 @@ function renderPaxConv(at, a1, atFiltrado, a1Filtrado) {
   const paxMarA1   = calcPaxDia(a1, 'PAX MAR');
   const ingMuseuA1 = a1.filter(r => TEM_MUSEU.includes(r['Produto'])).reduce((a,r) => a+(Number(r['Quantidade'])||0), 0);
 
-  const conv    = (num, den) => den > 0 ? (num/den*100).toFixed(1)+'%' : '—';
+  const conv    = (num, den) => den > 0 ? (num/den*100).toFixed(3)+'%' : '—';
   const varTag  = (v, v1) => {
     if (!v || !v1 || v==='—' || v1==='—') return '';
     const d = parseFloat(v) - parseFloat(v1);
