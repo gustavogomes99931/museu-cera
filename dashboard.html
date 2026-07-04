@@ -1141,10 +1141,7 @@ function renderAtracao(at, atPax){
     tb.appendChild(tr);
   });
   const totQtd = atr.Museu.qtd + atr.GEX.qtd + atr.MAR.qtd;
-  const percTot = paxAqTotal > 0 ? (totQtd / paxAqTotal * 100).toFixed(3)+'%' : '—';
-  const tot = document.createElement('tr');
-  tot.innerHTML = `<td style="font-weight:600;border-top:2px solid var(--bd)">Total</td><td class="r" style="border-top:2px solid var(--bd)">${fmtN(totQtd)}</td><td class="r" style="border-top:2px solid var(--bd)">${percTot}</td>`;
-  tb.appendChild(tot);
+  // Total removido conforme solicitado
 }
 
 // Helper: soma PAX por dia (maior valor por dia) para qualquer campo
