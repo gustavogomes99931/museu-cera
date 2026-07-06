@@ -180,7 +180,7 @@ body.modo-restrito .hide-restrito{display:none!important}
 
 <div class="hdr">
   <div class="hdr-l">
-    <button class="back" onclick="irParaLancamento()">
+    <button class="back" id="btn-lancamento" onclick="irParaLancamento()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Lançamento
     </button>
@@ -200,11 +200,8 @@ body.modo-restrito .hide-restrito{display:none!important}
     <span class="flt-lbl">Período</span>
     <select id="f-per" onchange="onPerChange()">
       <option value="hoje" selected>Hoje</option>
-      <option value="u30">Últimos 30 dias</option>
-      <option value="u90">Últimos 90 dias</option>
+      <option value="ontem">Ontem</option>
       <option value="mes_atual">Mês atual</option>
-      <option value="mes_ant">Mês anterior</option>
-      <option value="ano">Ano atual</option>
       <option value="custom">Personalizado</option>
     </select>
   </div>
@@ -262,7 +259,7 @@ body.modo-restrito .hide-restrito{display:none!important}
 <!-- ── KPIs ── -->
 <div class="kpi-grid">
   <div class="kpi"><div class="kpi-ico" style="background:#d6eae8"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="kpi-lbl">Vendas Totais</div><div class="kpi-val" id="k-vend">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-vend-a1"></span><span class="kpi-var ne" id="k-vend-v"></span></div></div>
-  <div class="kpi"><div class="kpi-ico" style="background:#dde8e7"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="kpi-lbl">Ingressos Vendidos</div><div class="kpi-val" id="k-ing">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-ing-a1"></span><span class="kpi-var ne" id="k-ing-v"></span></div></div>
+  <div class="kpi"><div class="kpi-ico" style="background:#dde8e7"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="kpi-lbl">PAX Museu</div><div class="kpi-val" id="k-ing">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-ing-a1"></span><span class="kpi-var ne" id="k-ing-v"></span></div></div>
   <div class="kpi"><div class="kpi-ico" style="background:#e8f0ef"><svg viewBox="0 0 24 24" fill="none" stroke="#4C5958" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg></div><div class="kpi-lbl">Ticket Médio</div><div class="kpi-val" id="k-tkt">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-tkt-a1"></span><span class="kpi-var ne" id="k-tkt-v"></span></div></div>
   <div class="kpi"><div class="kpi-ico" style="background:#dde8e7"><svg viewBox="0 0 24 24" fill="none" stroke="#127369" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="kpi-lbl">PAX Aquário</div><div class="kpi-val" id="k-pax">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-pax-a1"></span><span class="kpi-var ne" id="k-pax-v"></span></div></div>
   <div class="kpi kpi-conv-mobile"><div class="kpi-ico" style="background:#e8f0ef"><svg viewBox="0 0 24 24" fill="none" stroke="#4C5958" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="kpi-lbl">Conversão Museu</div><div class="kpi-val" id="k-conv">—</div><div class="kpi-cmp"><span class="kpi-a1" id="k-conv-a1"></span><span class="kpi-var ne" id="k-conv-v"></span></div></div>
@@ -298,7 +295,7 @@ body.modo-restrito .hide-restrito{display:none!important}
   <div class="card">
     <div class="sec-title">Visitação por Atração</div>
     <div class="tbl-scroll"><table class="tbl">
-      <colgroup><col><col style="width:68px"><col style="width:68px"><col style="width:56px"><col style="width:60px"></colgroup>
+      <colgroup><col><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:72px"></colgroup>
       <thead><tr><th>Atração</th><th class="r">Ano Atual</th><th class="r">Ano Anterior</th><th class="r">LY %</th><th class="r">% Aqua</th></tr></thead>
       <tbody id="tbl-pax-atr-body"></tbody>
     </table></div>
@@ -480,7 +477,8 @@ function ativarModoRestrito() {
   fTipo.value = 'museu';
   fTipo.disabled = true;
   fTipo.closest('.flt-grp').style.display = 'none';
-  // Filtros de vendedor/canal/cat/atr ocultos
+  const btnLanc = document.getElementById('btn-lancamento');
+  if (btnLanc) btnLanc.style.display = 'none';
   ['f-vend','f-canal','f-cat','f-atr'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.closest('.flt-grp').style.display = 'none';
@@ -755,6 +753,12 @@ function getRange(per){
   const h=new Date();h.setHours(23,59,59,999);
   const s=new Date();s.setHours(0,0,0,0);
   if(per==='hoje'){return[s,h];}
+  if(per==='ontem'){
+    const d=new Date();d.setDate(d.getDate()-1);
+    const ini=new Date(d);ini.setHours(0,0,0,0);
+    const fim=new Date(d);fim.setHours(23,59,59,999);
+    return[ini,fim];
+  }
   if(per==='mes_atual'){s.setDate(1);return[s,h];}
   if(per==='mes_ant'){s.setDate(1);s.setMonth(s.getMonth()-1);const e=new Date(s);e.setMonth(e.getMonth()+1);e.setDate(0);e.setHours(23,59,59,999);return[s,e];}
   if(per==='u30'){s.setDate(s.getDate()-30);return[s,h];}
