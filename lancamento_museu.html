@@ -10,7 +10,7 @@
 :root {
   --green:#127369;--green2:#10403B;--green-l:#e8f0ef;--green-m:rgba(18,115,105,0.12);
   --bg:#f4f5f5;--white:#FFFFFF;--text:#10403B;--muted:#4C5958;--muted2:#8AA6A3;
-  --border:#BFBFBF;--danger:#c0392b;
+  --border:#BFBFBF;--danger:#c0392b;--danger-l:#fde8e8;
 }
 body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;font-size:15px;}
 .page{max-width:480px;margin:0 auto;padding:28px 16px 80px;}
@@ -19,7 +19,6 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 .header-title{font-size:22px;font-weight:600;color:var(--text);line-height:1.2;}
 .header-sub{font-size:13px;color:var(--muted);margin-top:2px;}
 .header-avatar{width:40px;height:40px;background:var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;}
-.header-avatar svg{width:20px;height:20px;}
 .card{background:var(--white);border-radius:20px;overflow:visible;padding:0;box-shadow:0 2px 16px rgba(0,0,0,0.06);}
 .card-section-title{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:20px 24px 8px;}
 .field{display:flex;align-items:center;padding:14px 24px;border-bottom:1px solid var(--border);gap:12px;min-height:60px;position:relative;overflow:visible;}
@@ -31,12 +30,10 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 .field-ctrl{font-size:15px;font-weight:500;color:var(--text);width:100%;}
 input[type="date"],input[type="number"],input[type="text"]{background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;color:var(--text);width:100%;padding:0;}
 input::placeholder{color:var(--muted2);font-weight:400;}
-input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;cursor:pointer;}
 .vwrap{display:flex;align-items:center;gap:8px;}
 .vwrap select{flex:1;min-width:0;background:#fff;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;color:var(--text);cursor:pointer;-webkit-appearance:auto;appearance:auto;}
 .vwrap select option{background:#fff;color:var(--text);}
-.btn-plus{width:28px;height:28px;border-radius:8px;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;}
-.btn-plus:hover{background:var(--green2);}
+.btn-plus{width:28px;height:28px;border-radius:8px;background:var(--green);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .btn-plus svg{width:14px;height:14px;color:white;}
 .cdd{position:relative;width:100%;}
 .cdd-trigger{display:flex;align-items:center;justify-content:space-between;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;color:var(--text);text-align:left;cursor:pointer;width:100%;padding:0;gap:8px;}
@@ -48,8 +45,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;cursor:pointer
 .cdd-opt{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.1s;}
 .cdd-opt:hover{background:var(--green-l);color:var(--text);}
 .cdd-opt.sel{color:var(--green);font-weight:600;}
-.cdd-panel::-webkit-scrollbar{width:4px;}
-.cdd-panel::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:4px;}
 .prod-badge{font-size:13px;font-weight:500;color:var(--green);line-height:1.4;}
 .val-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--green-l);}
 .val-lbl{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;}
@@ -62,17 +57,53 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;cursor:pointer
 .cat-pill input{display:none;}
 .cat-pill span{display:inline-block;padding:6px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
 .cat-pill input:checked + span{background:var(--green);border-color:var(--green);color:white;}
-.cat-pill:hover span{border-color:var(--green);color:var(--green);}
 .radio-group{display:flex;gap:8px;}
 .rpill input{display:none;}
 .rpill span{display:inline-block;padding:6px 18px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.15s;}
 .rpill input:checked + span{background:var(--green);border-color:var(--green);color:white;}
-.btn-row{display:flex;gap:10px;margin-top:20px;}
-.btn-primary{flex:1;padding:15px;background:var(--green);color:white;border:none;border-radius:14px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:background 0.15s,transform 0.1s;box-shadow:0 6px 20px rgba(29,201,148,0.35);}
+.btn-row{display:flex;gap:10px;margin-top:16px;}
+.btn-primary{flex:1;padding:15px;background:var(--green);color:white;border:none;border-radius:14px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:background 0.15s;}
 .btn-primary:hover{background:var(--green2);}
-.btn-ghost{padding:15px 22px;background:var(--white);color:var(--muted);border:1.5px solid var(--border);border-radius:14px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:white;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;padding:12px 24px;border-radius:12px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:400;white-space:nowrap;box-shadow:0 6px 20px rgba(29,201,148,0.4);}
+.btn-ghost{padding:15px 22px;background:var(--white);color:var(--muted);border:1.5px solid var(--border);border-radius:14px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-ghost:hover{border-color:var(--muted2);color:var(--text);}
+
+/* ── FILA DE RASCUNHO ── */
+#fila-wrap{margin-top:16px;display:none;}
+#fila-wrap .fila-titulo{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+#fila-wrap .fila-titulo span{background:var(--green);color:#fff;border-radius:20px;font-size:10px;padding:2px 8px;}
+.fila-item{background:var(--white);border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 6px rgba(0,0,0,0.06);display:flex;align-items:flex-start;gap:10px;}
+.fila-info{flex:1;min-width:0;}
+.fila-prod{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fila-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.fila-val{font-size:14px;font-weight:600;color:var(--green);white-space:nowrap;margin-top:2px;}
+.fila-acoes{display:flex;gap:6px;flex-shrink:0;margin-top:2px;}
+.fila-btn{width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.fila-btn.edit{background:var(--green-l);color:var(--green);}
+.fila-btn.edit:hover{background:var(--green);color:#fff;}
+.fila-btn.del{background:var(--danger-l);color:var(--danger);}
+.fila-btn.del:hover{background:var(--danger);color:#fff;}
+.fila-btn svg{width:13px;height:13px;}
+.btn-enviar-tudo{width:100%;padding:16px;background:var(--green);color:white;border:none;border-radius:14px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
+.btn-enviar-tudo:hover{background:var(--green2);}
+.btn-enviar-tudo:disabled{opacity:.6;cursor:not-allowed;}
+
+/* toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:white;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;padding:12px 24px;border-radius:12px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:400;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* login */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+#login-box{background:var(--white);border-radius:20px;padding:40px 32px;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.08);width:100%;max-width:360px;text-align:center;}
+#login-box h2{font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px;}
+#login-box p{font-size:13px;color:var(--muted2);margin-bottom:28px;}
+#login-box input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text);background:var(--bg);outline:none;text-align:center;letter-spacing:4px;transition:border-color .15s;margin-bottom:12px;}
+#login-box input:focus{border-color:var(--green);}
+#login-box input.erro{border-color:var(--danger);animation:shake .3s;}
+#login-box .btn-entrar{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;cursor:pointer;}
+#login-box .msg-erro{font-size:12px;color:var(--danger);margin-top:10px;opacity:0;transition:opacity .2s;}
+#login-box .msg-erro.show{opacity:1;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
 @media(max-width:480px){
   .page{padding:20px 12px 80px;}
   .field{padding:12px 16px;}
@@ -82,22 +113,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.4;cursor:pointer
   .card-section-title{padding:16px 16px 6px;}
 }
 </style>
-<style>
-#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
-#login-box{background:var(--white);border-radius:20px;padding:40px 32px;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.08);width:100%;max-width:360px;text-align:center;}
-#login-box .logo-area{margin-bottom:28px;}
-#login-box .logo-area svg{width:48px;height:48px;color:var(--green);}
-#login-box h2{font-size:20px;font-weight:600;color:var(--text);margin-bottom:4px;}
-#login-box p{font-size:13px;color:var(--muted2);margin-bottom:28px;}
-#login-box input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text);background:var(--bg);outline:none;text-align:center;letter-spacing:4px;transition:border-color .15s;margin-bottom:12px;}
-#login-box input:focus{border-color:var(--green);}
-#login-box input.erro{border-color:var(--danger);animation:shake .3s;}
-#login-box .btn-entrar{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;cursor:pointer;}
-#login-box .btn-entrar:hover{background:var(--green2);}
-#login-box .msg-erro{font-size:12px;color:var(--danger);margin-top:10px;opacity:0;transition:opacity .2s;}
-#login-box .msg-erro.show{opacity:1;}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-</style>
 <script>
 const SENHA_ACESSO = 'museu2025';
 function verificarSenha() {
@@ -105,11 +120,13 @@ function verificarSenha() {
   const erro  = document.getElementById('msg-erro');
   if (!input) return;
   if (input.value === SENHA_ACESSO) {
-    sessionStorage.setItem('mcera_auth','1');
+    sessionStorage.setItem('mcera_auth', '1');
     document.getElementById('login-screen').style.display = 'none';
   } else {
-    input.classList.add('erro'); erro.classList.add('show');
-    input.value = ''; input.focus();
+    input.classList.add('erro');
+    erro.classList.add('show');
+    input.value = '';
+    input.focus();
     setTimeout(() => input.classList.remove('erro'), 400);
   }
 }
@@ -122,16 +139,18 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </head>
 <body>
+
 <div id="login-screen">
   <div id="login-box">
-    <div class="logo-area">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <div style="margin-bottom:24px">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>
     </div>
     <h2>Área Restrita</h2>
     <p>Tela de lançamento de vendas<br>Museu de Cera RJ</p>
-    <input type="password" id="senha-input" placeholder="Digite a senha" maxlength="20" onkeydown="if(event.key==='Enter') verificarSenha()">
+    <input type="password" id="senha-input" placeholder="Digite a senha" maxlength="20"
+      onkeydown="if(event.key==='Enter') verificarSenha()">
     <button class="btn-entrar" onclick="verificarSenha()">Entrar</button>
     <div class="msg-erro" id="msg-erro">Senha incorreta. Tente novamente.</div>
   </div>
@@ -139,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="page">
   <div class="header">
-    <div class="header-text">
+    <div>
       <div class="header-date" id="h-date"></div>
       <div class="header-title">Registrar Venda</div>
       <div class="header-sub">Museu de Cera RJ</div>
@@ -157,23 +176,26 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr">
       <div style="padding:12px 10px;border-right:1px solid var(--border)">
         <div class="val-lbl" style="margin-bottom:4px">Aquário</div>
-        <input type="number" id="f-pax" placeholder="350" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;color:var(--text)">
+        <input type="number" id="f-pax" placeholder="350" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text)">
       </div>
       <div style="padding:12px 10px;border-right:1px solid var(--border)">
         <div class="val-lbl" style="margin-bottom:4px">Museu</div>
-        <input type="number" id="f-pax-museu" placeholder="200" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;color:var(--text)">
+        <input type="number" id="f-pax-museu" placeholder="200" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text)">
       </div>
       <div style="padding:12px 10px;border-right:1px solid var(--border)">
         <div class="val-lbl" style="margin-bottom:4px">GEX</div>
-        <input type="number" id="f-pax-gex" placeholder="120" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;color:var(--text)">
+        <input type="number" id="f-pax-gex" placeholder="120" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text)">
       </div>
       <div style="padding:12px 10px">
         <div class="val-lbl" style="margin-bottom:4px">MAR</div>
-        <input type="number" id="f-pax-mar" placeholder="80" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;color:var(--text)">
+        <input type="number" id="f-pax-mar" placeholder="80" min="0" style="width:100%;background:none;border:none;outline:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text)">
       </div>
     </div>
     <div style="padding:10px 16px;border-top:1px solid var(--border)">
-      <button type="button" onclick="salvarPax()" style="width:100%;padding:10px;background:var(--green-l);color:var(--green);border:1.5px solid var(--green);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;" onmouseover="this.style.background='var(--green)';this.style.color='#fff'" onmouseout="this.style.background='var(--green-l)';this.style.color='var(--green)'">
+      <button type="button" onclick="salvarPax()"
+        style="width:100%;padding:10px;background:var(--green-l);color:var(--green);border:1.5px solid var(--green);border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s"
+        onmouseover="this.style.background='var(--green)';this.style.color='#fff'"
+        onmouseout="this.style.background='var(--green-l)';this.style.color='var(--green)'">
         Salvar PAX do dia
       </button>
     </div>
@@ -182,24 +204,39 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Card venda -->
   <div class="card">
     <div class="card-section-title">Dados da venda</div>
+
     <!-- DATA -->
     <div class="field">
-      <div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-      <div class="field-body"><div class="field-lbl">Data</div><div class="field-ctrl"><input type="date" id="f-data"></div></div>
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Data</div>
+        <div class="field-ctrl"><input type="date" id="f-data"></div>
+      </div>
     </div>
+
     <!-- VENDEDOR -->
     <div class="field" style="flex-direction:column;align-items:stretch;padding:0;">
       <div style="display:flex;align-items:center;padding:14px 24px;gap:12px;min-height:60px;">
-        <div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="field-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
         <div class="field-body">
           <div class="field-lbl">Vendedor</div>
           <div class="field-ctrl">
             <div class="vwrap">
               <select id="f-vendedor" onchange="localStorage.setItem('mcera_ultimo_vend', this.value)">
-                <option value="">— Carregando... —</option>
+                <option value="">— Selecione —</option>
               </select>
               <button class="btn-plus" type="button" onclick="togglePainelVend()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -207,15 +244,27 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div id="painel-vend" style="display:none;border-top:1px solid var(--border);padding:16px 24px;background:var(--bg);">
         <div style="display:flex;gap:8px;margin-bottom:12px;">
-          <input id="m-nome" type="text" placeholder="Nome do vendedor" style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
-          <button type="button" onclick="addVendedor()" style="padding:10px 16px;background:var(--green);color:white;border:none;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Adicionar</button>
+          <input id="m-nome" type="text" placeholder="Nome do vendedor"
+            style="flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;color:var(--text);outline:none;"
+            onfocus="this.style.borderColor='var(--green)'"
+            onblur="this.style.borderColor='var(--border)'">
+          <button type="button" onclick="addVendedor()"
+            style="padding:10px 16px;background:var(--green);color:white;border:none;border-radius:12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+            Adicionar
+          </button>
         </div>
         <div id="v-list" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;"></div>
       </div>
     </div>
+
     <!-- CATEGORIA -->
     <div class="field">
-      <div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
       <div class="field-body">
         <div class="field-lbl">Categoria</div>
         <div class="field-ctrl">
@@ -229,25 +278,42 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
+
     <!-- PRODUTO -->
     <div class="field">
-      <div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/>
+        </svg>
+      </div>
       <div class="field-body">
         <div class="field-lbl">Produto</div>
         <div class="field-ctrl">
           <div class="cdd" id="cdd">
-            <button type="button" class="cdd-trigger ph" id="cdd-btn"><span id="cdd-lbl">— Selecione —</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg></button>
+            <button type="button" class="cdd-trigger ph" id="cdd-btn">
+              <span id="cdd-lbl">— Selecione a categoria primeiro —</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l4 4 4-4"/></svg>
+            </button>
             <div class="cdd-panel" id="cdd-panel"></div>
             <input type="hidden" id="f-produto">
           </div>
         </div>
       </div>
     </div>
+
     <!-- BADGE -->
     <div class="field" id="row-badge" style="display:none">
-      <div class="field-icon" style="background:var(--green-m)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="field-body"><div class="field-lbl">Selecionado</div><div class="prod-badge" id="badge"></div></div>
+      <div class="field-icon" style="background:var(--green-m)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Selecionado</div>
+        <div class="prod-badge" id="badge"></div>
+      </div>
     </div>
+
     <!-- VALORES -->
     <div class="val-grid" id="row-vals" style="display:none">
       <div class="val-item"><div class="val-lbl">Total combo</div><div class="val-num hi" id="v-unit">—</div></div>
@@ -256,14 +322,28 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="val-item" id="vi-gex" style="display:none"><div class="val-lbl">GEX</div><div class="val-num" id="v-gex">—</div></div>
       <div class="val-item" id="vi-mar" style="display:none"><div class="val-lbl">MAR</div><div class="val-num" id="v-mar">—</div></div>
     </div>
+
     <!-- QUANTIDADE -->
     <div class="field">
-      <div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
-      <div class="field-body"><div class="field-lbl">Quantidade</div><div class="field-ctrl"><input type="number" id="f-qtd" value="1" min="1" max="999" oninput="calcTotal()"></div></div>
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </div>
+      <div class="field-body">
+        <div class="field-lbl">Quantidade</div>
+        <div class="field-ctrl"><input type="number" id="f-qtd" value="1" min="1" max="999" oninput="calcTotal()"></div>
+      </div>
     </div>
+
     <!-- CANAL -->
     <div class="field">
-      <div class="field-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+      <div class="field-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </div>
       <div class="field-body">
         <div class="field-lbl">Canal de venda</div>
         <div class="field-ctrl">
@@ -274,19 +354,34 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
+
     <div class="total-row">
       <div class="total-lbl">Total do bilhete</div>
       <div class="total-num" id="v-total">R$ 0,00</div>
     </div>
   </div>
 
+  <!-- Botões do formulário -->
   <div class="btn-row">
     <button class="btn-ghost" type="button" onclick="limpar()">Limpar</button>
-    <button class="btn-primary" type="button" onclick="salvar()">Registrar venda</button>
+    <button class="btn-primary" type="button" onclick="adicionarNaFila()">+ Adicionar</button>
   </div>
 
-  <div style="margin-top:12px;text-align:center">
-    <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--green);text-decoration:none;padding:8px 16px;border:1.5px solid var(--green);border-radius:20px;" onmouseover="this.style.background='var(--green-l)'" onmouseout="this.style.background='transparent'">
+  <!-- FILA DE RASCUNHO -->
+  <div id="fila-wrap">
+    <div class="fila-titulo">
+      Rascunho para envio
+      <span id="fila-contador">0</span>
+    </div>
+    <div id="fila-lista"></div>
+    <button class="btn-enviar-tudo" onclick="enviarTudo()" id="btn-enviar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Enviar tudo para o Sheets
+    </button>
+  </div>
+
+  <div style="margin-top:16px;text-align:center">
+    <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--green);text-decoration:none;padding:8px 16px;border:1.5px solid var(--green);border-radius:20px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Ver Dashboard
     </a>
@@ -296,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Configuração ──
+// ── Config ──
 const SHEET_ID        = "1GARcdxPGQC7UlDaXTj3Ga-nyUQAQicg09Fmca5-4n-A";
 const PRECOS_GID      = "2116371882";
 const VENDEDORES_GID  = "1203004653";
@@ -307,7 +402,6 @@ const hoje = new Date();
 document.getElementById('f-data').value = hoje.toISOString().split('T')[0];
 const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 document.getElementById('h-date').textContent = hoje.getDate() + ' de ' + meses[hoje.getMonth()] + ' de ' + hoje.getFullYear();
-
 const fmt = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
 // ── Preços ──
@@ -360,174 +454,389 @@ const PRECOS = {
 };
 
 const produtosPorCat = {
-  avulso:[["Museu de Cera — Visitantes · R$ 50","MUSEU DE CERA - VISITANTES|50"],["Museu de Cera — Inteira · R$ 66","MUSEU DE CERA - INTEIRA|66"],["Museu de Cera — Meia · R$ 33","MUSEU DE CERA - MEIA|33"],["GEX — Inteira · R$ 50","GEX - INTEIRA|50"],["GEX — Meia · R$ 66","GEX - MEIA|66"],["GEX — Complemento · R$ 45","GEX - COMPLEMENTO|45"],["GEX — Infantil · R$ 33","GEX - INFANTIL|33"],["Mar de Espelhos — Visitante · R$ 50","MAR DE ESPELHOS - VISITANTE|50"],["Mar de Espelhos — Inteira · R$ 66","MAR DE ESPELHOS - INTEIRA|66"],["Mar de Espelhos — Meia · R$ 33","MAR DE ESPELHOS - MEIA|33"]],
-  combo_duplo:[["Combo Aqua + Museu — Inteira · R$ 216","COMBO AQUA + MUSEU - INTEIRA|216"],["Combo Aqua + Museu — Meia · R$ 113","COMBO AQUA + MUSEU - MEIA|113"],["Combo Aqua + Museu — Promo RJ · R$ 165","COMBO AQUA + MUSEU - PROMO RJ|165"],["Combo Aqua + Museu — Infantil · R$ 103","COMBO AQUA + MUSEU - INFANTIL|103"],["Combo Aqua + GEX — Inteira · R$ 216","COMBO AQUA + GEX - INTEIRA|216"],["Combo Aqua + GEX — Meia · R$ 113","COMBO AQUA + GEX - MEIA|113"],["Combo Aqua + GEX — Promo RJ · R$ 165","COMBO AQUA + GEX - PROMO RJ|165"],["Combo Aqua + GEX — Infantil · R$ 103","COMBO AQUA + GEX - INFANTIL|103"],["Combo Aqua + Mar — Inteira · R$ 216","COMBO AQUA + MAR - INTEIRA|216"],["Combo Aqua + Mar — Meia · R$ 113","COMBO AQUA + MAR - MEIA|113"],["Combo Aqua + Mar — Promo RJ · R$ 165","COMBO AQUA + MAR - PROMO RJ|165"],["Combo Aqua + Mar — Infantil · R$ 103","COMBO AQUA + MAR - INFANTIL|103"]],
-  combo_triplo:[["Combo Aqua + Mar + Museu — Inteira · R$ 230","COMBO AQUA + MAR + MUSEU - INTEIRA|230"],["Combo Aqua + Mar + Museu — Meia · R$ 146","COMBO AQUA + MAR + MUSEU - MEIA|146"],["Combo Aqua + Mar + Museu — Promo RJ · R$ 179","COMBO AQUA + MAR + MUSEU - PROMO RJ|179"],["Combo Aqua + Mar + Museu — Infantil · R$ 136","COMBO AQUA + MAR + MUSEU - INFANTIL|136"],["Combo Aqua + Museu + GEX — Inteira · R$ 230","COMBO AQUA + MUSEU + GEX - INTEIRA|230"],["Combo Aqua + Museu + GEX — Meia · R$ 146","COMBO AQUA + MUSEU + GEX - MEIA|146"],["Combo Aqua + Museu + GEX — Promo RJ · R$ 179","COMBO AQUA + MUSEU + GEX - PROMO RJ|179"],["Combo Aqua + Museu + GEX — Infantil · R$ 136","COMBO AQUA + MUSEU + GEX - INFANTIL|136"],["Combo Aqua + Mar + GEX — Inteira · R$ 230","COMBO AQUA + MAR + GEX - INTEIRA|230"],["Combo Aqua + Mar + GEX — Meia · R$ 141","COMBO AQUA + MAR + GEX - MEIA|141"],["Combo Aqua + Mar + GEX — Promo RJ · R$ 179","COMBO AQUA + MAR + GEX - PROMO RJ|179"],["Combo Aqua + Mar + GEX — Infantil · R$ 136","COMBO AQUA + MAR + GEX - INFANTIL|136"]],
-  exp_completa:[["Experiência Completa + GEX — Inteira · R$ 239","EXPERIENCIA COMPLETA + GEX - INTEIRA|239"],["Experiência Completa + GEX — Meia · R$ 179","EXPERIENCIA COMPLETA + GEX - MEIA|179"],["Experiência Completa + GEX — Promo RJ · R$ 198","EXPERIENCIA COMPLETA + GEX - PROMO RJ|198"],["Experiência Completa + GEX — Infantil · R$ 169","EXPERIENCIA COMPLETA + GEX - INFANTIL|169"]],
-  complementos:[["Museu + Mar — Duas Atrações · R$ 80","MUSEU + MAR - DUAS ATRAÇÕES|80"],["Museu + Mar — Duas Atrações Meia · R$ 66","MUSEU + MAR - DUAS ATRAÇÕES MEIA|66"],["Museu + GEX — Duas Atrações · R$ 80","MUSEU + GEX - DUAS ATRAÇÕES|80"],["Museu + GEX — Duas Atrações Meia · R$ 66","MUSEU + GEX - DUAS ATRAÇÕES MEIA|66"],["Mar + Museu + GEX — Três Atrações · R$ 99","MAR + MUSEU + GEX - TRÊS ATRAÇÕES|99"],["Mar + GEX — Duas Atrações · R$ 80","MAR + GEX - DUAS ATRAÇÕES|80"],["Mar + GEX — Duas Atrações Meia · R$ 66","MAR + GEX - DUAS ATRAÇÕES MEIA|66"]],
+  avulso:[
+    ["Museu de Cera — Visitantes · R$ 50","MUSEU DE CERA - VISITANTES|50"],
+    ["Museu de Cera — Inteira · R$ 66","MUSEU DE CERA - INTEIRA|66"],
+    ["Museu de Cera — Meia · R$ 33","MUSEU DE CERA - MEIA|33"],
+    ["GEX — Inteira · R$ 50","GEX - INTEIRA|50"],
+    ["GEX — Meia · R$ 66","GEX - MEIA|66"],
+    ["GEX — Complemento · R$ 45","GEX - COMPLEMENTO|45"],
+    ["GEX — Infantil · R$ 33","GEX - INFANTIL|33"],
+    ["Mar de Espelhos — Visitante · R$ 50","MAR DE ESPELHOS - VISITANTE|50"],
+    ["Mar de Espelhos — Inteira · R$ 66","MAR DE ESPELHOS - INTEIRA|66"],
+    ["Mar de Espelhos — Meia · R$ 33","MAR DE ESPELHOS - MEIA|33"],
+  ],
+  combo_duplo:[
+    ["Combo Aqua + Museu — Inteira · R$ 216","COMBO AQUA + MUSEU - INTEIRA|216"],
+    ["Combo Aqua + Museu — Meia · R$ 113","COMBO AQUA + MUSEU - MEIA|113"],
+    ["Combo Aqua + Museu — Promo RJ · R$ 165","COMBO AQUA + MUSEU - PROMO RJ|165"],
+    ["Combo Aqua + Museu — Infantil · R$ 103","COMBO AQUA + MUSEU - INFANTIL|103"],
+    ["Combo Aqua + GEX — Inteira · R$ 216","COMBO AQUA + GEX - INTEIRA|216"],
+    ["Combo Aqua + GEX — Meia · R$ 113","COMBO AQUA + GEX - MEIA|113"],
+    ["Combo Aqua + GEX — Promo RJ · R$ 165","COMBO AQUA + GEX - PROMO RJ|165"],
+    ["Combo Aqua + GEX — Infantil · R$ 103","COMBO AQUA + GEX - INFANTIL|103"],
+    ["Combo Aqua + Mar — Inteira · R$ 216","COMBO AQUA + MAR - INTEIRA|216"],
+    ["Combo Aqua + Mar — Meia · R$ 113","COMBO AQUA + MAR - MEIA|113"],
+    ["Combo Aqua + Mar — Promo RJ · R$ 165","COMBO AQUA + MAR - PROMO RJ|165"],
+    ["Combo Aqua + Mar — Infantil · R$ 103","COMBO AQUA + MAR - INFANTIL|103"],
+  ],
+  combo_triplo:[
+    ["Combo Aqua + Mar + Museu — Inteira · R$ 230","COMBO AQUA + MAR + MUSEU - INTEIRA|230"],
+    ["Combo Aqua + Mar + Museu — Meia · R$ 146","COMBO AQUA + MAR + MUSEU - MEIA|146"],
+    ["Combo Aqua + Mar + Museu — Promo RJ · R$ 179","COMBO AQUA + MAR + MUSEU - PROMO RJ|179"],
+    ["Combo Aqua + Mar + Museu — Infantil · R$ 136","COMBO AQUA + MAR + MUSEU - INFANTIL|136"],
+    ["Combo Aqua + Museu + GEX — Inteira · R$ 230","COMBO AQUA + MUSEU + GEX - INTEIRA|230"],
+    ["Combo Aqua + Museu + GEX — Meia · R$ 146","COMBO AQUA + MUSEU + GEX - MEIA|146"],
+    ["Combo Aqua + Museu + GEX — Promo RJ · R$ 179","COMBO AQUA + MUSEU + GEX - PROMO RJ|179"],
+    ["Combo Aqua + Museu + GEX — Infantil · R$ 136","COMBO AQUA + MUSEU + GEX - INFANTIL|136"],
+    ["Combo Aqua + Mar + GEX — Inteira · R$ 230","COMBO AQUA + MAR + GEX - INTEIRA|230"],
+    ["Combo Aqua + Mar + GEX — Meia · R$ 141","COMBO AQUA + MAR + GEX - MEIA|141"],
+    ["Combo Aqua + Mar + GEX — Promo RJ · R$ 179","COMBO AQUA + MAR + GEX - PROMO RJ|179"],
+    ["Combo Aqua + Mar + GEX — Infantil · R$ 136","COMBO AQUA + MAR + GEX - INFANTIL|136"],
+  ],
+  exp_completa:[
+    ["Experiência Completa + GEX — Inteira · R$ 239","EXPERIENCIA COMPLETA + GEX - INTEIRA|239"],
+    ["Experiência Completa + GEX — Meia · R$ 179","EXPERIENCIA COMPLETA + GEX - MEIA|179"],
+    ["Experiência Completa + GEX — Promo RJ · R$ 198","EXPERIENCIA COMPLETA + GEX - PROMO RJ|198"],
+    ["Experiência Completa + GEX — Infantil · R$ 169","EXPERIENCIA COMPLETA + GEX - INFANTIL|169"],
+  ],
+  complementos:[
+    ["Museu + Mar — Duas Atrações · R$ 80","MUSEU + MAR - DUAS ATRAÇÕES|80"],
+    ["Museu + Mar — Duas Atrações Meia · R$ 66","MUSEU + MAR - DUAS ATRAÇÕES MEIA|66"],
+    ["Museu + GEX — Duas Atrações · R$ 80","MUSEU + GEX - DUAS ATRAÇÕES|80"],
+    ["Museu + GEX — Duas Atrações Meia · R$ 66","MUSEU + GEX - DUAS ATRAÇÕES MEIA|66"],
+    ["Mar + Museu + GEX — Três Atrações · R$ 99","MAR + MUSEU + GEX - TRÊS ATRAÇÕES|99"],
+    ["Mar + GEX — Duas Atrações · R$ 80","MAR + GEX - DUAS ATRAÇÕES|80"],
+    ["Mar + GEX — Duas Atrações Meia · R$ 66","MAR + GEX - DUAS ATRAÇÕES MEIA|66"],
+  ],
 };
 
 function onCategoria() {
   const cat = document.querySelector('input[name="cat"]:checked')?.value;
-  document.getElementById('f-produto').value=''; document.getElementById('cdd-lbl').textContent='— Selecione o produto —';
-  document.getElementById('cdd-btn').classList.add('ph'); document.querySelectorAll('.cdd-opt').forEach(o=>o.classList.remove('sel'));
-  document.getElementById('row-badge').style.display='none'; document.getElementById('row-vals').style.display='none'; document.getElementById('v-total').textContent='R$ 0,00';
-  const panel=document.getElementById('cdd-panel'); panel.innerHTML='';
-  if (!cat||!produtosPorCat[cat]) return;
-  produtosPorCat[cat].forEach(([label,value])=>{ const opt=document.createElement('div'); opt.className='cdd-opt'; opt.textContent=label; opt.dataset.v=value; panel.appendChild(opt); });
+  document.getElementById('f-produto').value = '';
+  document.getElementById('cdd-lbl').textContent = '— Selecione o produto —';
+  document.getElementById('cdd-btn').classList.add('ph');
+  document.querySelectorAll('.cdd-opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById('row-badge').style.display = 'none';
+  document.getElementById('row-vals').style.display  = 'none';
+  document.getElementById('v-total').textContent = 'R$ 0,00';
+  const panel = document.getElementById('cdd-panel');
+  panel.innerHTML = '';
+  if (!cat || !produtosPorCat[cat]) return;
+  produtosPorCat[cat].forEach(([label, value]) => {
+    const opt = document.createElement('div');
+    opt.className = 'cdd-opt'; opt.textContent = label; opt.dataset.v = value;
+    panel.appendChild(opt);
+  });
 }
 
-document.getElementById('cdd-btn').addEventListener('click',function(e){ e.stopPropagation(); document.getElementById('cdd').classList.toggle('open'); });
-document.getElementById('cdd-panel').addEventListener('click',function(e){ const opt=e.target.closest('.cdd-opt'); if(!opt)return; document.getElementById('cdd-lbl').textContent=opt.textContent; document.getElementById('cdd-btn').classList.remove('ph'); document.getElementById('f-produto').value=opt.dataset.v; document.querySelectorAll('.cdd-opt').forEach(o=>o.classList.toggle('sel',o===opt)); document.getElementById('cdd').classList.remove('open'); onProduto(); });
-document.addEventListener('click',function(e){ if(!document.getElementById('cdd').contains(e.target)) document.getElementById('cdd').classList.remove('open'); });
+document.getElementById('cdd-btn').addEventListener('click', function(e) {
+  e.stopPropagation(); document.getElementById('cdd').classList.toggle('open');
+});
+document.getElementById('cdd-panel').addEventListener('click', function(e) {
+  const opt = e.target.closest('.cdd-opt'); if (!opt) return;
+  document.getElementById('cdd-lbl').textContent = opt.textContent;
+  document.getElementById('cdd-btn').classList.remove('ph');
+  document.getElementById('f-produto').value = opt.dataset.v;
+  document.querySelectorAll('.cdd-opt').forEach(o => o.classList.toggle('sel', o === opt));
+  document.getElementById('cdd').classList.remove('open');
+  onProduto();
+});
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('cdd').contains(e.target)) document.getElementById('cdd').classList.remove('open');
+});
 
 function onProduto() {
-  const val=document.getElementById('f-produto').value;
-  if(!val){document.getElementById('row-badge').style.display='none';document.getElementById('row-vals').style.display='none';document.getElementById('v-total').textContent='R$ 0,00';return;}
-  const [nome,preco]=val.split('|');
-  document.getElementById('badge').textContent=nome; document.getElementById('v-unit').textContent=fmt(Number(preco));
-  const p=PRECOS[nome]||{};
-  [{id:'aqua',v:p.aqua},{id:'museu',v:p.museu},{id:'gex',v:p.gex},{id:'mar',v:p.mar}].forEach(({id,v})=>{
-    const item=document.getElementById('vi-'+id),num=document.getElementById('v-'+id);
-    if(item&&num){if(v&&v>0){item.style.display='';num.textContent=fmt(v);}else{item.style.display='none';}}
+  const val = document.getElementById('f-produto').value;
+  if (!val) { document.getElementById('row-badge').style.display='none'; document.getElementById('row-vals').style.display='none'; return; }
+  const [nome, preco] = val.split('|');
+  document.getElementById('badge').textContent = nome;
+  document.getElementById('v-unit').textContent = fmt(Number(preco));
+  const p = PRECOS[nome] || {};
+  [{id:'aqua',v:p.aqua},{id:'museu',v:p.museu},{id:'gex',v:p.gex},{id:'mar',v:p.mar}].forEach(({id,v}) => {
+    const item=document.getElementById('vi-'+id), num=document.getElementById('v-'+id);
+    if(item&&num){ if(v&&v>0){item.style.display='';num.textContent=fmt(v);}else{item.style.display='none';} }
   });
-  document.getElementById('row-badge').style.display=''; document.getElementById('row-vals').style.display=''; calcTotal();
+  document.getElementById('row-badge').style.display='';
+  document.getElementById('row-vals').style.display='';
+  calcTotal();
 }
 
-function calcTotal(){
-  const val=document.getElementById('f-produto').value; if(!val)return;
-  const[,preco]=val.split('|'); const qtd=parseInt(document.getElementById('f-qtd').value)||1;
-  document.getElementById('v-total').textContent=fmt(Number(preco)*qtd);
+function calcTotal() {
+  const val = document.getElementById('f-produto').value; if (!val) return;
+  const [, preco] = val.split('|');
+  const qtd = parseInt(document.getElementById('f-qtd').value) || 1;
+  document.getElementById('v-total').textContent = fmt(Number(preco) * qtd);
 }
 
 // ── Vendedores ──
 let vendedores = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
-function saveVend(){ localStorage.setItem('mcera_vend', JSON.stringify(vendedores)); }
+function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedores)); }
 
 async function carregarVendedores() {
-  // Mostra cache local imediatamente
   if (vendedores.length > 0) { renderSelect(); renderLista(); }
-  // Busca sempre do Sheets para manter atualizado em qualquer dispositivo
   try {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const txt = await res.text();
-    const nomes = txt.trim().split('\n').slice(1)  // pula header linha 1
-      .map(l => l.split(',')[0].replace(/"/g,'').trim())  // coluna A
-      .filter(n => n.length > 0);
-    if (nomes.length > 0) {
-      vendedores = nomes;
-      saveVend();
-    }
-  } catch(e) {
-    console.warn('Falha ao carregar vendedores do Sheets:', e);
-  }
-  renderSelect();
-  renderLista();
+    const nomes = txt.trim().split('\n').slice(1).map(l => l.split(',')[0].replace(/"/g,'').trim()).filter(n => n.length > 0);
+    if (nomes.length > 0) { vendedores = nomes; saveVend(); }
+  } catch(e) { console.warn('Vendedores: usando cache local'); }
+  renderSelect(); renderLista();
 }
 
-function togglePainelVend(){
-  const p=document.getElementById('painel-vend');
-  const aberto=p.style.display==='block';
-  p.style.display=aberto?'none':'block';
-  if(!aberto){renderLista();document.getElementById('m-nome').focus();}
+function togglePainelVend() {
+  const p = document.getElementById('painel-vend');
+  const aberto = p.style.display === 'block';
+  p.style.display = aberto ? 'none' : 'block';
+  if (!aberto) { renderLista(); document.getElementById('m-nome').focus(); }
 }
 
-function renderSelect(){
-  const sel=document.getElementById('f-vendedor');
-  const cur=sel.value||localStorage.getItem('mcera_ultimo_vend')||'';
-  sel.innerHTML='<option value="">— Selecione —</option>';
-  vendedores.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
-  if(cur) sel.value=cur;
+function renderSelect() {
+  const sel = document.getElementById('f-vendedor');
+  const cur = sel.value || localStorage.getItem('mcera_ultimo_vend') || '';
+  sel.innerHTML = '<option value="">— Selecione —</option>';
+  vendedores.forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+  if (cur) sel.value = cur;
 }
 
-function renderLista(){
-  const list=document.getElementById('v-list'); list.innerHTML='';
-  if(!vendedores.length){list.innerHTML='<div style="text-align:center;font-size:13px;color:var(--muted2);padding:10px 0">Nenhum vendedor cadastrado ainda</div>';return;}
-  vendedores.forEach((n,i)=>{
-    const d=document.createElement('div');
+function renderLista() {
+  const list = document.getElementById('v-list'); list.innerHTML = '';
+  if (!vendedores.length) { list.innerHTML='<div style="text-align:center;font-size:13px;color:var(--muted2);padding:10px 0">Nenhum vendedor cadastrado ainda</div>'; return; }
+  vendedores.forEach((n, i) => {
+    const d = document.createElement('div');
     d.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--white);border-radius:10px;font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px;';
     d.innerHTML=`<span>${n}</span><button type="button" data-i="${i}" style="background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;">×</button>`;
     list.appendChild(d);
   });
 }
 
-document.getElementById('v-list').addEventListener('click',function(e){
-  const btn=e.target.closest('button[data-i]'); if(!btn)return;
-  vendedores.splice(parseInt(btn.dataset.i),1); saveVend(); salvarVendedoresNoSheets(); renderSelect(); renderLista();
+document.getElementById('v-list').addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-i]'); if (!btn) return;
+  vendedores.splice(parseInt(btn.dataset.i), 1); saveVend(); renderSelect(); renderLista();
 });
 
-function addVendedor(){
-  const inp=document.getElementById('m-nome'); const nome=inp.value.trim(); if(!nome)return;
-  if(vendedores.includes(nome)){showToast('Nome já cadastrado');return;}
-  vendedores.push(nome); saveVend(); salvarVendedoresNoSheets(); renderSelect(); renderLista();
+function addVendedor() {
+  const inp = document.getElementById('m-nome'); const nome = inp.value.trim(); if (!nome) return;
+  if (vendedores.includes(nome)) { showToast('Nome já cadastrado'); return; }
+  vendedores.push(nome); saveVend(); renderSelect(); renderLista();
   inp.value=''; inp.focus(); showToast(nome+' adicionado');
 }
+document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key==='Enter') addVendedor(); });
 
-async function salvarVendedoresNoSheets(){
-  try{ await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({acao:'salvarVendedores',vendedores})}); }
-  catch(e){console.warn('Falha ao salvar vendedores:',e);}
+// ── Preços dinâmicos ──
+async function carregarPrecos() {
+  try {
+    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${PRECOS_GID}`;
+    const res=await fetch(url); if (!res.ok) throw new Error();
+    const txt=await res.text(); const linhas=txt.trim().split('\n');
+    const hdrs=linhas[0].split(',').map(h=>h.replace(/"/g,'').trim());
+    linhas.slice(1).forEach(linha => {
+      const vals=linha.split(',').map(v=>v.replace(/"/g,'').trim());
+      const obj={}; hdrs.forEach((h,i)=>obj[h]=vals[i]||'');
+      const prod=obj['Produto']||''; if (!prod) return;
+      PRECOS[prod]={aqua:Number(obj['Aqua']||0),museu:Number(obj['Museu']||0),gex:Number(obj['GEX']||0),mar:Number(obj['MAR']||0),total:Number(obj['Total']||0)};
+    });
+  } catch(e) { console.warn('Preços: usando tabela fixa'); }
 }
 
-document.getElementById('m-nome').addEventListener('keydown',e=>{if(e.key==='Enter')addVendedor();});
-
-// ── Inicializar vendedores ──
-carregarVendedores();
-
-// ── Salvar PAX ──
-async function salvarPax(){
-  const pax=document.getElementById('f-pax').value,paxMuseu=document.getElementById('f-pax-museu').value,
-        paxGex=document.getElementById('f-pax-gex').value,paxMar=document.getElementById('f-pax-mar').value;
-  if(!pax&&!paxMuseu&&!paxGex&&!paxMar){showToast('Preencha ao menos um campo de PAX');return;}
+// ── PAX ──
+async function salvarPax() {
+  const pax=document.getElementById('f-pax').value, paxMuseu=document.getElementById('f-pax-museu').value;
+  const paxGex=document.getElementById('f-pax-gex').value, paxMar=document.getElementById('f-pax-mar').value;
+  if (!pax&&!paxMuseu&&!paxGex&&!paxMar) { showToast('Preencha ao menos um campo de PAX'); return; }
   const data=document.getElementById('f-data').value;
   const reg={data,vendedor:'',categoria:'',produto:'',valorUnitario:'',valorMuseu:'',quantidade:'',total:'',canal:'',
     pax:pax?Number(pax):'',paxMuseu:paxMuseu?Number(paxMuseu):'',paxGex:paxGex?Number(paxGex):'',paxMar:paxMar?Number(paxMar):'',ts:new Date().toISOString()};
-  const btn=document.querySelector('[onclick="salvarPax()"]');
-  btn.textContent='Salvando...'; btn.disabled=true;
-  try{
+  const btn=document.querySelector('[onclick="salvarPax()"]'); btn.textContent='Salvando...'; btn.disabled=true;
+  try {
     await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(reg)});
     showToast('✅ PAX do dia salvo!');
     ['f-pax','f-pax-museu','f-pax-gex','f-pax-mar'].forEach(id=>document.getElementById(id).value='');
-  }catch(e){showToast('Erro ao salvar PAX');}
-  finally{btn.textContent='Salvar PAX do dia';btn.disabled=false;}
+  } catch(e) { showToast('Erro ao salvar PAX'); }
+  finally { btn.textContent='Salvar PAX do dia'; btn.disabled=false; }
 }
 
-// ── Salvar venda ──
-async function salvar(){
-  const data=document.getElementById('f-data').value,vendedor=document.getElementById('f-vendedor').value,
-        produto=document.getElementById('f-produto').value,qtd=parseInt(document.getElementById('f-qtd').value)||1,
-        canal=document.querySelector('input[name="canal"]:checked').value,
-        catEl=document.querySelector('input[name="cat"]:checked'),categoria=catEl?catEl.value:'';
-  if(!data||!vendedor||!produto){alert('Preencha Data, Vendedor e Produto antes de registrar.');return;}
-  const[nomeProd,preco]=produto.split('|');
-  const precoProd=PRECOS[nomeProd]||{};
-  const reg={data,vendedor,categoria,produto:nomeProd,valorUnitario:Number(preco),valorMuseu:precoProd.museu||0,
-    quantidade:qtd,total:Number(preco)*qtd,canal,pax:null,paxGex:null,paxMar:null,ts:new Date().toISOString()};
-  const lista=JSON.parse(localStorage.getItem('mcera_vendas')||'[]');
-  lista.push(reg); localStorage.setItem('mcera_vendas',JSON.stringify(lista));
-  const btn=document.querySelector('.btn-primary');
-  btn.textContent='Enviando...'; btn.disabled=true;
-  try{
-    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(reg)});
-    showToast('Venda registrada!'); limpar();
-  }catch(e){showToast('Salvo localmente — sem conexão');limpar();}
-  finally{btn.textContent='Registrar venda';btn.disabled=false;}
+// ── FILA DE RASCUNHO ──
+let fila = [];
+let editandoIdx = null;
+
+function adicionarNaFila() {
+  const data     = document.getElementById('f-data').value;
+  const vendedor = document.getElementById('f-vendedor').value;
+  const produto  = document.getElementById('f-produto').value;
+  const qtd      = parseInt(document.getElementById('f-qtd').value) || 1;
+  const canal    = document.querySelector('input[name="canal"]:checked').value;
+  const catEl    = document.querySelector('input[name="cat"]:checked');
+  const categoria = catEl ? catEl.value : '';
+
+  if (!data || !vendedor || !produto) { alert('Preencha Data, Vendedor e Produto antes de adicionar.'); return; }
+
+  const [nomeProd, preco] = produto.split('|');
+  const precoProd = PRECOS[nomeProd] || {};
+
+  const item = {
+    data, vendedor, categoria,
+    produto: nomeProd,
+    valorUnitario: Number(preco),
+    valorMuseu: precoProd.museu || 0,
+    quantidade: qtd,
+    total: Number(preco) * qtd,
+    canal,
+    ts: new Date().toISOString()
+  };
+
+  if (editandoIdx !== null) {
+    fila[editandoIdx] = item;
+    editandoIdx = null;
+    document.querySelector('.btn-primary').textContent = '+ Adicionar';
+  } else {
+    fila.push(item);
+  }
+
+  renderFila();
+  limpar();
+  showToast('Item adicionado ao rascunho');
 }
 
-function limpar(){
-  document.getElementById('f-produto').value=''; document.getElementById('cdd-lbl').textContent='— Selecione —';
-  document.getElementById('cdd-btn').classList.add('ph'); document.querySelectorAll('.cdd-opt').forEach(o=>o.classList.remove('sel'));
+function renderFila() {
+  const wrap  = document.getElementById('fila-wrap');
+  const lista = document.getElementById('fila-lista');
+  const cont  = document.getElementById('fila-contador');
+  lista.innerHTML = '';
+  cont.textContent = fila.length;
+  wrap.style.display = fila.length > 0 ? 'block' : 'none';
+
+  fila.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'fila-item';
+    div.innerHTML = `
+      <div class="fila-info">
+        <div class="fila-prod">${item.produto}</div>
+        <div class="fila-meta">${item.vendedor} · ${item.canal} · ${item.data} · Qtd: ${item.quantidade}</div>
+        <div class="fila-val">${fmt(item.total)}</div>
+      </div>
+      <div class="fila-acoes">
+        <button class="fila-btn edit" title="Editar" onclick="editarItem(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button class="fila-btn del" title="Excluir" onclick="excluirItem(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>`;
+    lista.appendChild(div);
+  });
+}
+
+function editarItem(i) {
+  const item = fila[i];
+  editandoIdx = i;
+
+  // Preencher formulário com os dados do item
+  document.getElementById('f-data').value = item.data;
+  document.getElementById('f-vendedor').value = item.vendedor;
+  document.getElementById('f-qtd').value = item.quantidade;
+
+  // Canal
+  const canalEl = document.querySelector(`input[name="canal"][value="${item.canal}"]`);
+  if (canalEl) canalEl.checked = true;
+
+  // Categoria
+  const catEl = document.querySelector(`input[name="cat"][value="${item.categoria}"]`);
+  if (catEl) { catEl.checked = true; onCategoria(); }
+
+  // Produto — selecionar no dropdown
+  setTimeout(() => {
+    const opts = document.querySelectorAll('.cdd-opt');
+    opts.forEach(opt => {
+      if (opt.dataset.v && opt.dataset.v.startsWith(item.produto + '|')) {
+        document.getElementById('cdd-lbl').textContent = opt.textContent;
+        document.getElementById('cdd-btn').classList.remove('ph');
+        document.getElementById('f-produto').value = opt.dataset.v;
+        opt.classList.add('sel');
+        onProduto();
+      }
+    });
+  }, 50);
+
+  document.querySelector('.btn-primary').textContent = '✓ Salvar edição';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Editando item #' + (i + 1));
+}
+
+function excluirItem(i) {
+  fila.splice(i, 1);
+  if (editandoIdx === i) { editandoIdx = null; document.querySelector('.btn-primary').textContent = '+ Adicionar'; limpar(); }
+  renderFila();
+  showToast('Item removido');
+}
+
+async function enviarTudo() {
+  if (fila.length === 0) { showToast('Nenhum item na fila'); return; }
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true; btn.textContent = `Enviando ${fila.length} itens...`;
+
+  let enviados = 0, erros = 0;
+  for (const item of fila) {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          data: item.data, vendedor: item.vendedor, categoria: item.categoria,
+          produto: item.produto, valorUnitario: item.valorUnitario,
+          valorMuseu: item.valorMuseu, quantidade: item.quantidade,
+          total: item.total, canal: item.canal,
+          pax: null, paxMuseu: null, paxGex: null, paxMar: null,
+          ts: item.ts
+        })
+      });
+      enviados++;
+    } catch(e) { erros++; }
+    // Pequena pausa para não sobrecarregar o Apps Script
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  if (erros === 0) {
+    showToast(`✅ ${enviados} itens enviados com sucesso!`);
+    fila = [];
+    renderFila();
+  } else {
+    showToast(`⚠️ ${enviados} enviados, ${erros} com erro`);
+  }
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar tudo para o Sheets`;
+}
+
+function limpar() {
+  document.getElementById('f-produto').value='';
+  document.getElementById('cdd-lbl').textContent='— Selecione —';
+  document.getElementById('cdd-btn').classList.add('ph');
+  document.querySelectorAll('.cdd-opt').forEach(o=>o.classList.remove('sel'));
   document.querySelectorAll('input[name="cat"]').forEach(r=>r.checked=false);
-  document.getElementById('cdd-panel').innerHTML=''; document.getElementById('f-qtd').value=1;
-  document.getElementById('f-pax').value=''; document.getElementById('f-pax-gex').value=''; document.getElementById('f-pax-mar').value='';
+  document.getElementById('cdd-panel').innerHTML='';
+  document.getElementById('f-qtd').value=1;
   document.querySelector('input[name="canal"][value="Bilheteria"]').checked=true;
-  document.getElementById('row-badge').style.display='none'; document.getElementById('row-vals').style.display='none';
+  document.getElementById('row-badge').style.display='none';
+  document.getElementById('row-vals').style.display='none';
   document.getElementById('v-total').textContent='R$ 0,00';
   document.getElementById('f-data').value=new Date().toISOString().split('T')[0];
 }
 
-function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
+function showToast(msg) {
+  const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+carregarPrecos();
+carregarVendedores();
+renderSelect();
 </script>
 </body>
 </html>
