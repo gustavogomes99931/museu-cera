@@ -356,8 +356,14 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div class="total-row">
-      <div class="total-lbl">Total do bilhete</div>
-      <div class="total-num" id="v-total">R$ 0,00</div>
+      <div>
+        <div class="total-lbl">Total do item</div>
+        <div class="total-num" id="v-total">R$ 0,00</div>
+      </div>
+      <div style="text-align:right">
+        <div class="total-lbl">Total acumulado</div>
+        <div class="total-num" id="v-total-fila" style="font-size:18px;opacity:.85">R$ 0,00</div>
+      </div>
     </div>
   </div>
 
@@ -707,6 +713,11 @@ function renderFila() {
   lista.innerHTML = '';
   cont.textContent = fila.length;
   wrap.style.display = fila.length > 0 ? 'block' : 'none';
+
+  // Total acumulado
+  const totalAcum = fila.reduce((a,b) => a + b.total, 0);
+  const elTotalFila = document.getElementById('v-total-fila');
+  if (elTotalFila) elTotalFila.textContent = fmt(totalAcum);
 
   fila.forEach((item, i) => {
     const div = document.createElement('div');
