@@ -521,6 +521,8 @@ function fecharPerfModal() {
   document.getElementById('perf-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+function sair() {
   sessionStorage.removeItem('mcera_dash_auth');
   sessionStorage.removeItem('mcera_dash_modo');
   // Recarrega a página para voltar à tela de login
