@@ -548,13 +548,7 @@ function fecharPerfModal() {
 
 const CODIGO_ALTERACAO = 'museu@gu26';
 
-// Senhas padrão (fallback se Sheets não responder)
-const LOGINS = {
-  'admin':     { senha: 'museu2025',  modo: 'admin' },
-  'museu2026': { senha: '@museu2026', modo: 'restrito' },
-};
-
-// Carregar senhas salvas no Sheets
+// Carregar senhas salvas no Sheets (atualiza LOGINS em memória)
 async function carregarSenhas() {
   try {
     const url = APPS_SCRIPT_URL + '?acao=carregarSenhas';
@@ -674,7 +668,8 @@ document.getElementById('modal-senha').addEventListener('click', function(e) {
   if (e.target === this) fecharModalSenha();
 });
 
-const SHEET_ID    = "1GARcdxPGQC7UlDaXTj3Ga-nyUQAQicg09Fmca5-4n-A";
+const SHEET_ID        = "1GARcdxPGQC7UlDaXTj3Ga-nyUQAQicg09Fmca5-4n-A";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5fJmNbX-fUiJkQ15e4jW-kRHqjK5TjhD1bP4RCidaGCBR_w27zLCwRM_aGI3voXeZ/exec";
 const ABA_GID     = "0";
 const SHEET_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ABA_GID}`;
 // GID da aba Precos — Gustavo deve criar a aba e colar o GID aqui
