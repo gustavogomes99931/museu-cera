@@ -415,8 +415,8 @@ const PRECOS = {
   'MUSEU DE CERA - VISITANTES':{aqua:0,museu:50,gex:0,mar:0,total:50},
   'MUSEU DE CERA - INTEIRA':{aqua:0,museu:66,gex:0,mar:0,total:66},
   'MUSEU DE CERA - MEIA':{aqua:0,museu:33,gex:0,mar:0,total:33},
-  'GEX - INTEIRA':{aqua:0,museu:0,gex:50,mar:0,total:50},
-  'GEX - MEIA':{aqua:0,museu:0,gex:66,mar:0,total:66},
+  'GEX - INTEIRA':{aqua:0,museu:0,gex:66,mar:0,total:66},
+  'GEX - MEIA':{aqua:0,museu:0,gex:33,mar:0,total:33},
   'GEX - COMPLEMENTO':{aqua:0,museu:0,gex:45,mar:0,total:45},
   'GEX - INFANTIL':{aqua:0,museu:0,gex:33,mar:0,total:33},
   'MAR DE ESPELHOS - VISITANTE':{aqua:0,museu:0,gex:0,mar:50,total:50},
@@ -464,8 +464,8 @@ const produtosPorCat = {
     ["Museu de Cera — Visitantes · R$ 50","MUSEU DE CERA - VISITANTES|50"],
     ["Museu de Cera — Inteira · R$ 66","MUSEU DE CERA - INTEIRA|66"],
     ["Museu de Cera — Meia · R$ 33","MUSEU DE CERA - MEIA|33"],
-    ["GEX — Inteira · R$ 50","GEX - INTEIRA|50"],
-    ["GEX — Meia · R$ 66","GEX - MEIA|66"],
+    ["GEX — Inteira · R$ 66","GEX - INTEIRA|66"],
+    ["GEX — Meia · R$ 33","GEX - MEIA|33"],
     ["GEX — Complemento · R$ 45","GEX - COMPLEMENTO|45"],
     ["GEX — Infantil · R$ 33","GEX - INFANTIL|33"],
     ["Mar de Espelhos — Visitante · R$ 50","MAR DE ESPELHOS - VISITANTE|50"],
@@ -642,9 +642,19 @@ async function carregarPrecos() {
       const vals=linha.split(',').map(v=>v.replace(/"/g,'').trim());
       const obj={}; hdrs.forEach((h,i)=>obj[h]=vals[i]||'');
       const prod=obj['Produto']||''; if (!prod) return;
-      PRECOS[prod]={aqua:Number(obj['Aqua']||0),museu:Number(obj['Museu']||0),gex:Number(obj['GEX']||0),mar:Number(obj['MAR']||0),total:Number(obj['Total']||0)};
+      const total=Number(obj['Total']||0);
+      PRECOS[prod]={aqua:Number(obj['Aqua']||0),museu:Number(obj['Museu']||0),gex:Number(obj['GEX']||0),mar:Number(obj['MAR']||0),total};
+      const cat=obj['Categoria']||'';
+      // Atualizar label no produtosPorCat se já existir
+      if(cat && produtosPorCat[cat]) {
+        const idx = produtosPorCat[cat].findIndex(([,v]) => v.startsWith(prod+'|'));
+        const novoLabel = `${prod} · R$ ${total}`;
+        const novoVal   = `${prod}|${total}`;
+        if(idx >= 0) produtosPorCat[cat][idx] = [novoLabel, novoVal];
+      }
     });
-  } catch(e) { console.warn('Preços: usando tabela fixa'); }
+    console.log('✅ Preços carregados do Sheets');
+  } catch(e) { console.warn('Preços: usando tabela fixa', e.message); }
 }
 
 // ── PAX ──
