@@ -1090,7 +1090,7 @@ function optsDoughnutQtd(){
 
 function renderCharts(at,de,ate,tipo){
   // Vendas por vendedor
-  const pv={};at.forEach(r=>{const v=r['Vendedor']||'S/N';if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
+  const pv={};at.forEach(r=>{const v=r['Vendedor']||''; if(!v||!r['Produto']) return; if(!pv[v])pv[v]={val:0,qtd:0};pv[v].val+=valorReg(r,tipo);pv[v].qtd+=Number(r['Quantidade'])||0;});
   const vends=Object.keys(pv).sort((a,b)=>pv[b].val-pv[a].val);
   // 100px por barra fixa — 7 barras = 700px. Se ultrapassar o card, scroll ativa
   const PX_VEND = 100;
@@ -1324,7 +1324,7 @@ function renderVisitacaoPorAtracao(at, a1) {
 function renderAtracaoVend(at){
   const por={};
   at.forEach(r=>{
-    const v=r['Vendedor']||'S/N';
+    const v=r['Vendedor']||''; if(!v||!r['Produto']) return;
     if(!por[v])por[v]={museu:0,gex:0,mar:0};
     por[v].museu += parcelaAtr(r,'museu');
     por[v].gex   += parcelaAtr(r,'gex');
@@ -1344,7 +1344,7 @@ function renderAtracaoVend(at){
 function renderConvAtracao(at, a1) {
   const por = {};
   at.forEach(r => {
-    const v = r['Vendedor'] || 'S/N';
+    const v = r['Vendedor'] || ''; if (!v || !r['Produto']) return;
     if (!por[v]) por[v] = {
       museu:{qtd:0,val:0}, gex:{qtd:0,val:0}, mar:{qtd:0,val:0}, aqua:{qtd:0,val:0}
     };
@@ -1447,7 +1447,7 @@ function renderExpCompleta(at,tipo){
 // ── RANKING MUSEU ──
 function renderRankingMuseu(at){
   const por={};
-  at.filter(r=>TEM_MUSEU.includes(r['Produto'])).forEach(r=>{const v=r['Vendedor']||'S/N';if(!por[v])por[v]={ing:0,val:0};por[v].ing+=Number(r['Quantidade'])||0;por[v].val+=parcelaAtr(r,'museu');});
+  at.filter(r=>TEM_MUSEU.includes(r['Produto'])).forEach(r=>{const v=r['Vendedor']||''; if(!v) return; if(!por[v])por[v]={ing:0,val:0};por[v].ing+=Number(r['Quantidade'])||0;por[v].val+=parcelaAtr(r,'museu');});
   // Denominador = Museu + GEX + MAR total do time
   const totMuseu = at.filter(r=>TEM_MUSEU.includes(r['Produto'])).reduce((a,r)=>a+parcelaAtr(r,'museu'),0);
   const totGex   = at.filter(r=>TEM_GEX.includes(r['Produto'])).reduce((a,r)=>a+parcelaAtr(r,'gex'),0);
