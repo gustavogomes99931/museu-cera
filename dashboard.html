@@ -860,7 +860,18 @@ async function carregar(){
     ]);
     popVendFiltro();
     aplicar();
-    document.getElementById('last-upd').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const modoRestrito = document.body.classList.contains('modo-restrito');
+    if (modoRestrito && todos.length > 0) {
+      const ultimaData = todos
+        .filter(r => r._data && r['Produto'])
+        .reduce((max, r) => r._data > max ? r._data : max, new Date(0));
+      const dataFmt = ultimaData.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'});
+      const horaFmt = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      document.getElementById('last-upd').innerHTML =
+        `<span style="font-weight:600;color:var(--g)">📅 ${dataFmt}</span><br><span style="font-size:10px">Atualizado ${horaFmt}</span>`;
+    } else {
+      document.getElementById('last-upd').textContent = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    }
   }catch(e){console.error('Erro ao carregar:',e.message,e);}
   finally{setLoad(false);}
 }
