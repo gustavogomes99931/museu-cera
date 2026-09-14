@@ -513,11 +513,18 @@ function ativarModoRestrito() {
   fTipo.closest('.flt-grp').style.display = 'none';
   const btnLanc = document.getElementById('btn-lancamento');
   if (btnLanc) btnLanc.style.display = 'none';
+  // Ocultar filtro de período e datas personalizadas
+  const fPer = document.getElementById('f-per');
+  if (fPer) fPer.closest('.flt-grp').style.display = 'none';
+  const custDts = document.getElementById('custom-dts');
+  if (custDts) custDts.style.display = 'none';
+  // Ocultar demais filtros
   ['f-vend','f-canal','f-cat','f-atr'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.closest('.flt-grp').style.display = 'none';
   });
-  // Separadores extras podem ficar — não afeta
+  // Ocultar separadores da barra de filtros
+  document.querySelectorAll('.flt-sep').forEach(s => s.style.display = 'none');
 }
 
 function abrirPerfModal() {
@@ -917,13 +924,26 @@ function filtrar(recs,de,ate,vend,canal,cat,atr,tipo){
 }
 
 function aplicar(){
-  const per=document.getElementById('f-per').value;
+  const modoRestrito = document.body.classList.contains('modo-restrito');
+  let de, ate;
+
+  if (modoRestrito && todos.length > 0) {
+    // Pegar a data mais recente da base
+    const ultimaData = todos
+      .filter(r => r._data && r['Produto']) // só registros com produto (não PAX)
+      .reduce((max, r) => r._data > max ? r._data : max, new Date(0));
+    de  = new Date(ultimaData); de.setHours(0,0,0,0);
+    ate = new Date(ultimaData); ate.setHours(23,59,59,999);
+  } else {
+    const per = document.getElementById('f-per').value;
+    [de, ate] = getRange(per);
+  }
+
   const vend=document.getElementById('f-vend').value;
   const canal=document.getElementById('f-canal').value;
   const cat=document.getElementById('f-cat').value;
   const atr=document.getElementById('f-atr').value;
   const tipo=document.getElementById('f-tipo').value;
-  const[de,ate]=getRange(per);
   const[deA,ateA]=getA1([de,ate]);
   const at=filtrar(todos,de,ate,vend,canal,cat,atr,tipo);
   const a1=filtrar(todos,deA,ateA,vend,canal,cat,atr,tipo);
