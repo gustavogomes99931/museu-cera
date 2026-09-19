@@ -675,14 +675,10 @@ document.getElementById('modal-senha').addEventListener('click', function(e) {
   if (e.target === this) fecharModalSenha();
 });
 
-const SHEET_ID        = "1GARcdxPGQC7UlDaXTj3Ga-nyUQAQicg09Fmca5-4n-A";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5fJmNbX-fUiJkQ15e4jW-kRHqjK5TjhD1bP4RCidaGCBR_w27zLCwRM_aGI3voXeZ/exec";
-const ABA_GID     = "0";
-const SHEET_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ABA_GID}`;
-// GID da aba Precos — Gustavo deve criar a aba e colar o GID aqui
-// Para obter o GID: abrir a aba Precos no Sheets → copiar o número após "gid=" na URL
-const PRECOS_GID  = "2116371882";
-const PRECOS_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${PRECOS_GID}`;
+// Dados lidos via Apps Script (planilha privada)
+const DADOS_URL  = APPS_SCRIPT_URL + '?acao=getDados';
+const PRECOS_URL = APPS_SCRIPT_URL + '?acao=getPrecos';
 
 Chart.register(ChartDataLabels);
 
@@ -802,14 +798,14 @@ function parseData(d){
   const dt=new Date(d);return isNaN(dt)?null:dt;
 }
 
-// ── CARREGAR PREÇOS DO SHEETS ──
+// ── CARREGAR PREÇOS DO SHEETS VIA APPS SCRIPT ──
 async function carregarPrecos() {
-  if (PRECOS_GID === 'COLE_O_GID_DA_ABA_PRECOS') return; // ainda não configurado
   try {
     const res = await fetch(PRECOS_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const txt = await res.text();
-    const rows = parseCSV(txt);
+    const json = await res.json();
+    if (json.status !== 'ok' || !json.rows || !json.rows.length) return;
+    const rows = json.rows;
     let atualizados = 0;
     rows.forEach(r => {
       const prod = (r['Produto'] || r['produto'] || '').trim();
@@ -847,10 +843,11 @@ async function carregar(){
     // Carrega preços e vendas em paralelo
     await Promise.all([
       carregarPrecos(),
-      fetch(SHEET_URL).then(async res => {
+      fetch(DADOS_URL).then(async res => {
         if(!res.ok) throw new Error('HTTP '+res.status);
-        const txt = await res.text();
-        todos = parseCSV(txt).map(r=>{
+        const json = await res.json();
+        if(json.status !== 'ok') throw new Error('Apps Script: '+JSON.stringify(json));
+        todos = (json.rows || []).map(r=>{
           // Usa Data; se vazia, extrai do Timestamp
           const dataStr = r['Data'] || (r['Timestamp'] ? r['Timestamp'].substring(0,10) : '');
           r._data = parseData(dataStr);
