@@ -600,11 +600,62 @@ function togglePainelVend() {
   if (!aberto) { renderLista(); document.getElementById('m-nome').focus(); }
 }
 
+// Histórico de uso: { vendedor: "Nome", data: "YYYY-MM-DD" }[]
+function registrarUso(itens) {
+  try {
+    const hist = JSON.parse(localStorage.getItem('mcera_hist_vend') || '[]');
+    itens.forEach(i => { if (i.vendedor && i.data) hist.push({ vendedor: i.vendedor, data: i.data }); });
+    // Manter apenas últimos 90 dias para não crescer demais
+    const corte90 = new Date(); corte90.setDate(corte90.getDate() - 90);
+    const filtrado = hist.filter(h => new Date(h.data) >= corte90);
+    localStorage.setItem('mcera_hist_vend', JSON.stringify(filtrado));
+  } catch(e) {}
+}
+
+// Vendedores ativos = quem lançou nos últimos 30 dias
+function vendedoresAtivos() {
+  try {
+    const hist = JSON.parse(localStorage.getItem('mcera_hist_vend') || '[]');
+    const corte = new Date(); corte.setDate(corte.getDate() - 30);
+    const ativos = new Set(hist.filter(h => new Date(h.data) >= corte).map(h => h.vendedor));
+    const ultimo = localStorage.getItem('mcera_ultimo_vend');
+    if (ultimo) ativos.add(ultimo);
+    return vendedores.filter(n => ativos.has(n));
+  } catch(e) { return []; }
+}
+
+let mostrarTodosVend = false;
+
 function renderSelect() {
   const sel = document.getElementById('f-vendedor');
   const cur = sel.value || localStorage.getItem('mcera_ultimo_vend') || '';
   sel.innerHTML = '<option value="">— Selecione —</option>';
-  vendedores.forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+
+  const ativos = vendedoresAtivos();
+  const lista = (mostrarTodosVend || ativos.length === 0) ? vendedores : ativos;
+
+  lista.forEach(n => {
+    const o = document.createElement('option');
+    o.value = n; o.textContent = n;
+    sel.appendChild(o);
+  });
+
+  // Botão "Ver todos / Ver ativos" no final do select
+  const wrap = sel.parentElement;
+  let toggler = wrap.querySelector('.vend-toggler');
+  if (!toggler && vendedores.length > ativos.length) {
+    toggler = document.createElement('button');
+    toggler.type = 'button';
+    toggler.className = 'vend-toggler';
+    toggler.style.cssText = 'font-size:11px;color:var(--muted2);background:none;border:none;cursor:pointer;padding:2px 0;margin-top:2px;text-decoration:underline;display:block';
+    toggler.onclick = () => { mostrarTodosVend = !mostrarTodosVend; renderSelect(); };
+    wrap.appendChild(toggler);
+  }
+  if (toggler) {
+    toggler.style.display = vendedores.length > ativos.length ? 'block' : 'none';
+    toggler.textContent = mostrarTodosVend ? '▲ Ver apenas ativos' : `▼ Ver todos (${vendedores.length})`;
+  }
+
   if (cur) sel.value = cur;
 }
 
@@ -823,6 +874,7 @@ async function enviarTudo() {
 
   if (erros === 0) {
     showToast(`✅ ${enviados} itens enviados com sucesso!`);
+    registrarUso(fila);
     fila = [];
     renderFila();
   } else {
@@ -844,7 +896,10 @@ function limpar() {
   document.getElementById('row-badge').style.display='none';
   document.getElementById('row-vals').style.display='none';
   document.getElementById('v-total').textContent='R$ 0,00';
-  document.getElementById('f-data').value=new Date().toISOString().split('T')[0];
+  // Data mantém o valor selecionado — só volta pra hoje se estiver vazia
+  if (!document.getElementById('f-data').value) {
+    document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+  }
 }
 
 function showToast(msg) {
