@@ -582,13 +582,14 @@ function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedor
 async function carregarVendedores() {
   if (vendedores.length > 0) { renderSelect(); renderLista(); }
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VENDEDORES_GID}`;
+    const url = APPS_SCRIPT_URL + '?acao=getVendedores';
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const txt = await res.text();
-    const nomes = txt.trim().split('\n').slice(1).map(l => l.split(',')[0].replace(/"/g,'').trim()).filter(n => n.length > 0);
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error('Apps Script erro');
+    const nomes = (json.vendedores || []).filter(n => n.length > 0);
     if (nomes.length > 0) { vendedores = nomes; saveVend(); }
-  } catch(e) { console.warn('Vendedores: usando cache local'); }
+  } catch(e) { console.warn('Vendedores: usando cache local', e.message); }
   renderSelect(); renderLista();
 }
 
@@ -631,21 +632,17 @@ function addVendedor() {
 }
 document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key==='Enter') addVendedor(); });
 
-// ── Preços dinâmicos ──
+// ── Preços dinâmicos via Apps Script ──
 async function carregarPrecos() {
   try {
-    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${PRECOS_GID}`;
-    const res=await fetch(url); if (!res.ok) throw new Error();
-    const txt=await res.text(); const linhas=txt.trim().split('\n');
-    const hdrs=linhas[0].split(',').map(h=>h.replace(/"/g,'').trim());
-    linhas.slice(1).forEach(linha => {
-      const vals=linha.split(',').map(v=>v.replace(/"/g,'').trim());
-      const obj={}; hdrs.forEach((h,i)=>obj[h]=vals[i]||'');
+    const url = APPS_SCRIPT_URL + '?acao=getPrecos';
+    const res = await fetch(url); if (!res.ok) throw new Error('HTTP '+res.status);
+    const json = await res.json(); if (json.status !== 'ok') throw new Error();
+    (json.rows || []).forEach(obj => {
       const prod=obj['Produto']||''; if (!prod) return;
       const total=Number(obj['Total']||0);
       PRECOS[prod]={aqua:Number(obj['Aqua']||0),museu:Number(obj['Museu']||0),gex:Number(obj['GEX']||0),mar:Number(obj['MAR']||0),total};
       const cat=obj['Categoria']||'';
-      // Atualizar label no produtosPorCat se já existir
       if(cat && produtosPorCat[cat]) {
         const idx = produtosPorCat[cat].findIndex(([,v]) => v.startsWith(prod+'|'));
         const novoLabel = `${prod} · R$ ${total}`;
