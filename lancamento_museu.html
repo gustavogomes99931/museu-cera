@@ -576,7 +576,17 @@ function calcTotal() {
 }
 
 // ── Vendedores ──
-let vendedores = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
+// vendedores = [{nome, ativo}]
+// Migração: se vier array de strings (formato antigo), converte
+function loadVend() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('mcera_vend') || '[]');
+    if (!raw.length) return [];
+    if (typeof raw[0] === 'string') return raw.map(n => ({ nome: n, ativo: true }));
+    return raw;
+  } catch(e) { return []; }
+}
+let vendedores = loadVend();
 function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedores)); }
 
 async function carregarVendedores() {
@@ -587,8 +597,14 @@ async function carregarVendedores() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     if (json.status !== 'ok') throw new Error('Apps Script erro');
-    const nomes = (json.vendedores || []).filter(n => n.length > 0);
-    if (nomes.length > 0) { vendedores = nomes; saveVend(); }
+    const nomesSheets = (json.vendedores || []).filter(n => n.length > 0);
+    if (nomesSheets.length > 0) {
+      // Mescla: mantém status ativo/inativo do local, adiciona novos como ativos
+      const mapa = {};
+      vendedores.forEach(v => { mapa[v.nome] = v.ativo; });
+      vendedores = nomesSheets.map(n => ({ nome: n, ativo: mapa[n] !== undefined ? mapa[n] : true }));
+      saveVend();
+    }
   } catch(e) { console.warn('Vendedores: usando cache local', e.message); }
   renderSelect(); renderLista();
 }
@@ -600,88 +616,61 @@ function togglePainelVend() {
   if (!aberto) { renderLista(); document.getElementById('m-nome').focus(); }
 }
 
-// Histórico de uso: { vendedor: "Nome", data: "YYYY-MM-DD" }[]
-function registrarUso(itens) {
-  try {
-    const hist = JSON.parse(localStorage.getItem('mcera_hist_vend') || '[]');
-    itens.forEach(i => { if (i.vendedor && i.data) hist.push({ vendedor: i.vendedor, data: i.data }); });
-    // Manter apenas últimos 90 dias para não crescer demais
-    const corte90 = new Date(); corte90.setDate(corte90.getDate() - 90);
-    const filtrado = hist.filter(h => new Date(h.data) >= corte90);
-    localStorage.setItem('mcera_hist_vend', JSON.stringify(filtrado));
-  } catch(e) {}
-}
-
-// Vendedores ativos = quem lançou nos últimos 30 dias
-function vendedoresAtivos() {
-  try {
-    const hist = JSON.parse(localStorage.getItem('mcera_hist_vend') || '[]');
-    const corte = new Date(); corte.setDate(corte.getDate() - 30);
-    const ativos = new Set(hist.filter(h => new Date(h.data) >= corte).map(h => h.vendedor));
-    const ultimo = localStorage.getItem('mcera_ultimo_vend');
-    if (ultimo) ativos.add(ultimo);
-    return vendedores.filter(n => ativos.has(n));
-  } catch(e) { return []; }
-}
-
-let mostrarTodosVend = false;
+function registrarUso() {} // mantido por compatibilidade
 
 function renderSelect() {
   const sel = document.getElementById('f-vendedor');
   const cur = sel.value || localStorage.getItem('mcera_ultimo_vend') || '';
   sel.innerHTML = '<option value="">— Selecione —</option>';
-
-  const ativos = vendedoresAtivos();
-  const lista = (mostrarTodosVend || ativos.length === 0) ? vendedores : ativos;
-
-  lista.forEach(n => {
+  vendedores.filter(v => v.ativo).forEach(v => {
     const o = document.createElement('option');
-    o.value = n; o.textContent = n;
+    o.value = v.nome; o.textContent = v.nome;
     sel.appendChild(o);
   });
-
-  // Botão "Ver todos / Ver ativos" no final do select
-  const wrap = sel.parentElement;
-  let toggler = wrap.querySelector('.vend-toggler');
-  if (!toggler && vendedores.length > ativos.length) {
-    toggler = document.createElement('button');
-    toggler.type = 'button';
-    toggler.className = 'vend-toggler';
-    toggler.style.cssText = 'font-size:11px;color:var(--muted2);background:none;border:none;cursor:pointer;padding:2px 0;margin-top:2px;text-decoration:underline;display:block';
-    toggler.onclick = () => { mostrarTodosVend = !mostrarTodosVend; renderSelect(); };
-    wrap.appendChild(toggler);
-  }
-  if (toggler) {
-    toggler.style.display = vendedores.length > ativos.length ? 'block' : 'none';
-    toggler.textContent = mostrarTodosVend ? '▲ Ver apenas ativos' : `▼ Ver todos (${vendedores.length})`;
-  }
-
   if (cur) sel.value = cur;
 }
 
 function renderLista() {
   const list = document.getElementById('v-list'); list.innerHTML = '';
-  if (!vendedores.length) { list.innerHTML='<div style="text-align:center;font-size:13px;color:var(--muted2);padding:10px 0">Nenhum vendedor cadastrado ainda</div>'; return; }
-  vendedores.forEach((n, i) => {
+  if (!vendedores.length) {
+    list.innerHTML = '<div style="text-align:center;font-size:13px;color:var(--muted2);padding:10px 0">Nenhum vendedor cadastrado ainda</div>';
+    return;
+  }
+  vendedores.forEach((v, i) => {
     const d = document.createElement('div');
-    d.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--white);border-radius:10px;font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px;';
-    d.innerHTML=`<span>${n}</span><button type="button" data-i="${i}" style="background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer;padding:0 6px;line-height:1;">×</button>`;
+    d.style.cssText = `display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--white);border-radius:10px;font-size:14px;font-weight:500;margin-bottom:4px;opacity:${v.ativo ? 1 : 0.45};`;
+    d.innerHTML = `
+      <span style="flex:1;color:var(--text)">${v.nome}</span>
+      <button type="button" data-toggle="${i}" title="${v.ativo ? 'Desativar' : 'Ativar'}"
+        style="background:${v.ativo ? '#d6eae8' : '#f0f0f0'};border:none;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;color:${v.ativo ? '#10403B' : '#999'};margin-right:6px">
+        ${v.ativo ? 'Ativo' : 'Inativo'}
+      </button>
+      <button type="button" data-del="${i}" style="background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;">×</button>`;
     list.appendChild(d);
   });
 }
 
 document.getElementById('v-list').addEventListener('click', function(e) {
-  const btn = e.target.closest('button[data-i]'); if (!btn) return;
-  vendedores.splice(parseInt(btn.dataset.i), 1); saveVend(); renderSelect(); renderLista();
+  const toggle = e.target.closest('[data-toggle]');
+  if (toggle) {
+    const i = parseInt(toggle.dataset.toggle);
+    vendedores[i].ativo = !vendedores[i].ativo;
+    saveVend(); renderSelect(); renderLista(); return;
+  }
+  const del = e.target.closest('[data-del]');
+  if (del) {
+    vendedores.splice(parseInt(del.dataset.del), 1);
+    saveVend(); renderSelect(); renderLista();
+  }
 });
 
 function addVendedor() {
   const inp = document.getElementById('m-nome'); const nome = inp.value.trim(); if (!nome) return;
-  if (vendedores.includes(nome)) { showToast('Nome já cadastrado'); return; }
-  vendedores.push(nome); saveVend(); renderSelect(); renderLista();
-  inp.value=''; inp.focus(); showToast(nome+' adicionado');
+  if (vendedores.some(v => v.nome === nome)) { showToast('Nome já cadastrado'); return; }
+  vendedores.push({ nome, ativo: true }); saveVend(); renderSelect(); renderLista();
+  inp.value = ''; inp.focus(); showToast(nome + ' adicionado');
 }
-document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key==='Enter') addVendedor(); });
+document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key === 'Enter') addVendedor(); });
 
 // ── Preços dinâmicos via Apps Script ──
 async function carregarPrecos() {
