@@ -807,6 +807,20 @@ const TEM_MUSEU_DYN = [...TEM_MUSEU];
 const TEM_GEX_DYN   = [...TEM_GEX];
 const TEM_MAR_DYN   = [...TEM_MAR];
 
+// Busca todas as linhas de 'vendas', paginando (o Supabase limita a 1000 por consulta)
+async function buscarTodasVendas() {
+  const PAGE = 1000;
+  let all = [], from = 0;
+  while (true) {
+    const { data, error } = await sb.from('vendas').select('*').range(from, from + PAGE - 1);
+    if (error) throw error;
+    all = all.concat(data || []);
+    if (!data || data.length < PAGE) break;
+    from += PAGE;
+  }
+  return all;
+}
+
 // ── CARREGAR DADOS ──
 async function carregar(){
   setLoad(true);
@@ -814,8 +828,7 @@ async function carregar(){
     // Carrega preços e vendas em paralelo
     await Promise.all([
       carregarPrecos(),
-      sb.from('vendas').select('*').then(({ data, error }) => {
-        if (error) throw error;
+      buscarTodasVendas().then((data) => {
         todos = (data || []).map(r => {
           const row = {
             'Data': r.data, 'Vendedor': r.vendedor, 'Categoria': r.categoria,
