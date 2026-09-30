@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Museu de Cera RJ</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
@@ -473,26 +474,28 @@ body.modo-restrito .hide-restrito{display:none!important}
 
 </div><!-- /page -->
 <script>
-const SENHA_ACESSO = 'museu2025';
+const SENHA_ACESSO = 'museu2025'; // gate simples para a tela de lançamento (não é login do dashboard)
+const SUPABASE_URL = "https://ykzstcrtildqfiylgnro.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrenN0Y3J0aWxkcWZpeWxnbnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3NDIwNjYsImV4cCI6MjEwNjMxODA2Nn0.j1Yg8zJQetYXLs58gkU-O6aztmv-j8xIsFdnoJeZ0uY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── SISTEMA DE LOGIN ──
-const LOGINS = {
-  'admin':       { senha: 'museu2025',  modo: 'admin' },
-  'museu2026':   { senha: '@museu2026', modo: 'restrito' },
-};
-
-function fazerLogin() {
+async function fazerLogin() {
   const user  = (document.getElementById('dl-user').value || '').trim();
   const pass  = (document.getElementById('dl-pass').value || '').trim();
   const err   = document.getElementById('dl-err');
-  const cred  = LOGINS[user];
-  if (cred && cred.senha === pass) {
+  let ok = false, modo = 'admin';
+  try {
+    const { data, error } = await sb.rpc('verificar_login', { p_login: user, p_senha: pass });
+    if (error) throw error;
+    if (data && data.length && data[0].ok) { ok = true; modo = data[0].modo; }
+  } catch(e) { console.warn('Erro ao verificar login', e); }
+  if (ok) {
     sessionStorage.setItem('mcera_dash_auth', '1');
-    sessionStorage.setItem('mcera_dash_modo', cred.modo);
+    sessionStorage.setItem('mcera_dash_modo', modo);
     document.getElementById('dash-login').style.display = 'none';
     const sub = document.getElementById('hdr-modo');
-    if (sub) sub.textContent = cred.modo === 'restrito' ? 'Museu de Cera RJ — Acesso Restrito' : 'Museu de Cera RJ';
-    if (cred.modo === 'restrito') ativarModoRestrito();
+    if (sub) sub.textContent = modo === 'restrito' ? 'Museu de Cera RJ — Acesso Restrito' : 'Museu de Cera RJ';
+    if (modo === 'restrito') ativarModoRestrito();
     carregar();
   } else {
     err.classList.add('show');
@@ -553,24 +556,6 @@ function fecharPerfModal() {
   document.body.style.overflow = '';
 }
 
-const CODIGO_ALTERACAO = 'museu@gu26';
-
-// Carregar senhas salvas no Sheets (atualiza LOGINS em memória)
-async function carregarSenhas() {
-  try {
-    const url = APPS_SCRIPT_URL + '?acao=carregarSenhas';
-    const res = await fetch(url);
-    const json = await res.json();
-    if (json.status === 'ok' && json.senhas) {
-      Object.entries(json.senhas).forEach(([login, senha]) => {
-        if (LOGINS[login]) LOGINS[login].senha = senha;
-      });
-    }
-  } catch(e) {
-    console.warn('Senhas: usando padrão local', e);
-  }
-}
-
 function abrirAlterarSenha() {
   document.getElementById('ms-codigo').value = '';
   document.getElementById('ms-nova').value = '';
@@ -588,23 +573,19 @@ async function confirmarAlterarSenha() {
   const confirma = document.getElementById('ms-confirma').value;
   const err      = document.getElementById('ms-err');
   err.textContent = '';
-  if (codigo !== CODIGO_ALTERACAO) { err.textContent = 'Código de autorização incorreto.'; return; }
   if (nova.length < 4) { err.textContent = 'A nova senha deve ter pelo menos 4 caracteres.'; return; }
   if (nova !== confirma) { err.textContent = 'As senhas não coincidem.'; return; }
 
-  // Atualizar localmente
-  LOGINS[login].senha = nova;
-
-  // Salvar permanentemente no Sheets
+  // Salvar permanentemente no Supabase (o código é conferido no servidor)
   err.textContent = 'Salvando...';
   try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ acao: 'salvarSenha', login, senha: nova })
-    });
+    const { data, error } = await sb.rpc('alterar_senha', { p_codigo: codigo, p_login: login, p_senha_nova: nova });
+    if (error) throw error;
+    if (!data) { err.textContent = 'Login não encontrado.'; return; }
   } catch(e) {
-    console.warn('Erro ao salvar senha no Sheets:', e);
+    err.textContent = 'Código de autorização incorreto.';
+    console.warn('Erro ao salvar senha no Supabase:', e);
+    return;
   }
 
   fecharAlterarSenha();
@@ -624,9 +605,6 @@ function sair() {
 
 // Verificar sessão ao carregar
 window.addEventListener('DOMContentLoaded', async function() {
-  // Carregar senhas do Sheets antes de qualquer coisa
-  await carregarSenhas();
-
   const auth = sessionStorage.getItem('mcera_dash_auth');
   const modo = sessionStorage.getItem('mcera_dash_modo');
   if (auth === '1') {
@@ -674,11 +652,6 @@ function fecharModalSenha() {
 document.getElementById('modal-senha').addEventListener('click', function(e) {
   if (e.target === this) fecharModalSenha();
 });
-
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5fJmNbX-fUiJkQ15e4jW-kRHqjK5TjhD1bP4RCidaGCBR_w27zLCwRM_aGI3voXeZ/exec";
-// Dados lidos via Apps Script (planilha privada)
-const DADOS_URL  = APPS_SCRIPT_URL + '?acao=getDados';
-const PRECOS_URL = APPS_SCRIPT_URL + '?acao=getPrecos';
 
 Chart.register(ChartDataLabels);
 
@@ -798,23 +771,21 @@ function parseData(d){
   const dt=new Date(d);return isNaN(dt)?null:dt;
 }
 
-// ── CARREGAR PREÇOS DO SHEETS VIA APPS SCRIPT ──
+// ── CARREGAR PREÇOS DO SUPABASE ──
 async function carregarPrecos() {
   try {
-    const res = await fetch(PRECOS_URL);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    if (json.status !== 'ok' || !json.rows || !json.rows.length) return;
-    const rows = json.rows;
+    const { data, error } = await sb.from('precos').select('*');
+    if (error) throw error;
+    if (!data || !data.length) return;
     let atualizados = 0;
-    rows.forEach(r => {
-      const prod = (r['Produto'] || r['produto'] || '').trim();
+    data.forEach(r => {
+      const prod = (r.produto || '').trim();
       if (!prod) return;
-      const aqua  = Number(r['Aqua']  || r['AQUA']  || r['aqua']  || 0);
-      const museu = Number(r['Museu'] || r['MUSEU'] || r['museu'] || 0);
-      const gex   = Number(r['GEX']   || r['gex']   || 0);
-      const mar   = Number(r['MAR']   || r['mar']   || 0);
-      const total = Number(r['Total'] || r['TOTAL'] || r['total'] || (aqua+museu+gex+mar));
+      const aqua  = Number(r.aqua  || 0);
+      const museu = Number(r.museu || 0);
+      const gex   = Number(r.gex   || 0);
+      const mar   = Number(r.mar   || 0);
+      const total = Number(r.total || (aqua+museu+gex+mar));
       PRECOS[prod] = { aqua, museu, gex, mar, total };
       atualizados++;
     });
@@ -825,9 +796,9 @@ async function carregarPrecos() {
       if(v.gex   > 0) TEM_GEX_DYN.push(k);
       if(v.mar   > 0) TEM_MAR_DYN.push(k);
     });
-    console.log(`Preços carregados do Sheets: ${atualizados} produtos`);
+    console.log(`Preços carregados do Supabase: ${atualizados} produtos`);
   } catch(e) {
-    console.warn('Não foi possível carregar preços do Sheets, usando tabela fixa.', e.message);
+    console.warn('Não foi possível carregar preços do Supabase, usando tabela fixa.', e.message);
   }
 }
 
@@ -843,15 +814,19 @@ async function carregar(){
     // Carrega preços e vendas em paralelo
     await Promise.all([
       carregarPrecos(),
-      fetch(DADOS_URL).then(async res => {
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const json = await res.json();
-        if(json.status !== 'ok') throw new Error('Apps Script: '+JSON.stringify(json));
-        todos = (json.rows || []).map(r=>{
-          // Usa Data; se vazia, extrai do Timestamp
-          const dataStr = r['Data'] || (r['Timestamp'] ? r['Timestamp'].substring(0,10) : '');
-          r._data = parseData(dataStr);
-          return r;
+      sb.from('vendas').select('*').then(({ data, error }) => {
+        if (error) throw error;
+        todos = (data || []).map(r => {
+          const row = {
+            'Data': r.data, 'Vendedor': r.vendedor, 'Categoria': r.categoria,
+            'Produto': r.produto, 'Valor Unitário': r.valor_unitario, 'Valor Museu': r.valor_museu,
+            'Quantidade': r.quantidade, 'Total': r.total, 'Canal': r.canal,
+            'PAX Aquário': r.pax_aquario, 'PAX Museu': r.pax_museu, 'PAX GEX': r.pax_gex, 'PAX MAR': r.pax_mar,
+            'Timestamp': r.criado_em
+          };
+          const dataStr = row['Data'] || (row['Timestamp'] ? row['Timestamp'].substring(0,10) : '');
+          row._data = parseData(dataStr);
+          return row;
         }).filter(r=>r._data&&!isNaN(r._data));
       })
     ]);

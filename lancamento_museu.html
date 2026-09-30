@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lançamento de Vendas — Museu de Cera RJ</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -398,10 +399,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 // ── Config ──
-const SHEET_ID        = "1GARcdxPGQC7UlDaXTj3Ga-nyUQAQicg09Fmca5-4n-A";
-const PRECOS_GID      = "2116371882";
-const VENDEDORES_GID  = "1203004653";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5fJmNbX-fUiJkQ15e4jW-kRHqjK5TjhD1bP4RCidaGCBR_w27zLCwRM_aGI3voXeZ/exec";
+const SUPABASE_URL = "https://ykzstcrtildqfiylgnro.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrenN0Y3J0aWxkcWZpeWxnbnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3NDIwNjYsImV4cCI6MjEwNjMxODA2Nn0.j1Yg8zJQetYXLs58gkU-O6aztmv-j8xIsFdnoJeZ0uY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Data ──
 const hoje = new Date();
@@ -592,17 +592,13 @@ function saveVend() { localStorage.setItem('mcera_vend', JSON.stringify(vendedor
 async function carregarVendedores() {
   if (vendedores.length > 0) { renderSelect(); renderLista(); }
   try {
-    const url = APPS_SCRIPT_URL + '?acao=getVendedores';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error('Apps Script erro');
-    const nomesSheets = (json.vendedores || []).filter(n => n.length > 0);
-    if (nomesSheets.length > 0) {
-      // Mescla: mantém status ativo/inativo do local, adiciona novos como ativos
+    const { data, error } = await sb.from('vendedores').select('nome,ativo').order('nome');
+    if (error) throw error;
+    if (data && data.length > 0) {
+      // Mescla: mantém status ativo/inativo do local, adiciona novos conforme o Supabase
       const mapa = {};
       vendedores.forEach(v => { mapa[v.nome] = v.ativo; });
-      vendedores = nomesSheets.map(n => ({ nome: n, ativo: mapa[n] !== undefined ? mapa[n] : true }));
+      vendedores = data.map(v => ({ nome: v.nome, ativo: mapa[v.nome] !== undefined ? mapa[v.nome] : v.ativo }));
       saveVend();
     }
   } catch(e) { console.warn('Vendedores: usando cache local', e.message); }
@@ -650,39 +646,47 @@ function renderLista() {
   });
 }
 
-document.getElementById('v-list').addEventListener('click', function(e) {
+document.getElementById('v-list').addEventListener('click', async function(e) {
   const toggle = e.target.closest('[data-toggle]');
   if (toggle) {
     const i = parseInt(toggle.dataset.toggle);
     vendedores[i].ativo = !vendedores[i].ativo;
-    saveVend(); renderSelect(); renderLista(); return;
+    saveVend(); renderSelect(); renderLista();
+    try { await sb.from('vendedores').update({ ativo: vendedores[i].ativo }).eq('nome', vendedores[i].nome); }
+    catch(e) { console.warn('Não foi possível atualizar vendedor no Supabase', e.message); }
+    return;
   }
   const del = e.target.closest('[data-del]');
   if (del) {
-    vendedores.splice(parseInt(del.dataset.del), 1);
+    const i = parseInt(del.dataset.del);
+    const nome = vendedores[i].nome;
+    vendedores.splice(i, 1);
     saveVend(); renderSelect(); renderLista();
+    try { await sb.from('vendedores').delete().eq('nome', nome); }
+    catch(e) { console.warn('Não foi possível remover vendedor no Supabase', e.message); }
   }
 });
 
-function addVendedor() {
+async function addVendedor() {
   const inp = document.getElementById('m-nome'); const nome = inp.value.trim(); if (!nome) return;
   if (vendedores.some(v => v.nome === nome)) { showToast('Nome já cadastrado'); return; }
   vendedores.push({ nome, ativo: true }); saveVend(); renderSelect(); renderLista();
   inp.value = ''; inp.focus(); showToast(nome + ' adicionado');
+  try { await sb.from('vendedores').insert({ nome, ativo: true }); }
+  catch(e) { console.warn('Não foi possível salvar vendedor no Supabase', e.message); }
 }
 document.getElementById('m-nome').addEventListener('keydown', e => { if (e.key === 'Enter') addVendedor(); });
 
-// ── Preços dinâmicos via Apps Script ──
+// ── Preços dinâmicos via Supabase ──
 async function carregarPrecos() {
   try {
-    const url = APPS_SCRIPT_URL + '?acao=getPrecos';
-    const res = await fetch(url); if (!res.ok) throw new Error('HTTP '+res.status);
-    const json = await res.json(); if (json.status !== 'ok') throw new Error();
-    (json.rows || []).forEach(obj => {
-      const prod=obj['Produto']||''; if (!prod) return;
-      const total=Number(obj['Total']||0);
-      PRECOS[prod]={aqua:Number(obj['Aqua']||0),museu:Number(obj['Museu']||0),gex:Number(obj['GEX']||0),mar:Number(obj['MAR']||0),total};
-      const cat=obj['Categoria']||'';
+    const { data, error } = await sb.from('precos').select('*');
+    if (error) throw error;
+    (data || []).forEach(obj => {
+      const prod=obj.produto||''; if (!prod) return;
+      const total=Number(obj.total||0);
+      PRECOS[prod]={aqua:Number(obj.aqua||0),museu:Number(obj.museu||0),gex:Number(obj.gex||0),mar:Number(obj.mar||0),total};
+      const cat=obj.categoria||'';
       if(cat && produtosPorCat[cat]) {
         const idx = produtosPorCat[cat].findIndex(([,v]) => v.startsWith(prod+'|'));
         const novoLabel = `${prod} · R$ ${total}`;
@@ -690,7 +694,7 @@ async function carregarPrecos() {
         if(idx >= 0) produtosPorCat[cat][idx] = [novoLabel, novoVal];
       }
     });
-    console.log('✅ Preços carregados do Sheets');
+    console.log('✅ Preços carregados do Supabase');
   } catch(e) { console.warn('Preços: usando tabela fixa', e.message); }
 }
 
@@ -700,14 +704,18 @@ async function salvarPax() {
   const paxGex=document.getElementById('f-pax-gex').value, paxMar=document.getElementById('f-pax-mar').value;
   if (!pax&&!paxMuseu&&!paxGex&&!paxMar) { showToast('Preencha ao menos um campo de PAX'); return; }
   const data=document.getElementById('f-data').value;
-  const reg={data,vendedor:'',categoria:'',produto:'',valorUnitario:'',valorMuseu:'',quantidade:'',total:'',canal:'',
-    pax:pax?Number(pax):'',paxMuseu:paxMuseu?Number(paxMuseu):'',paxGex:paxGex?Number(paxGex):'',paxMar:paxMar?Number(paxMar):'',ts:new Date().toISOString()};
+  const reg={
+    data, vendedor:'', categoria:'', produto:'', valor_unitario:0, valor_museu:0, quantidade:0, total:0, canal:'',
+    pax_aquario: pax?Number(pax):null, pax_museu: paxMuseu?Number(paxMuseu):null,
+    pax_gex: paxGex?Number(paxGex):null, pax_mar: paxMar?Number(paxMar):null
+  };
   const btn=document.querySelector('[onclick="salvarPax()"]'); btn.textContent='Salvando...'; btn.disabled=true;
   try {
-    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(reg)});
+    const { error } = await sb.from('vendas').insert(reg);
+    if (error) throw error;
     showToast('✅ PAX do dia salvo!');
     ['f-pax','f-pax-museu','f-pax-gex','f-pax-mar'].forEach(id=>document.getElementById(id).value='');
-  } catch(e) { showToast('Erro ao salvar PAX'); }
+  } catch(e) { showToast('Erro ao salvar PAX'); console.error(e); }
   finally { btn.textContent='Salvar PAX do dia'; btn.disabled=false; }
 }
 
@@ -840,26 +848,19 @@ async function enviarTudo() {
   const btn = document.getElementById('btn-enviar');
   btn.disabled = true; btn.textContent = `Enviando ${fila.length} itens...`;
 
+  const linhas = fila.map(item => ({
+    data: item.data, vendedor: item.vendedor, categoria: item.categoria,
+    produto: item.produto, valor_unitario: item.valorUnitario,
+    valor_museu: item.valorMuseu, quantidade: item.quantidade,
+    total: item.total, canal: item.canal
+  }));
+
   let enviados = 0, erros = 0;
-  for (const item of fila) {
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method:'POST', mode:'no-cors',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          data: item.data, vendedor: item.vendedor, categoria: item.categoria,
-          produto: item.produto, valorUnitario: item.valorUnitario,
-          valorMuseu: item.valorMuseu, quantidade: item.quantidade,
-          total: item.total, canal: item.canal,
-          pax: null, paxMuseu: null, paxGex: null, paxMar: null,
-          ts: item.ts
-        })
-      });
-      enviados++;
-    } catch(e) { erros++; }
-    // Pequena pausa para não sobrecarregar o Apps Script
-    await new Promise(r => setTimeout(r, 300));
-  }
+  try {
+    const { error } = await sb.from('vendas').insert(linhas);
+    if (error) throw error;
+    enviados = linhas.length;
+  } catch(e) { erros = linhas.length; console.error(e); }
 
   if (erros === 0) {
     showToast(`✅ ${enviados} itens enviados com sucesso!`);
