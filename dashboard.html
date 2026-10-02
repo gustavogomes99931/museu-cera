@@ -831,7 +831,7 @@ async function carregar(){
       buscarTodasVendas().then((data) => {
         todos = (data || []).map(r => {
           const row = {
-            'Data': r.data, 'Vendedor': r.vendedor, 'Categoria': r.categoria,
+            'Data': r.data, 'Vendedor': (r.vendedor || '').trim(), 'Categoria': r.categoria,
             'Produto': r.produto, 'Valor Unitário': r.valor_unitario, 'Valor Museu': r.valor_museu,
             'Quantidade': r.quantidade, 'Total': r.total, 'Canal': r.canal,
             'PAX Aquário': r.pax_aquario, 'PAX Museu': r.pax_museu, 'PAX GEX': r.pax_gex, 'PAX MAR': r.pax_mar,

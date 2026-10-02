@@ -849,7 +849,7 @@ async function enviarTudo() {
   btn.disabled = true; btn.textContent = `Enviando ${fila.length} itens...`;
 
   const linhas = fila.map(item => ({
-    data: item.data, vendedor: item.vendedor, categoria: item.categoria,
+    data: item.data, vendedor: (item.vendedor || '').trim(), categoria: item.categoria,
     produto: item.produto, valor_unitario: item.valorUnitario,
     valor_museu: item.valorMuseu, quantidade: item.quantidade,
     total: item.total, canal: item.canal
