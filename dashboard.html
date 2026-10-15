@@ -831,9 +831,9 @@ async function carregar(){
       buscarTodasVendas().then((data) => {
         todos = (data || []).map(r => {
           const row = {
-            'Data': r.data, 'Vendedor': (r.vendedor || '').trim(), 'Categoria': r.categoria,
-            'Produto': r.produto, 'Valor Unitário': r.valor_unitario, 'Valor Museu': r.valor_museu,
-            'Quantidade': r.quantidade, 'Total': r.total, 'Canal': r.canal,
+            'Data': r.data, 'Vendedor': (r.vendedor || '').trim(), 'Categoria': (r.categoria || '').trim(),
+            'Produto': (r.produto || '').trim(), 'Valor Unitário': r.valor_unitario, 'Valor Museu': r.valor_museu,
+            'Quantidade': r.quantidade, 'Total': r.total, 'Canal': (r.canal || '').trim(),
             'PAX Aquário': r.pax_aquario, 'PAX Museu': r.pax_museu, 'PAX GEX': r.pax_gex, 'PAX MAR': r.pax_mar,
             'Timestamp': r.criado_em
           };
@@ -905,7 +905,7 @@ function filtrar(recs,de,ate,vend,canal,cat,atr,tipo){
   return recs.filter(r=>{
     if(r._data<de||r._data>ate)return false;
     if(vend&&r['Vendedor']!==vend)return false;
-    if(canal&&r['Canal']!==canal)return false;
+    if(canal&&String(r['Canal']||'').trim().toUpperCase()!==canal.toUpperCase())return false;
     if(cat&&r['Categoria']!==cat)return false;
     if(atr&&r['Produto']!==atr)return false;
     if(tipo){
@@ -1007,12 +1007,15 @@ function renderKPIs(at, a1Pax, tipo) {
   const vAt = v(at), vA1 = v(a1), qAt = q(at), qA1 = q(a1);
   const tAt = qAt > 0 ? vAt / qAt : 0;
   const tA1 = qA1 > 0 ? vA1 / qA1 : 0;
+  // PAX Museu = só ingressos de produtos que incluem Museu (mesma regra da Performance e do Ranking)
+  const qMuseu = s => q(s.filter(r => TEM_MUSEU.includes(r['Produto'])));
+  const qMuseuAt = qMuseu(at), qMuseuA1 = qMuseu(a1);
 
   kpiSet('k-vend', fmt(vAt),  'k-vend-a1', vA1 > 0 ? fmt(vA1)  : null, 'k-vend-v', vA1 > 0 && vAt > 0 ? ((vAt-vA1)/vA1)*100 : null);
-  kpiSet('k-ing',  fmtN(qAt), 'k-ing-a1',  qA1 > 0 ? fmtN(qA1) : null, 'k-ing-v',  qA1 > 0 && qAt > 0 ? ((qAt-qA1)/qA1)*100 : null);
+  kpiSet('k-ing',  fmtN(qMuseuAt), 'k-ing-a1',  qMuseuA1 > 0 ? fmtN(qMuseuA1) : null, 'k-ing-v',  qMuseuA1 > 0 && qMuseuAt > 0 ? ((qMuseuAt-qMuseuA1)/qMuseuA1)*100 : null);
   kpiSet('k-tkt',  fmt(tAt),  'k-tkt-a1',  tA1 > 0 ? fmt(tA1)  : null, 'k-tkt-v',  tA1 > 0 && tAt > 0 ? ((tAt-tA1)/tA1)*100 : null);
   if(!vA1){ setEl('k-vend-a1',''); const e=document.getElementById('k-vend-v'); if(e){e.className='kpi-var ne';e.textContent='';} }
-  if(!qA1){ setEl('k-ing-a1', ''); const e=document.getElementById('k-ing-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
+  if(!qMuseuA1){ setEl('k-ing-a1', ''); const e=document.getElementById('k-ing-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
   if(!tA1){ setEl('k-tkt-a1', ''); const e=document.getElementById('k-tkt-v');  if(e){e.className='kpi-var ne';e.textContent='';} }
 
   // PAX Aquário — pega o MAIOR valor lançado por dia (não soma todos os registros do dia)
